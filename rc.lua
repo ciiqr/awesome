@@ -30,8 +30,6 @@
 -- - Demaximizing in the reverse direction goes to the floating layout even though	--
 --		I do not have that layout in my layouts. Unsure of exact reason, maybe it	--
 --		can't figure out what layout to switch to.									--
--- - Awesome api does not show the proper cursor colour for run prompt (fine wih	--
---		lua prompt). The addition of a single parameter should fix this.			--
 -- - Modules like ColorDisplayWidget do not create new instaces if required again.	--
 --------------------------------------------------------------------------------------
 -- Required:																		--
@@ -180,7 +178,6 @@ for s = 1, screen.count() do
 	--Left Widgets
 	if s == 1 then left_layout:add(wvWidgets:getMainMenuButton()) end
 	left_layout:add(wvWidgets:getTagsList(s))
-	-- left_layout:add(wvWidgets:getPromptBoxes():addPrompt(s))
 
 	--Middle Widget
 	middle_layout:add(wvWidgets:getIP())
@@ -336,10 +333,6 @@ globalKeys = awful.util.table.join(
 	awful.key({SUPER}, "w", function() wvWidgets.mainMenu:show({coords = {x = 0, y = 0}}) end),
 	awful.key({SUPER}, "p", function() awful.util.spawn_with_shell(string.format(COMMAND_LAUNCHER, screen[mouse.screen].workarea.y)) end),
 	awful.key({SUPER}, "o", function() awful.util.spawn_with_shell(string.format(COMMAND_FILE_OPENER, screen[mouse.screen].workarea.y)) end),
-
-	--Prompts
-	awful.key({SUPER}, "r", function() wvWidgets.promptBox:runPrompt() end),
-	awful.key({SUPER}, "x", function() wvWidgets.promptBox:luaPrompt() end),
 
 	--Programs
 	-- Terminals
