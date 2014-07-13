@@ -36,7 +36,7 @@ COMMAND_FILE_OPENER = "xdg-open \"$(locate \"\" | dmenu -y %s -i -p Open -l 20 -
 COMMAND_TASK_MANAGER_MEM = "sudo htop -s PERCENT_MEM"
 COMMAND_TASK_MANAGER_CPU = "sudo htop -s PERCENT_CPU"
 PERSONAL_BIN = HOME_DIR.."/.local/bin/"
-COMMAND_LAUNCHER = "/home/william/Programming/Python/Projects/QuickLaunch/".."QuickLaunch.py" -- TODO: Change back COMMAND_LAUNCHER = PERSONAL_BIN.."quick-launch"
+COMMAND_LAUNCHER = "/home/william/Programming/Python/Projects/QuickLaunch/".."QuickLaunch.py -y %s" -- TODO: Change back COMMAND_LAUNCHER = PERSONAL_BIN.."quick-launch"
 
 STARTUP_PROGRAMS = {
 	"sudo seaf-cli start",		-- Seafile Files Syncer (Root)
@@ -57,7 +57,7 @@ STARTUP_PROGRAMS = {
 
 	-- "system-config-printer-applet", -- Printer Applet
 	
-	-- "seafile-applet",		-- Seafile Files Syncer
+	"seafile-applet",		-- Seafile Files Syncer
 	"redshiftgui --min",	-- Orange Screen at Night
 	"nm-applet"				-- Wireless
 
