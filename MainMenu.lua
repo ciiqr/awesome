@@ -1,6 +1,6 @@
 local powerMenu =
 {
-	{"Sleep",  putToSleep},
+	-- {"Sleep",  putToSleep},
 	{"Hybrid", "systemctl hybrid-sleep"},
 	{"Hibernate", "sudo systemctl hibernate"},
 	{"Logout", awesome.quit},
