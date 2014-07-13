@@ -334,8 +334,8 @@ globalKeys = awful.util.table.join(
 
 	--Popups
 	awful.key({SUPER}, "w", function() wvWidgets.mainMenu:show({coords = {x = 0, y = 0}}) end),
-	awful.key({SUPER}, "p", function() awful.util.spawn_with_shell(COMMAND_LAUNCHER) end),
-	awful.key({SUPER}, "o", function() awful.util.spawn_with_shell(string.format(COMMAND_FILE_OPENER, ternary(tWibox[mouse.screen].visible, tWibox[mouse.screen].height, "0"))) end),
+	awful.key({SUPER}, "p", function() awful.util.spawn_with_shell(string.format(COMMAND_LAUNCHER, screen[mouse.screen].workarea.y)) end),
+	awful.key({SUPER}, "o", function() awful.util.spawn_with_shell(string.format(COMMAND_FILE_OPENER, screen[mouse.screen].workarea.y)) end),
 
 	--Prompts
 	awful.key({SUPER}, "r", function() wvWidgets.promptBox:runPrompt() end),
