@@ -675,10 +675,13 @@ awful.rules.rules = {
 			border_width = 0,
 			callback=  function(c)
 				-- Change Size of Normal Window Only
-				if not c.type == "dialog" then
+				if c.type == "normal" then
+					existingDimens = c:geometry()
+					screenDimens = screen[mouse.screen].workarea
+					
 					c:geometry({
-						height = 750,
-						width = 302
+						x = screenDimens.width - existingDimens.width,
+						y = screenDimens.y
 					})
 				end
 			end
