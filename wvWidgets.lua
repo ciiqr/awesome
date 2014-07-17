@@ -136,7 +136,6 @@ end
 function wvWidgets:getTextClock()
 	self.textClock = awful.widget.textclock('  <span foreground="#94738c">%A, %B %d</span>  <span foreground="#ecac13">%I:%M %p</span>  ', 10)
 	-- Add Calendar
-	-- TODO: Figure the nill problem
 	require("cal").register(self.textClock, '<span weight="bold" foreground="'..(beautiful.taglist_fg_focus or beautiful.fg_focus or "")..'" underline="single">%s</span>')
 	return self.textClock
 end
