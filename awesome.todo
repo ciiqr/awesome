@@ -103,6 +103,10 @@ end
 
 	-- Awesome
 	function toggleClient(c)
+	
+-- Prevent windows moving/glitching with client side window controls (unless the window is floating)
+-- Hidable system tray & general widgets
+	-- There should be a way to remove the tray widget & readd it later (but can I re-add it at the proper index? maybe replace it with a widget I can identify OR have a wrapper (layout or whatever))
 
 - Quake popups shoulf be above floating
 ? Specify size for role=GtkFileChooserDialog & similar windows
