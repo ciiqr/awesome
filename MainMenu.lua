@@ -38,7 +38,8 @@ local hardwareMenu =
 	{"Wifi",		PERSONAL_BIN.."toggleWifi.py"},
 	{"Graphics",	PERSONAL_BIN.."toggleGraphics.py"},
 	{"Bluetooth",	PERSONAL_BIN.."toggleBluetooth.py"},
-	{"Mouse Keys",	PERSONAL_BIN.."toggleMouseKeys.py"}
+	{"Mouse Keys",	PERSONAL_BIN.."toggleMouseKeys.py"},
+	{"Notifications",	toggleNaughtyNotifications},
 }
 local mainMenu = awful.menu(
 {

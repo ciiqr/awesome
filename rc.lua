@@ -717,7 +717,35 @@ awful.rules.rules = {
 			class = "Plugin-container"
 		},
 		properties = {
-			fullscreen = true
+			callback=function(c) c.fullscreen = true end
+		}
+	}
+	,{
+		rule = {
+			class = "Vmware"
+		},
+		properties = {
+			tag = tags[mouse.screen][4]
+		}
+	}
+	,{
+		rule = {
+			role = "GtkFileChooserDialog"
+		},
+		properties = {
+			callback=  function(c)
+				-- Change Size of Normal Window Only
+				-- if c.type == "floating" then
+					-- existingDimens = c:geometry()
+					screenDimens = screen[mouse.screen].workarea
+					local height = screenDimens.height * 0.75
+					c:geometry({
+						y = (screenDimens.height - height) / 2,
+						width = screenDimens.width * 0.5,
+						height = height
+					})
+				-- end
+			end
 		}
 	}
 	--,{

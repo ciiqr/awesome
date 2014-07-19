@@ -338,6 +338,26 @@ function debug_subl(object, recursion)
 	return debug_editor(object, recursion, "subl3 -n")
 end
 
+-- This is a wrapper function which passes a boolean to it's first parameter, it then inverts the boolean for the next time it is called
+-- If it is given a second parameter, this parameter is the starting boolean (default is true)
+function toggleFuncState(functionToToggle, state)
+	local state = state or true
+	return function()
+		functionToToggle(state)
+		state = not state
+	end
+end
+
+toggleNaughtyNotifications = toggleFuncState(function(enabled)
+	if enabled then -- Disable Naughty
+		wvprint("Naughty Suspended", 1)
+		naughty.suspend()
+	else -- Enable Naughty
+		naughty.resume()
+		wvprint("Naughty Resumed", 1)
+	end
+end)
+
 -- System --
 ------------
 -- Screen --
