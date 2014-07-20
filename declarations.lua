@@ -9,11 +9,10 @@ THEME_PATH = CONFIG_DIR..THEME_NAME.."/theme.lua"
 IS_LAPTOP = true
 
 -- Programs
-TERMINAL="xterm -rv"
+TERMINAL="xterm"
 TERMINAL_EXEC=TERMINAL.." -e "
 FILE_MANAGER="spacefm"
 EDITOR="subl3"
-EDITOR_CMD=TERMINAL_EXEC..EDITOR
 
 --Keys
 SUPER="Mod4"

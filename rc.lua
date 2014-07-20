@@ -638,13 +638,13 @@ awful.rules.rules = {
 
 				if clientName then
 					-- Determine Tag
-					if clientName:find("%(QuickLaunch%)") or clientName:find("%(GtkNote%)") then
+					if clientName:find("%(QuickLaunch%)") or clientName:find("%(Dame%)") then
 						targetTag = tags[clientScreen][2]
 						
 					elseif clientName:find("%(Random%)") then
 						targetTag = tags[clientScreen][3]
 						
-					elseif clientName:find("%(GtkNote, Testing%)") then
+					elseif clientName:find("%(Dame, Testing%)") then
 						targetTag = tags[clientScreen][2]
 						
 					-- elseif clientName:find("%(Website%)") then
