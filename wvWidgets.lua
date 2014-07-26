@@ -189,8 +189,6 @@ function wvWidgets:getLayoutBox(screen)
 	self.layoutBox:buttons(awful.util.table.join(
 		awful.button({}, 1, function() goToLayout(1) end)
 		,awful.button({}, 3, function() goToLayout(-1) end)
-		-- ,awful.button({}, 4, function() goToLayout(1) end)
-		-- ,awful.button({}, 5, function() goToLayout(-1) end)
 	))
 
 	return self.layoutBox
