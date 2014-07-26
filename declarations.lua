@@ -5,6 +5,8 @@ CONFIG_DIR = HOME_DIR.."/.config/awesome/"
 THEME_NAME = "theme"
 THEME_PATH = CONFIG_DIR..THEME_NAME.."/theme.lua"
 
+DEBUG = true
+
 -- Device
 IS_LAPTOP = true
 

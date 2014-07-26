@@ -36,18 +36,6 @@
 -- xterm, sublime text(subl3), systemd(systemctl), scrot, import, python2, xdg-open --
 --------------------------------------------------------------------------------------
 
--- Configuration Time --
-------------------------
--- function millis()
--- 	socket = socket or require("socket")
--- 	return socket.gettime() * 1000 --os.time()
--- end
--- function printEnd()
--- 	wvprint("Configure Time: "..os.difftime(millis(), START_TIME).."ms", 4)
--- end
--- START_TIME = millis()
-DEBUG = true
-
 -- Include --
 -------------
 -- Config
@@ -66,62 +54,31 @@ naughty		= require("naughty")
 if DEBUG then
 inspect		= require("inspect")
 end
--- revelation	= require("revelation"); revelation.init()
 quake		= require("quake")
--- xrandr		= require("utilities.xrandr")
-			  -- TODO: Re-decide which things shoudl really have been included in lua
-			  -- require("utilities.lua")
-			  -- TODO: Re-decide which things shoudl really have been included in awesome
-			  -- require("utilities.awesome")
-			  require("utilities.config")
+xrandr		= require("utils.xrandr")
+			  -- TODO: Re-decide which things should really have been included in lua
+			  -- require("utils.lua")
+			  -- TODO: Re-decide which things should really have been included in awesome
+			  require("utils.awesome")
+			  require("utils.config")
 -- Beautiful Theme
 beautiful.init(THEME_PATH)
-
--- Errors --
-------------
--- TODO: Move to function setupErrorDisplaying or something
--- Startup
-if awesome.startup_errors then
-	naughty.notify({preset = naughty.config.presets.critical, title = "Errors Occured During Startup!", text = awesome.startup_errors})
-end
--- Runtime
-do
-	local in_error = false
-	awesome.connect_signal("debug::error", 
-	function(err)
-		if in_error then return end -- Prevent Endless Error Loop
-		in_error = true
-		naughty.notify({ preset = naughty.config.presets.critical, title = "Errors Occurred", text = err })
-		in_error = false
-	end)
-end
-
--- Hooking --
--------------
--- disable startup-notification globally
-local oldspawn = awful.util.spawn
-awful.util.spawn = function (s)
-  oldspawn(s, false)
-end
 
 -- Variables --
 ---------------
 --Model
-layouts=nil
-tags={}
-local globalKeys
-local clientKeys
-local clientButtons
+layouts=nil -- Global, Required
+local globalKeys -- Setup
+local clientKeys -- Setup
+local clientButtons -- Setup
 --Visual
-tWibox={}
-bWibox={}
-infoWibox={}
-local name_callback = {}
+tWibox={} -- Persistent
+bWibox={} -- Persistent
+infoWibox={} -- Persistent
+local name_callback = {}  -- Persistent
 --Widgets
 local wvWidgets = require("wvWidgets")
-local content_box
 --Misc
-local client_list
 --PopupTerminal
 local quake_terminal = {}
 --Popup htop CPU
@@ -157,7 +114,7 @@ for s = 1, screen.count() do
 	--Tags
 	local fLay = layouts[2]
 	local sLay = layouts[1]
-	tags[s] = awful.tag({"➊ Browsing","➋ ❴❵","➌ Learn","➍ iOS","➎ Site","➏ School","➐ ⚙","➑ Ent.","➒ ♫"}, s,
+	awful.tag({"➊ Browsing","➋ ❴❵","➌ Learn","➍ iOS","➎ Site","➏ School","➐ ⚙","➑ Ent.","➒ ♫"}, s,
 						{sLay, fLay, fLay, fLay, fLay, fLay, fLay, fLay, fLay}) --🌐 --{} ⌥
 
 
@@ -168,11 +125,6 @@ for s = 1, screen.count() do
 	quake_htop_mem_terminal[s] = quake({terminal=TERMINAL, argname="-name %s -e "..COMMAND_TASK_MANAGER_MEM, name="QUAKE_COMMAND_TASK_MANAGER_MEM", height=0.75, screen=s, width=0.5, horiz="left"})
 	quake_leafpad_quick_note[s] = quake({terminal = "leafpad", argname="--name=%s", name="LEAFPAD_QUICK_NOTE", height = 0.35, screen = s, width = 0.5})
 
-	-- 
-
-	-- Setup screens for Maximizing and restoring the previous layout
-	-- TODO: Find
-	-- initAddScreenMaximizeLayout(s)
 
 	--Wiboxes w/ Widgets
 	--Left Widgets
@@ -183,10 +135,6 @@ for s = 1, screen.count() do
 	middle_layout:add(wvWidgets:getIP())
 
 	--Right Widgets
-
-	-- Attempt to display a clients preview
-	-- content_box = wibox.widget.imagebox(beautiful.awesome_icon)
-	-- right_layout:add(content_box)
 
 	-- Colour Tester	
 	-- right_layout:add(require("ColorDisplayWidget"):init({"6e0e1f", "46088c", "007eff"}))
@@ -274,30 +222,21 @@ for s = 1, screen.count() do
 	end)
 end
 
---Mouse Bindings (Menu on Desktop)
-root.buttons(awful.util.table.join(
-	awful.button({}, 1, function() wvWidgets.mainMenu:hide() end)
-	-- ,awful.button({}, 3, function() wvWidgets.mainMenu:hide(); wvWidgets.mainMenu:show() end)
-))
-
 --Global Key Bindings
 globalKeys = awful.util.table.join(
 	--Switch Between Tags
 	awful.key({SUPER}, "Escape", awful.tag.history.restore),
 	awful.key({ALT, CONTROL}, "Left", awful.tag.viewprev),
 	awful.key({ALT, CONTROL}, "Right", awful.tag.viewnext),
-	awful.key({ALT, CONTROL}, "Down", function() viewOnlyTag(9) end),
-	awful.key({ALT, CONTROL}, "Up", function() viewOnlyTag(1) end),
+	awful.key({ALT, CONTROL}, "Up", switchToFirstTag),
+	awful.key({ALT, CONTROL}, "Down", switchToLastTag),
 
 	--Toggle Bars
 	awful.key({SUPER}, "[", function() toggleWibox(tWibox); toggleWibox(bWibox) end),
 	awful.key({SUPER}, "]", function() toggleWibox(bWibox) end),
 	awful.key({SUPER}, "c", function() toggleWibox(infoWibox) end),
 
-	-- Toggle System Tray
-	-- awful.key({SUPER}, "s", function() wvWidgets.sysTray.hidden = not wvWidgets.sysTray.hidden end),
-
-	--Modify Layout
+	--Modify Layout (NOTE: never use)
 	awful.key({SUPER, SHIFT}, "h", function() awful.tag.incnmaster(1) end),
 	awful.key({SUPER, SHIFT}, "l", function() awful.tag.incnmaster(-1) end),
 
@@ -306,16 +245,40 @@ globalKeys = awful.util.table.join(
 	awful.key({SUPER, SHIFT}, "space", function() goToLayout(-1) end),
 
 	--Swtich Window
-	awful.key({SUPER}, "Tab", function() switchWindow(1) end),
-	awful.key({SUPER, SHIFT}, "Tab", function() switchWindow(-1) end),
+	awful.key({SUPER}, "Tab", function() switchClient(1) end),
+	awful.key({SUPER, SHIFT}, "Tab", function() switchClient(-1) end),
 	-- Alternatively With Page Up/Down
-	awful.key({SUPER}, "Next", function() switchWindow(1) end),
-	awful.key({SUPER}, "Prior", function() switchWindow(-1) end),
-
-	-- Add Tags
-	-- awful.key({SUPER}, "y", function() awful.tag.add("Tag "..#tags) end),
+	awful.key({SUPER}, "Next", function() switchClient(1) end),
+	awful.key({SUPER}, "Prior", function() switchClient(-1) end),
 	
-	--Change Position
+	--ClientRestore
+	awful.key({SUPER, CONTROL}, "Up", restoreClient),
+
+	--Maximize
+	awful.key({SUPER}, "Up", switchToMaximizedLayout),
+	--Revert Maximize
+	awful.key({SUPER}, "Down", revertFromMaximizedLayout),
+	
+	--Sleep
+	awful.key({}, "XF86Sleep", putToSleep),
+
+	-- Add Tag
+	awful.key({SUPER}, "y", function()
+		-- Add Tag
+		newTag = awful.tag.add("Tag "..(#awful.tag.gettags(mouse.screen)) + 1)
+		-- Switch to it
+		awful.tag.viewonly(newTag)
+	end),
+	
+	-- Remove Tags
+	awful.key({SUPER, SHIFT}, "y", function()
+		local selectedTags = awful.tag.selectedlist(mouse.screen)
+		for tag, _ in pairs(selectedTags) do
+			awful.tag.delete(_, tag)
+		end
+	end),
+	
+	--Change Position (NOTE: never use)
 	awful.key({SUPER}, "Left",	function() awful.client.swap.bydirection("left") end), 
 	awful.key({SUPER}, "Right",function() awful.client.swap.bydirection("right") end),
 	-- awful.key({SUPER, CONTROL}, "Up",	function() awful.client.swap.bydirection("up") end), 
@@ -333,23 +296,26 @@ globalKeys = awful.util.table.join(
 	awful.key({SUPER}, "w", function() wvWidgets.mainMenu:show({coords = {x = 0, y = 0}}) end),
 	awful.key({SUPER}, "p", function() awful.util.spawn_with_shell(string.format(COMMAND_LAUNCHER, screen[mouse.screen].workarea.y)) end),
 	awful.key({SUPER}, "o", function() awful.util.spawn_with_shell(string.format(COMMAND_FILE_OPENER, screen[mouse.screen].workarea.y)) end),
-
-	--Programs
-	-- Terminals
-	awful.key({SUPER}, "t", function() awful.util.spawn(TERMINAL) end),
+	-- Terminal
 	awful.key({SUPER, SHIFT}, "t", function() quake_terminal[mouse.screen]:toggle() end),
 	-- Quick Note
 	awful.key({SUPER, SHIFT}, "n", function() quake_leafpad_quick_note[mouse.screen]:toggle() end),
 	-- Htop
 	awful.key({SUPER, SHIFT}, "c", function() quake_htop_cpu_terminal[mouse.screen]:toggle() end),
 	awful.key({SUPER, SHIFT}, "m", function() quake_htop_mem_terminal[mouse.screen]:toggle() end),
+
+	--Programs
+	-- Terminal
+	awful.key({SUPER}, "t", function() awful.util.spawn(TERMINAL) end),
+	
 	-- File Manager
 	awful.key({SUPER}, "Return", function() awful.util.spawn(FILE_MANAGER) end),
 	awful.key({SUPER, SHIFT}, "Return", function() awful.util.spawn("sudo "..FILE_MANAGER) end),
 
 	--Awesome
 	awful.key({SUPER, CONTROL}, "r", awesome.restart),
-	awful.key({SUPER, SHIFT}, "q", awesome.quit),
+	-- NOTE: never use
+	-- awful.key({SUPER, SHIFT}, "q", awesome.quit),
 
 	--System
 	--Volume
@@ -370,27 +336,11 @@ globalKeys = awful.util.table.join(
 	--PrintScreen
 	awful.key({}, "Print", function() awful.util.spawn_with_shell(COMMAND_SCREEN_SHOT) end), -- ; wvprint("Scrot...", 1)
 
-	-- Snip Screen (Select Area)
-	-- TODO: just need to find a way to get it to input the date / time
+	--PrintScreen (Select Area)
 	awful.key({SUPER}, "Print", function() awful.util.spawn_with_shell(os.date(COMMAND_SCREEN_SHOT_SELECT)) end), -- ; wvprint("Snip...", 1)
 
-	--Expose
-	-- awful.key({SUPER}, "e", revelation),
-
-	--ClientRestore
-	awful.key({SUPER, CONTROL}, "Up", restoreClient),
-
-	--Maximize
-	awful.key({SUPER}, "Up", maximizeLayout),
-
-	--Revert Maximize
-	awful.key({SUPER}, "Down", revertMaximizeLayout),
-
 	--Cycle Displays
-	awful.key({SUPER}, "F11", function() xrandr:cycle() end),
-
-	--Sleep
-	awful.key({}, "XF86Sleep", putToSleep)
+	awful.key({SUPER}, "F11", xrandr)
 
 		--Switch Focus
 	-- awful.key({SUPER}, "j",
@@ -429,11 +379,11 @@ globalKeys = awful.util.table.join(
 )
 --Tag Keys
 -- Uses keycodes to make it works on any keyboard layout
-local numberOfTags = #(tags[mouse.screen])
+local numberOfTags = #(awful.tag.gettags(mouse.screen))
 for i = 1, numberOfTags do
 	local iKey = "#"..(i + numberOfTags)
 	globalKeys = awful.util.table.join(globalKeys,
-		awful.key({ALT, CONTROL},		iKey, function() viewOnlyTag(i) end),
+		awful.key({ALT, CONTROL},		iKey, function() switchToTag(i) end),
 		awful.key({SUPER, SHIFT},		iKey, function() toggleTag(i) end),
 		awful.key({SUPER, ALT},			iKey, function() moveClientToTagAndFollow(i) end),
 		awful.key({SUPER, CONTROL, ALT},iKey, function() toggleClientTag(i) end)) -- TODO: Change to Control, Alt Shift to be more like mod shift for toggleing a tag visibility
@@ -448,19 +398,22 @@ clientkeys = awful.util.table.join(
 	-- Move Between Tags
 	awful.key({SUPER, ALT}, "Left", moveClientLeftAndFollow),
 	awful.key({SUPER, ALT}, "Right", moveClientRightAndFollow),
-	awful.key({SUPER, ALT}, "Up", function() moveClientToTagAndFollow(1) end),
-	awful.key({SUPER, ALT}, "Down", function() moveClientToTagAndFollow(9) end),
+	awful.key({SUPER, ALT}, "Up", moveClientToFirstTagAndFollow),
+	awful.key({SUPER, ALT}, "Down", moveClientToLastTagAndFollow),
 	--Kill
 	awful.key({SUPER}, "q", function(c) c:kill() end),
 
 	--Fullscreen
-	awful.key({SUPER}, "f", function(c) c.fullscreen = not c.fullscreen end),
+	awful.key({SUPER}, "f", toggleClientFullscreen),
+	
+	-- Multi Fullscreen
+	awful.key({SUPER, SHIFT}, "f", toggleClientMultiFullscreen),
 
 	--Minimize
 	awful.key({SUPER, CONTROL}, "Down", minimizeClient),
 
 	--Toggle Titlebar
-	awful.key({SUPER, ALT}, "[", toggleTitleBar)
+	awful.key({SUPER, ALT}, "[", toggleClientTitlebar)
 
 	--Debug Info
 	,awful.key({SUPER}, "F12", debug)
@@ -473,22 +426,65 @@ clientkeys = awful.util.table.join(
 	--,awful.key({SUPER}, "Insert", function(c) c.ontop = not c.ontop end) --Toggle OnTop
 
 	,awful.key({SUPER}, "g", function(c)
-	-- 	-- content_box:set_image(beautiful.arch_icon)
-		-- content_box:set_image(gears.surface.load(c.content))
+		-- Window Info
+		wvprint("size_hints: "..inspect(c.size_hints))
+		
+		-- Object Info
+		wvprint(inspect(widgets, 5))
+		
+		-- Root Object Info
+		-- wvprint(inspect(root, 4))
+		-- for prop,val in pairs(root) do
+		-- 	wvprint(prop .. inspect(val(), 4))
+		-- end
+		
+		-- DBus
+		
+		-- dbus.connect_signal("org.freedesktop.NetworkManager.Device.Wireless.PropertiesChanged", function (body, bodyMarkup, iconStatic) wvprint("Got DBUS Notification!!!") end)
+		-- dbus.request_name("session", "org.freedesktop.NetworkManager.Device.Wireless.PropertiesChanged")
 
-	-- 	wvprint(content_box._image)
-		wvprint(tostring(c.content))
+		-- dbus.request_name("system", "org.freedesktop.NetworkManager.Device.Wireless")
+		-- dbus.add_match("system", "interface='org.freedesktop.NetworkManager.Device.Wireless',member='PropertiesChanged'")
+		-- dbus.connect_signal("org.freedesktop.NetworkManager.Device.Wireless", function(first, property, ...)
+		-- 	ipAddress = property["Ip4Adress"]
+		-- 	if ipAddress then
+		-- 		wvprint(ipAddress)
+		-- 	end
+		-- 	-- wvprint(inspect(first, 3))
+		-- 	-- wvprint(inspect(property, 3))
+		-- end)
 
-	-- 	-- content_box:set_image(c.content)
-	-- 	-- content_box:set_image(nil)
+		-- dbus.request_name("system", "org.freedesktop.DBus.Properties")
+		-- dbus.add_match("system", "interface='org.freedesktop.DBus.Properties',member='GetAll',string='org.freedesktop.NetworkManager.Device.Wireless")
+		-- dbus.connect_signal("org.freedesktop.DBus.Properties", function(first, property, third, fourth, fifth, ...)
+		-- 	wvprint("There is a Dog!")
+		-- 	-- ipAddress = property["Ip4Adress"]
+		-- 	if ipAddress then
+		-- 		wvprint(ipAddress)
+		-- 	end
+		-- 	-- wvprint(inspect(first, 3))
+		-- 	wvprint(inspect(property, 3))
+		-- 	wvprint(inspect(third, 3))
+		-- 	wvprint(inspect(fourth, 3))
+		-- 	wvprint(inspect(fifth, 3))
+		-- end)
+		-- 
+
+		-- Working
+		-- dbus.request_name("system", "org.freedesktop.NetworkManager")
+		-- dbus.add_match("system", "interface='org.freedesktop.NetworkManager',member='PropertiesChanged'")
+		-- dbus.connect_signal("org.freedesktop.NetworkManager", function(first, ...)
+		-- 	wvprint("FFS, It Worked!!")
+		-- 	debug_leaf(first)
+		-- end)
 	end)
 )
 --Buttons
 clientButtons = awful.util.table.join(
 	awful.button({}, 1, function(c) client.focus = c; c:raise() end),-- Click Focuses & Raises
 	awful.button({SUPER}, 1, awful.mouse.client.move),				 -- Super + Left Moves
-	awful.button({SUPER}, 3, awful.mouse.client.resize))			 -- Super + Right Resizes
-
+	awful.button({SUPER}, 3, awful.mouse.client.resize)				 -- Super + Right Resizes
+)
 
 --Rules
 awful.rules.rules = {
@@ -629,7 +625,7 @@ awful.rules.rules = {
 			}
 		},
 		properties = {
-			switchtotag = true -- tag = tags[1][3], 
+			switchtotag = true
 			,callback = function(c)
 				local targetTag = nil
 				-- Client Info
@@ -637,24 +633,27 @@ awful.rules.rules = {
 				local clientName = c.name
 
 				if clientName then
+					-- Get Tags
+					local tags = awful.tag.gettags(clientScreen)
+					
 					-- Determine Tag
 					if clientName:find("%(QuickLaunch%)") or clientName:find("%(Dame%)") then
-						targetTag = tags[clientScreen][2]
+						targetTag = tags[2]
 						
 					elseif clientName:find("%(Random%)") then
-						targetTag = tags[clientScreen][3]
+						targetTag = tags[3]
 						
 					elseif clientName:find("%(Dame, Testing%)") then
-						targetTag = tags[clientScreen][2]
+						targetTag = tags[2]
 						
 					-- elseif clientName:find("%(Website%)") then
-					-- 	targetTag = tags[clientScreen][5]
+					-- 	targetTag = tags[5]
 
 					-- elseif clientName:find("%(School%)") then
-					-- 	targetTag = tags[clientScreen][6]
+					-- 	targetTag = tags[6]
 
 					elseif clientName:find("%(.awesome%)") then
-						targetTag = tags[clientScreen][7]
+						targetTag = tags[7]
 
 					end
 
@@ -725,7 +724,7 @@ awful.rules.rules = {
 			class = "Vmware"
 		},
 		properties = {
-			tag = tags[mouse.screen][4]
+			tag = awful.tag.gettags(mouse.screen)[4]
 		}
 	}
 	,{
@@ -753,17 +752,9 @@ awful.rules.rules = {
 	--		class = "Eclipse"
 	--	},
 	--	properties = {
-	--		tag = tags[1][2]
+	--		tag = awful.tag.gettags[1][2]
 	--	}
 	--}
-	--,{
-	-- 	rule = {
-	-- 		role = "browser"
-	-- 	},
-	-- 	properties = {
-	-- 		tag = tags[1][1]
-	-- 	}
-	-- }
 }
 
 --Signals
@@ -780,11 +771,8 @@ end
 
 -- End Configuring --
 ---------------------
--- Doesnt Account for compilation (Unless compiled and executed line by line, which i don't think it is)
--- printEnd()
 -- Move Mouse
--- TODO: Readd
--- move_mouse((100), (100))
+moveMouse(100, 100)
 
 -- Cleanup Variables --
 -----------------------
@@ -797,42 +785,3 @@ clientKeys = nil
 clientButtons = nil
 START_TIME = nil
 printEnd = nil
-
-
--- dbus.connect_signal("org.freedesktop.NetworkManager.Device.Wireless.PropertiesChanged", function (body, bodyMarkup, iconStatic) wvprint("Got DBUS Notification!!!") end)
--- dbus.request_name("session", "org.freedesktop.NetworkManager.Device.Wireless.PropertiesChanged")
-
--- dbus.request_name("system", "org.freedesktop.NetworkManager.Device.Wireless")
--- dbus.add_match("system", "interface='org.freedesktop.NetworkManager.Device.Wireless',member='PropertiesChanged'")
--- dbus.connect_signal("org.freedesktop.NetworkManager.Device.Wireless", function(first, property, ...)
--- 	ipAddress = property["Ip4Adress"]
--- 	if ipAddress then
--- 		wvprint(ipAddress)
--- 	end
--- 	-- wvprint(inspect(first, 3))
--- 	-- wvprint(inspect(property, 3))
--- end)
-
--- dbus.request_name("system", "org.freedesktop.DBus.Properties")
--- dbus.add_match("system", "interface='org.freedesktop.DBus.Properties',member='GetAll',string='org.freedesktop.NetworkManager.Device.Wireless")
--- dbus.connect_signal("org.freedesktop.DBus.Properties", function(first, property, third, fourth, fifth, ...)
--- 	wvprint("There is a Dog!")
--- 	-- ipAddress = property["Ip4Adress"]
--- 	if ipAddress then
--- 		wvprint(ipAddress)
--- 	end
--- 	-- wvprint(inspect(first, 3))
--- 	wvprint(inspect(property, 3))
--- 	wvprint(inspect(third, 3))
--- 	wvprint(inspect(fourth, 3))
--- 	wvprint(inspect(fifth, 3))
--- end)
--- 
-
--- Working
--- dbus.request_name("system", "org.freedesktop.NetworkManager")
--- dbus.add_match("system", "interface='org.freedesktop.NetworkManager',member='PropertiesChanged'")
--- dbus.connect_signal("org.freedesktop.NetworkManager", function(first, ...)
--- 	wvprint("FFS, It Worked!!")
--- 	debug_leaf(first)
--- end)
