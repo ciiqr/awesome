@@ -207,19 +207,7 @@ for s = 1, screen.count() do
 	infoLayout:add(wvWidgets:getTaskBox(s, true))
 
 	-- Info Wibox
-	local screenDimens = screen[mouse.screen].workarea
-	-- infoWibox[s] = wibox({position = "left", screen = s, width = 100, height = 1080-122*2, y = 100})--awful.wibox({position = "left", screen = s, width = 100, height = 1080-122-122, y = 100})
-	infoWibox[s] = wibox({position = "left", screen = s, width = 300, height = screenDimens.height, y = screenDimens.y}) -- 836 should be dynamic, on task list change it should update height, never more than screen height - (t/b)wiboxes, normally a multiple of 31-33.44 -- TODO: That << lol
-
-	infoWibox[s]:set_widget(infoLayout)
-	infoWibox[s].ontop = true
-	-- Start Hidden
-	infoWibox[s].visible = false
-	
-	infoWibox[s]:connect_signal("property::visible", function()
-		-- debug_leaf(infoWibox[s], 5)
-		-- wvprint(inspect(verticalTaskBox.widgets, 2))
-	end)
+	infoWibox[s] = wvWidgets:getInfoWibox(s, infoLayout)
 end
 
 --Global Key Bindings
@@ -331,10 +319,10 @@ globalKeys = awful.util.table.join(
 	awful.key({SHIFT}, "XF86MonBrightnessDown", function() changeBrightness("-", 52) end),
 	
 	--Invert Screen
-	awful.key({SUPER}, "i", function() awful.util.spawn_with_shell(COMMAND_SCREEN_INVERT) end), -- ; wvprint("Scrot...", 1)
+	awful.key({SUPER}, "i", function() awful.util.spawn_with_shell(COMMAND_SCREEN_INVERT) end),
 	
 	--PrintScreen
-	awful.key({}, "Print", function() awful.util.spawn_with_shell(COMMAND_SCREEN_SHOT) end), -- ; wvprint("Scrot...", 1)
+	awful.key({}, "Print", captureScreenShot),
 
 	--PrintScreen (Select Area)
 	awful.key({SUPER}, "Print", function() awful.util.spawn_with_shell(os.date(COMMAND_SCREEN_SHOT_SELECT)) end), -- ; wvprint("Snip...", 1)
@@ -427,10 +415,17 @@ clientkeys = awful.util.table.join(
 
 	,awful.key({SUPER}, "g", function(c)
 		-- Window Info
-		wvprint("size_hints: "..inspect(c.size_hints))
+		-- wvprint("size_hints: "..inspect(c.size_hints))
 		
 		-- Object Info
-		wvprint(inspect(widgets, 5))
+		-- wvprint("InfoWibox:"..inspect(infoWibox[mouse.screen], 2))
+		
+		wvprint("InfoLayout:"..inspect(infoWibox[mouse.screen].drawin.height, 3))
+		
+		-- infoLayout:set_max_widget_size(100)
+		wvprint("InfoLayout:"..inspect(infoLayout, 3))
+		-- wvprint("Drawable:"..inspect(infoWibox[mouse.screen]._drawable, 2))
+		-- wvprint("Drawable.Widget:"..inspect(infoWibox[mouse.screen]._drawable.widget, 2))
 		
 		-- Root Object Info
 		-- wvprint(inspect(root, 4))
