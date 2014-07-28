@@ -22,8 +22,8 @@ local mountMenu =
 -- TODO: ? Change to generated, function which takes the display-name & ssh-args
 local sshMenu = {
 	{"Data-Server",	TERMINAL.." -e ".."ssh root@data-server -p 57251"},
-	{"iPad" ,		TERMINAL.." -e ".."ssh root@iPad-W"},
-	{"Linksys" ,	TERMINAL.." -e ".."ssh root@router"},
+	{"iPad" ,		TERMINAL.." -e ".."ssh root@iPad"},
+	{"Router" ,		TERMINAL.." -e ".."ssh root@router"},
 	{"Pi" ,			TERMINAL.." -e ".."ssh pi@192.168.1.100"},
 	{"Desktop", 	TERMINAL.." -e ".."ssh desktop -p 57251"}
 }

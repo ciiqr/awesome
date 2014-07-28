@@ -139,4 +139,4 @@ function XRandR:cycle()
 	self.timer:start()
 end
 
-return bind(XRandR, XRandR.cycle)
+return bindFunc(XRandR, XRandR.cycle)

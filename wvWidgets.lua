@@ -163,6 +163,23 @@ function wvWidgets:getTaskBox(screen, is_vertical)
 	end
 end
 
+function wvWidgets:getInfoWibox(s, widget)
+	local screenDimens = screen[s].workarea
+	-- local aWibox = wibox({position = "left", screen = s, width = 100, height = 1080-122*2, y = 100})--awful.wibox({position = "left", screen = s, width = 100, height = 1080-122-122, y = 100})
+	local aWibox = wibox({position = "left", screen = s, width = 300, height = screenDimens.height, y = screenDimens.y}) -- 836 should be dynamic, on task list change it should update height, never more than screen height - (t/b)wiboxes, normally a multiple of 31-33.44 -- TODO: That << lol
+	-- TODO: Think of a decent way to 
+	aWibox:set_widget(widget)
+	aWibox.ontop = true
+	-- Start Hidden
+	aWibox.visible = false
+	
+	aWibox:connect_signal("property::visible", function()
+		-- debug_leaf(aWibox, 5)
+		-- wvprint(inspect(verticalTaskBox.widgets, 2))
+	end)
+	return aWibox
+end
+
 -- TagsList
 function wvWidgets:getTagsList(screen)
 	-- TODO: Consider Moving

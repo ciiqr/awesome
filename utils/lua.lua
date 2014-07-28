@@ -1,5 +1,5 @@
 -- Bind a method call it it's object so it can be used as a normal function with it's object always being passed
-function bind(object, method)
+function bindFunc(object, method)
 	return function(...)
 		method(object, ...)
 	end
@@ -13,6 +13,17 @@ function toggleStateFunc(functionToToggle, state)
 		functionToToggle(state)
 		state = not state
 	end
+end
+
+-- Delay
+-- TODO: Allow passing of arguments
+function delayFunc(delayTime, func)
+	delayTimer = timer({timeout = delayTime})
+	delayTimer:connect_signal("timeout", function()
+		func()
+		delayTimer:stop()
+	end)
+	delayTimer:start()
 end
 
 -- If the condition is true, returns the tVal, else it returns the fVal

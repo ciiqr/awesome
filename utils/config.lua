@@ -175,6 +175,14 @@ function putToSleep()
 	moveMouse(screenDimens.width / 2, screenDimens.height / 2)
 	awful.util.spawn(COMMAND_SLEEP)
 end
+function captureScreenShot()
+	-- Capture
+	awful.util.spawn_with_shell(COMMAND_SCREEN_SHOT)
+	-- Display Naughty
+	delayFunc(0.5, function()
+		wvprint("ScreenShot Taken", 1)
+	end)
+end
 
 --Debugging
 function debug_editor(object, recursion, editor)

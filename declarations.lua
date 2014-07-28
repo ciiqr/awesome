@@ -31,13 +31,11 @@ COMMAND_SLEEP = "systemctl suspend"
 COMMAND_SCREEN_SHOT = "scrot ~/Random/Screens/%Y-%m-%d-%T-screen.png"
 COMMAND_SCREEN_SHOT_SELECT = "import ~/Random/Screens/%Y-%m-%d-%T-screen.png"
 COMMAND_SCREEN_INVERT = "xcalib -i -a"
--- MUST Replace %s using string.format, with y Height -- -x 480 -w 960 -f
-COMMAND_FILE_OPENER = "xdg-open \"$(locate \"\" | dmenu -y %s -i -p Open -l 20 -fn \"Nimbus Sans L-10\" -dim 0.75)\""
--- COMMAND_LAUNCHER_ALTERNATIVE  = "j4-dmenu-desktop --dmenu=\"dmenu -fn 'DejaVu Sans-10' -y 22 -i\"" -- -l 20
+COMMAND_FILE_OPENER = "xdg-open \"$(locate \"\" | dmenu -y %s -i -p Open -l 20 -fn \"Nimbus Sans L-10\" -dim 0.75)\"" -- MUST Replace %s using string.format, with y Height -- -x 480 -w 960 -f
 COMMAND_TASK_MANAGER_MEM = "sudo htop -s PERCENT_MEM"
 COMMAND_TASK_MANAGER_CPU = "sudo htop -s PERCENT_CPU"
 PERSONAL_BIN = HOME_DIR.."/.local/bin/"
-COMMAND_LAUNCHER = "/home/william/Programming/Python/Projects/QuickLaunch/".."QuickLaunch.py -y %s" -- TODO: Change back COMMAND_LAUNCHER = PERSONAL_BIN.."quick-launch"
+COMMAND_LAUNCHER = "/home/william/Programming/Python/Projects/QuickLaunch/".."QuickLaunch.py -y %s" -- TODO: Change back 
 
 STARTUP_PROGRAMS = {
 	"sudo seaf-cli start",		-- Seafile Files Syncer (Root)
