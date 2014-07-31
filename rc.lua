@@ -38,8 +38,6 @@
 
 -- Include --
 -------------
--- Config
-require("declarations")
 -- Standard
 gears		= require("gears")
 awful		= require("awful")
@@ -49,16 +47,13 @@ awful.rules	= require("awful.rules")
 wibox		= require("wibox")
 beautiful 	= require("beautiful"); 
 naughty		= require("naughty")
--- Libraries
--- Locals
-if DEBUG then
-inspect		= require("inspect")
-end
+-- Config
+require("declarations")
+if DEBUG then inspect = require("inspect") end
 quake		= require("quake")
 xrandr		= require("utils.xrandr")
-			  -- TODO: Re-decide which things should really have been included in lua
-			  -- require("utils.lua")
-			  -- TODO: Re-decide which things should really have been included in awesome
+			  -- TODO: Re-decide which things should really have been included in lua & awesome
+			  require("utils.lua")
 			  require("utils.awesome")
 			  require("utils.config")
 -- Beautiful Theme
@@ -112,15 +107,16 @@ for s = 1, screen.count() do
 	end
 	
 	--Tags
-	local fLay = layouts[2]
-	local sLay = layouts[1]
+	local fLay = layouts[1]
+	local sLay = layouts[2]
 	awful.tag({"➊ Browsing","➋ ❴❵","➌ Learn","➍ iOS","➎ Site","➏ School","➐ ⚙","➑ Ent.","➒ ♫"}, s,
 						{sLay, fLay, fLay, fLay, fLay, fLay, fLay, fLay, fLay}) --🌐 --{} ⌥
 
 
 	-- Quake Terminal
+	-- TODO: Move to wvWidgets, wvWidgets:getDropdownTerminal(s), wvWidgets:getDropdownCPU(s), wvWidgets:getDropdownMemory(s), wvWidgets:getDropdownNote(s)
+			-- Then functions to toggle them wvWidgets:toggleDropdownTerminal(s)
 	quake_terminal[s] = quake({ terminal = TERMINAL, height = 0.35, screen = s, width = 0.5})
-	-- quake_htop_cpu_terminal[s] = quake({ terminal = TERMINAL.." sudo htop -s PERCENT_MEM", height = 0.75, screen = s, width = 0.5})
 	quake_htop_cpu_terminal[s] = quake({terminal=TERMINAL, argname="-name %s -e "..COMMAND_TASK_MANAGER_CPU, name="QUAKE_COMMAND_TASK_MANAGER_CPU", height=0.75, screen=s, width=0.5, horiz="right"})
 	quake_htop_mem_terminal[s] = quake({terminal=TERMINAL, argname="-name %s -e "..COMMAND_TASK_MANAGER_MEM, name="QUAKE_COMMAND_TASK_MANAGER_MEM", height=0.75, screen=s, width=0.5, horiz="left"})
 	quake_leafpad_quick_note[s] = quake({terminal = "leafpad", argname="--name=%s", name="LEAFPAD_QUICK_NOTE", height = 0.35, screen = s, width = 0.5})
@@ -128,53 +124,45 @@ for s = 1, screen.count() do
 
 	--Wiboxes w/ Widgets
 	--Left Widgets
-	if s == 1 then left_layout:add(wvWidgets:getMainMenuButton()) end
+	-- Main Menu Button
+	if s == 1
+		then left_layout:add(wvWidgets:getMainMenuButton())
+	end
+	-- Tag List
 	left_layout:add(wvWidgets:getTagsList(s))
 
 	--Middle Widget
+	-- IP
 	middle_layout:add(wvWidgets:getIP())
 
 	--Right Widgets
-
-	-- Colour Tester	
-	-- right_layout:add(require("ColorDisplayWidget"):init({"6e0e1f", "46088c", "007eff"}))
-
 	if s == screen.count() then -- Main Widgets on Far Right
-
-		right_layout:add(wvWidgets:getTemperature())
-
 		-- Moon
 		-- right_layout:add(require("moonPhase"):init())
-
+		-- Test Widget
+		-- right_layout:add(require("testWidget"):init())
+		
+		-- Temperature
+		right_layout:add(wvWidgets:getTemperature())
 		-- Net Usage
 		right_layout:add(wvWidgets:getNetUsage())
-
 		-- Battery Widget
 		if IS_LAPTOP then
 			right_layout:add(wvWidgets:getBatteryWidget())
 		end
-
 		-- Volume
 		right_layout:add(wvWidgets:getVolume())
-
 		--Memory
 		right_layout:add(wvWidgets:getMemory())
-
 		--CPU
 		right_layout:add(wvWidgets:getCPU())
-
-		-- Test Widget
-		-- right_layout:add(require("testWidget"):init())
-
 		-- System Tray
-		-- TODO: 
 		right_layout:add(wvWidgets:getSystemTray())
-
 		-- Clock
 		right_layout:add(wvWidgets:getTextClock())
 	end
 
-	-- Info Widgets & Time
+	-- Layout Box
 	right_layout:add(wvWidgets:getLayoutBox(s))
 
 	--Add Layouts to Master Layout & Set tWibox Widget to Master Layout
@@ -202,6 +190,7 @@ for s = 1, screen.count() do
 
 
 	-- Info Wibox Layout
+	-- Info Widgets & Time
 	-- infoLayout:set_first(require("awedock"):init())
 	-- infoLayout:set_middle(require("ColorDisplayWidget"):init({"5A667F", "b0d54e", "5f8787", "69b2b2", "FF0000", "de5705", "00ff00"})) -- This overrides the previous
 	infoLayout:add(wvWidgets:getTaskBox(s, true))
@@ -281,7 +270,7 @@ globalKeys = awful.util.table.join(
 	-- awful.key({SUPER, CONTROL}, "l", function() awful.tag.incncol(-1) end),
 
 	--Popups
-	awful.key({SUPER}, "w", function() wvWidgets.mainMenu:show({coords = {x = 0, y = 0}}) end),
+	awful.key({SUPER}, "w", function() wvWidgets.mainMenu:show({coords = {x = 1, y = 1}}) end),
 	awful.key({SUPER}, "p", function() awful.util.spawn_with_shell(string.format(COMMAND_LAUNCHER, screen[mouse.screen].workarea.y)) end),
 	awful.key({SUPER}, "o", function() awful.util.spawn_with_shell(string.format(COMMAND_FILE_OPENER, screen[mouse.screen].workarea.y)) end),
 	-- Terminal
@@ -309,14 +298,14 @@ globalKeys = awful.util.table.join(
 	--Volume
 	awful.key({}, "XF86AudioLowerVolume", function() wvWidgets:changeVolume("-") end),
 	awful.key({}, "XF86AudioRaiseVolume", function() wvWidgets:changeVolume("+") end),
-	awful.key({SHIFT}, "XF86AudioLowerVolume", function() wvWidgets:changeVolume("-", 1) end),
-	awful.key({SHIFT}, "XF86AudioRaiseVolume", function() wvWidgets:changeVolume("+", 1) end),
+	awful.key({SHIFT}, "XF86AudioLowerVolume", function() wvWidgets:changeVolume("-", VOLUME_CHANGE_SMALL) end),
+	awful.key({SHIFT}, "XF86AudioRaiseVolume", function() wvWidgets:changeVolume("+", VOLUME_CHANGE_SMALL) end),
 
 	--Brightness
-	awful.key({}, "XF86MonBrightnessUp", function() changeBrightness("+", 527) end),
-	awful.key({}, "XF86MonBrightnessDown", function() changeBrightness("-", 527) end),
-	awful.key({SHIFT}, "XF86MonBrightnessUp", function() changeBrightness("+", 52) end),
-	awful.key({SHIFT}, "XF86MonBrightnessDown", function() changeBrightness("-", 52) end),
+	awful.key({}, "XF86MonBrightnessUp", function() changeBrightness("+", BRIGHTNESS_CHANGE_NORMAL) end),
+	awful.key({}, "XF86MonBrightnessDown", function() changeBrightness("-", BRIGHTNESS_CHANGE_NORMAL) end),
+	awful.key({SHIFT}, "XF86MonBrightnessUp", function() changeBrightness("+", BRIGHTNESS_CHANGE_SMALL) end),
+	awful.key({SHIFT}, "XF86MonBrightnessDown", function() changeBrightness("-", BRIGHTNESS_CHANGE_SMALL) end),
 	
 	--Invert Screen
 	awful.key({SUPER}, "i", function() awful.util.spawn_with_shell(COMMAND_SCREEN_INVERT) end),
@@ -325,21 +314,19 @@ globalKeys = awful.util.table.join(
 	awful.key({}, "Print", captureScreenShot),
 
 	--PrintScreen (Select Area)
-	awful.key({SUPER}, "Print", function() awful.util.spawn_with_shell(os.date(COMMAND_SCREEN_SHOT_SELECT)) end), -- ; wvprint("Snip...", 1)
+	awful.key({SUPER}, "Print", captureScreenSnip),
 
 	--Cycle Displays
 	awful.key({SUPER}, "F11", xrandr)
 
-		--Switch Focus
+	--Switch Focus
 	-- awful.key({SUPER}, "j",
 	--  function()
 	--	awful.client.focus.byidx( 1)
-	--	if client.focus then client.focus:raise() end
 	--  end),
 	-- awful.key({ SUPER,		   }, "k",
 	--  function()
 	--	awful.client.focus.byidx(-1)
-	--	if client.focus then client.focus:raise() end
 	--  end),
 
 	-- -- Run or raise applications with dmenu
@@ -356,7 +343,6 @@ globalKeys = awful.util.table.join(
 	-- 		if string.match(class, lower_command) then
 	-- 			for i, v in ipairs(c:tags()) do
 	-- 				awful.tag.viewonly(v)
-	-- 				c:raise()
 	-- 				c.minimized = false
 	-- 				return
 	-- 			end
@@ -372,8 +358,10 @@ for i = 1, numberOfTags do
 	local iKey = "#"..(i + numberOfTags)
 	globalKeys = awful.util.table.join(globalKeys,
 		awful.key({ALT, CONTROL},		iKey, function() switchToTag(i) end),
-		awful.key({SUPER, SHIFT},		iKey, function() toggleTag(i) end),
 		awful.key({SUPER, ALT},			iKey, function() moveClientToTagAndFollow(i) end),
+		
+		-- NOTE: Never Used
+		awful.key({SUPER, SHIFT},		iKey, function() toggleTag(i) end),
 		awful.key({SUPER, CONTROL, ALT},iKey, function() toggleClientTag(i) end)) -- TODO: Change to Control, Alt Shift to be more like mod shift for toggleing a tag visibility
 end
 
@@ -403,76 +391,11 @@ clientkeys = awful.util.table.join(
 	--Toggle Titlebar
 	awful.key({SUPER, ALT}, "[", toggleClientTitlebar)
 
-	--Debug Info
-	,awful.key({SUPER}, "F12", debug)
-
-	-- ,awful.key({SUPER, ALT}, "space", awful.client.floating.toggle) --Floating
-	,awful.key({SUPER, ALT}, "space", function(c)
-		awful.client.floating.toggle()
-		c.ontop = awful.client.floating.get(c) -- Toggling doesn't work if the window is ontop by default
-	end) --Floating
-	--,awful.key({SUPER}, "Insert", function(c) c.ontop = not c.ontop end) --Toggle OnTop
-
-	,awful.key({SUPER}, "g", function(c)
-		-- Window Info
-		-- wvprint("size_hints: "..inspect(c.size_hints))
-		
-		-- Object Info
-		-- wvprint("InfoWibox:"..inspect(infoWibox[mouse.screen], 2))
-		
-		wvprint("InfoLayout:"..inspect(infoWibox[mouse.screen].drawin.height, 3))
-		
-		-- infoLayout:set_max_widget_size(100)
-		wvprint("InfoLayout:"..inspect(infoLayout, 3))
-		-- wvprint("Drawable:"..inspect(infoWibox[mouse.screen]._drawable, 2))
-		-- wvprint("Drawable.Widget:"..inspect(infoWibox[mouse.screen]._drawable.widget, 2))
-		
-		-- Root Object Info
-		-- wvprint(inspect(root, 4))
-		-- for prop,val in pairs(root) do
-		-- 	wvprint(prop .. inspect(val(), 4))
-		-- end
-		
-		-- DBus
-		
-		-- dbus.connect_signal("org.freedesktop.NetworkManager.Device.Wireless.PropertiesChanged", function (body, bodyMarkup, iconStatic) wvprint("Got DBUS Notification!!!") end)
-		-- dbus.request_name("session", "org.freedesktop.NetworkManager.Device.Wireless.PropertiesChanged")
-
-		-- dbus.request_name("system", "org.freedesktop.NetworkManager.Device.Wireless")
-		-- dbus.add_match("system", "interface='org.freedesktop.NetworkManager.Device.Wireless',member='PropertiesChanged'")
-		-- dbus.connect_signal("org.freedesktop.NetworkManager.Device.Wireless", function(first, property, ...)
-		-- 	ipAddress = property["Ip4Adress"]
-		-- 	if ipAddress then
-		-- 		wvprint(ipAddress)
-		-- 	end
-		-- 	-- wvprint(inspect(first, 3))
-		-- 	-- wvprint(inspect(property, 3))
-		-- end)
-
-		-- dbus.request_name("system", "org.freedesktop.DBus.Properties")
-		-- dbus.add_match("system", "interface='org.freedesktop.DBus.Properties',member='GetAll',string='org.freedesktop.NetworkManager.Device.Wireless")
-		-- dbus.connect_signal("org.freedesktop.DBus.Properties", function(first, property, third, fourth, fifth, ...)
-		-- 	wvprint("There is a Dog!")
-		-- 	-- ipAddress = property["Ip4Adress"]
-		-- 	if ipAddress then
-		-- 		wvprint(ipAddress)
-		-- 	end
-		-- 	-- wvprint(inspect(first, 3))
-		-- 	wvprint(inspect(property, 3))
-		-- 	wvprint(inspect(third, 3))
-		-- 	wvprint(inspect(fourth, 3))
-		-- 	wvprint(inspect(fifth, 3))
-		-- end)
-		-- 
-
-		-- Working
-		-- dbus.request_name("system", "org.freedesktop.NetworkManager")
-		-- dbus.add_match("system", "interface='org.freedesktop.NetworkManager',member='PropertiesChanged'")
-		-- dbus.connect_signal("org.freedesktop.NetworkManager", function(first, ...)
-		-- 	wvprint("FFS, It Worked!!")
-		-- 	debug_leaf(first)
-		-- end)
-	end)
+	--Floating
+	,awful.key({SUPER, ALT}, "space", awful.client.floating.toggle)
+	
+	--Debug Info (F12)
+	,awful.key({SUPER}, "g", ternary(DEBUG, debugClient, function()end))
 )
 --Buttons
 clientButtons = awful.util.table.join(
@@ -498,22 +421,21 @@ awful.rules.rules = {
 			maximized_vertical   = false,
  			maximized_horizontal = false
 		}
-		,callback = function(c) if (not(c.size_hints.max_height == nil or c.size_hints.max_height == 32767)) then c.ontop = true end end -- Makes All Floating WIndows Ontop
 	}
-	,{
+	,{ -- Floating
 		rule_any = {
-			class = {"Speedcrunch", "pinentry", "MPlayer", "Plugin-container", "Exe", "Gtimer", "Vmware-modconfig", "freerdp", "Seafile-applet", "Xmessage", "mainframe"}, -- Probably Never Use Xmessage...
+			class = {"Speedcrunch", "pinentry", "MPlayer", "Plugin-container", "Exe", "Gtimer", "Vmware-modconfig", "freerdp", "Seafile-applet", "mainframe"},
 			name = {"Tab Organizer"},
-			type = {"dialog"}
+			type = {"dialog"},
+			role = {"pop-up"}
 		},
 		properties = {
-			floating = true,
-			ontop = true
+			floating = true
 		}
 	}
-	,{
+	,{ -- Ignore Size Hints
 		rule_any = {
-			name = {"FrostWire", "MonoDevelop", "7zFM"},
+			name = {"FrostWire", "MonoDevelop", "7zFM", "Vmware"},
 			class = {"XTerm", "Ghb"}
 		},
 		properties = {
@@ -566,7 +488,6 @@ awful.rules.rules = {
 							-- Set Floating
 							awful.client.floating.set(c, true)
 							-- Set Ontop
-							c.ontop = true
 							-- Change Size
 							local screenDimens = screen[mouse.screen].workarea
 							local screenHeight = screenDimens.height
@@ -576,11 +497,9 @@ awful.rules.rules = {
 						elseif string.find(c.name, "Select the email service you use") then -- Properties
 							-- Set Floating
 							awful.client.floating.set(c, true)
-							-- Set Ontop
-							c.ontop = true
 						else
 							-- Print Name So I Can Possibly Change Other Names
-							-- wvprint(tostring(c.name or "nil"), 2)
+							-- notify_send(tostring(c.name or "nil"), 2)
 						end
 						-- Clear Client From Callback Array
 						name_callback[c] = nil
@@ -606,7 +525,7 @@ awful.rules.rules = {
 				if c:geometry().width == 451 or c:geometry().width == 490 then
 					c:kill();
 				end
-				wvprint("Sublime\nHis name was Robert.. Oh I Mean '".. (c.name or "nil") .."'", 3);
+				notify_send("Sublime\nHis name was Robert.. Oh I Mean '".. (c.name or "nil") .."'", 3);
 			end --c:geometry()
 		}
 	}
@@ -663,21 +582,22 @@ awful.rules.rules = {
 	}
 	,{
 		rule = {
-			class = "Seafile-applet"
+			class = "Seafile-applet",
+			type = "normal"
 		},
 		properties = {
 			border_width = 0,
-			callback=  function(c)
-				-- Change Size of Normal Window Only
-				if c.type == "normal" then
-					existingDimens = c:geometry()
-					screenDimens = screen[mouse.screen].workarea
-					
-					c:geometry({
-						x = screenDimens.width - existingDimens.width,
-						y = screenDimens.y
-					})
-				end
+			callback = function(c)
+				-- existingDimens = c:geometry()
+				screenDimens = screen[mouse.screen].workarea
+				local width = 302
+				local height = 883
+				c:geometry({
+					x = screenDimens.width - width,
+					y = screenDimens.y,
+					width = width,
+					height = height
+				})
 			end
 		}
 	}
@@ -700,7 +620,6 @@ awful.rules.rules = {
 			-- 	-- False Assumption
 			-- 	-- if c.size_hints.win_gravity == "north_west" then
 			-- 	-- 	awful.client.floating.set(c, true)
-			-- 	-- 	c.ontop = true
 			-- 	-- end
 			-- end,
 			size_hints_honor = false
@@ -755,8 +674,18 @@ awful.rules.rules = {
 --Signals
 --Client
 client.connect_signal("manage", manageClient)
+-- Change Border Colours
+-- Raise on focus
 client.connect_signal("focus",	 function(c) c.border_color = beautiful.border_focus; c:raise() end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
+-- Floating always means ontop
+client.connect_signal("property::floating", function(c) c.ontop = awful.client.floating.get(c) end)
+--Mouse Over Focus
+client.connect_signal("mouse::enter", function(c)
+	if awful.client.focus.filter(c) then --  and awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
+		client.focus = c
+	end
+end)
 
 -- Programs -- (run_once takes a while, probably due to system calls, try making a script that takes a list of files and runs them with the same commands as before)
 --------------
@@ -772,8 +701,8 @@ moveMouse(100, 100)
 -- Cleanup Variables --
 -----------------------
 THEME_NAME = nil
-STARTUP_PROGRAMS = nil -- Clear as it is nolonger needed
-EDITOR = nil	 --
+STARTUP_PROGRAMS = nil
+EDITOR = nil
 
 globalKeys = nil
 clientKeys = nil

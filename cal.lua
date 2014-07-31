@@ -31,18 +31,18 @@ local tooltip
 local state = {}
 local current_day_format = "<u>%s</u>"
 
-function displayMonth(month,year,weekStart)
-	local t,wkSt=os.time{year=year, month=month+1, day=0},weekStart or 1
-	local d=os.date("*t",t)
-	local mthDays,stDay=d.day,(d.wday-d.day-wkSt+1)%7
+function displayMonth(month, year, weekStart)
+	local t, wkSt=os.time{year=year, month=month+1, day=0}, weekStart or 1
+	local d=os.date("*t", t)
+	local mthDays, stDay=d.day, (d.wday-d.day-wkSt+1)%7
 
 	local lines = "    "
 
 	for x=0,6 do
-		lines = lines .. os.date("%a ",os.time{year=2006,month=1,day=x+wkSt})
+		lines = lines .. os.date("%a ", os.time{year=2006, month=1, day=x+wkSt})
 	end
 
-	lines = lines .. "\n" .. os.date(" %V",os.time{year=year,month=month,day=1})
+	lines = lines .. "\n" .. os.date(" %V", os.time{year=year, month=month, day=1})
 
 	local writeLine = 1
 	while writeLine < (stDay + 1) do
@@ -50,29 +50,29 @@ function displayMonth(month,year,weekStart)
 		writeLine = writeLine + 1
 	end
 
-        for d=1,mthDays do
-                local x = d
-                local t = os.time{year=year,month=month,day=d}
-                if writeLine == 8 then
-                        writeLine = 1
-                        lines = lines .. "\n" .. os.date(" %V",t)
-                end
-                if os.date("%Y-%m-%d") == os.date("%Y-%m-%d", t) then
-                        x = string.format(current_day_format, d)
-                end
-                if d < 10 then
-                        x = " " .. x
-                end
-                lines = lines .. "  " .. x
-                writeLine = writeLine + 1
-        end
-        if stDay + mthDays < 36 then
-                lines = lines .. "\n"
-        end
-        if stDay + mthDays < 29 then
-                lines = lines .. "\n"
-        end
-        local header = os.date("%B %Y\n",os.time{year=year,month=month,day=1})
+	for d=1,mthDays do
+		local x = d
+		local t = os.time{year=year, month=month, day=d}
+		if writeLine == 8 then
+			writeLine = 1
+			lines = lines .. "\n" .. os.date(" %V", t)
+		end
+		if os.date("%Y-%m-%d") == os.date("%Y-%m-%d", t) then
+			x = string.format(current_day_format, d)
+		end
+		if d < 10 then
+			x = " " .. x
+		end
+		lines = lines .. "  " .. x
+		writeLine = writeLine + 1
+	end
+	if stDay + mthDays < 36 then
+		lines = lines .. "\n"
+	end
+	if stDay + mthDays < 29 then
+		lines = lines .. "\n"
+	end
+	local header = os.date("%B %Y\n", os.time{year=year, month=month, day=1})
 
 	return header .. "\n" .. lines
 end
@@ -83,42 +83,39 @@ function cal.register(mywidget, custom_current_day_format)
 
 	if not tooltip then
 		tooltip = awful.tooltip({})
-                function tooltip:update()
-                        local month, year = os.date('%m'), os.date('%Y')
-                        state = {month, year}
-                        tooltip:set_markup(string.format('<span font_desc="monospace" foreground="' ..beautiful.fg_normal.. '">%s</span>', displayMonth(month, year, 2)))
-                end
-                tooltip:update()
+		function tooltip:update()
+			local month, year = os.date('%m'), os.date('%Y')
+			state = {month, year}
+			tooltip:set_markup(string.format('<span font_desc="monospace" foreground="' ..beautiful.fg_normal.. '">%s</span>', displayMonth(month, year, 2)))
+			
+			-- Keep to right edge
+			-- TODO: Modularize so we can disable/keep to any edge
+			local tooltipWibox = tooltip.wibox
+			local screenDimens = screen[mouse.screen].workarea
+			local geom = tooltipWibox:geometry()
+			geom.x = screenDimens.width - geom.width - (tooltipWibox.border_width * 2)
+			tooltipWibox:geometry(geom)
+		end
+		tooltip:update()
 	end
 	tooltip:add_to_object(mywidget)
 
-	mywidget:connect_signal("mouse::enter",tooltip.update)
+	mywidget:connect_signal("mouse::enter", tooltip.update)
+	
+	local function backMonth() switchMonth(-1) end
+	local function forwardMonth() switchMonth(1) end
+	local function backYear() switchMonth(-12) end
+	local function forwardYear() switchMonth(12) end
 
 	mywidget:buttons(awful.util.table.join(
-	awful.button({ }, 1, function()
-		switchMonth(-1)
-	end),
-	awful.button({ }, 3, function()
-		switchMonth(1)
-	end),
-	awful.button({ }, 4, function()
-		switchMonth(-1)
-	end),
-	awful.button({ }, 5, function()
-		switchMonth(1)
-	end),
-	awful.button({ 'Shift' }, 1, function()
-		switchMonth(-12)
-	end),
-	awful.button({ 'Shift' }, 3, function()
-		switchMonth(12)
-	end),
-	awful.button({ 'Shift' }, 4, function()
-		switchMonth(-12)
-	end),
-	awful.button({ 'Shift' }, 5, function()
-		switchMonth(12)
-	end)))
+	awful.button({}, 1, forwardMonth),
+	awful.button({}, 3, backMonth),
+	awful.button({}, 4, backMonth),
+	awful.button({}, 5, forwardMonth),
+	awful.button({"Shift"}, 1, backYear),
+	awful.button({"Shift"}, 3, forwardYear),
+	awful.button({"Shift"}, 4, backYear),
+	awful.button({"Shift"}, 5, forwardYear)))
 end
 
 function switchMonth(delta)

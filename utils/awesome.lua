@@ -38,7 +38,7 @@ function run_once(prg)
 			break
 		end
 	end
-	-- wvprint(prg .. "\n" .. programName)
+	-- notify_send(prg .. "\n" .. programName)
 
 	-- checks if program is running
 		-- if program is root then checks root, otherwise checks current user
@@ -64,7 +64,6 @@ function restoreClient()
 	local c = awful.client.restore()
 	if c then
 		client.focus = c
-		c:raise()
 	end
 end
 function toggleClient(c)
@@ -76,7 +75,6 @@ function toggleClient(c)
 		awful.tag.viewonly(c:tags()[1])
 	end
 	client.focus = c
-	c:raise()
   end
 end
 function moveClientToTagAndFollow(tagNum, c)
@@ -144,12 +142,7 @@ function toggleClientTag(tagNum)
 		awful.client.toggletag(tag)
 	end
 end
-function switchClient(direction)
-	awful.client.focus.byidx(direction)
-	if client.focus then
-		client.focus:raise()
-	end
-end
+switchClient = awful.client.focus.byidx
 
 -- Tags
 function toggleTag(tagNum)
