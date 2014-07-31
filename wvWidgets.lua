@@ -27,7 +27,7 @@ function wvWidgets:getVolume()
 	return self.volume
 end
 function wvWidgets:changeVolume(incORDec, change)
-	local change = change or 9
+	local change = change or VOLUME_CHANGE_NORMAL
 
 	-- Get mixer control contents
 	local f = io.popen("amixer set Master "..change.."%"..incORDec)
@@ -154,8 +154,8 @@ function wvWidgets:getTaskBox(screen, is_vertical)
 		layout:fit(100, 100)
 		widget:fit(100, 100)
 		-- widget = awful.widget.layoutbox(screen)
-		-- wvprint(inspect(layout, 2))
-		-- wvprint(inspect(widget, 2))
+		-- notify_send(inspect(layout, 2))
+		-- notify_send(inspect(widget, 2))
 		return widget
 	else
 		return awful.widget.tasklist(screen, awful.widget.tasklist.filter.currenttags, buttons) -- Normal
@@ -175,7 +175,7 @@ function wvWidgets:getInfoWibox(s, widget)
 	
 	aWibox:connect_signal("property::visible", function()
 		-- debug_leaf(aWibox, 5)
-		-- wvprint(inspect(verticalTaskBox.widgets, 2))
+		-- notify_send(inspect(verticalTaskBox.widgets, 2))
 	end)
 	return aWibox
 end
@@ -229,8 +229,8 @@ function wvWidgets:getNetUsage()
 	-- TODO
 -- dbus.connect_signal("org.freedesktop.Notifications", function(signal, value)
 
-		-- wvprint("org.freedesktop.Notifications")
-	 --    wvprint(inspect({signal, value}, 2))
+		-- notify_send("org.freedesktop.Notifications")
+	 --    notify_send(inspect({signal, value}, 2))
 	-- end)
 
 	--dbus.connect_signal("org.freedesktop.Notifications", 

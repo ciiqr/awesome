@@ -1,7 +1,12 @@
 -- Bind a method call it it's object so it can be used as a normal function with it's object always being passed
-function bindFunc(object, method)
+function bindFunc(func, ...)
+	local bound_args = table.pack(...);
 	return function(...)
-		method(object, ...)
+		local args = table.pack(...);
+		for i=1, args.n do
+			table.insert(bound_args, args[i]);
+		end
+		return func(unpack(bound_args));
 	end
 end
 

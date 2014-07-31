@@ -2,8 +2,6 @@
 -- Actions: Toggle, Switch, Move, Follow, restore, minimize
 -- Descriptors: Left, Right, First, Last
 
--- TODO: Can I truely get rid of :raise() ? or do I want to remove raise from focus & have it everywhere else?
-
 -- Declarations & setup
 local preMaximizeLayouts = {}
 for s = 1, screen.count() do
@@ -74,8 +72,71 @@ function toggleClientMultiFullscreen(c)
      client.focus = c
 end
 
+function debugClient(c)
+	-- Window Info
+	-- notify_send("size_hints: "..inspect(c.size_hints))
+	
+	debug_print(c.transient_for)
+	
+	-- Object Info
+	-- notify_send("InfoWibox:"..inspect(infoWibox[mouse.screen], 2))
+	
+	-- notify_send("InfoLayout:"..inspect(infoWibox[mouse.screen].drawin.height, 3))
+	
+	-- -- infoLayout:set_max_widget_size(100)
+	-- notify_send("InfoLayout:"..inspect(infoLayout, 3))
+	-- notify_send("Drawable:"..inspect(infoWibox[mouse.screen]._drawable, 2))
+	-- notify_send("Drawable.Widget:"..inspect(infoWibox[mouse.screen]._drawable.widget, 2))
+	
+	-- Root Object Info
+	-- notify_send(inspect(root, 4))
+	-- for prop,val in pairs(root) do
+	-- 	notify_send(prop .. inspect(val(), 4))
+	-- end
+	
+	-- DBus
+	
+	-- dbus.connect_signal("org.freedesktop.NetworkManager.Device.Wireless.PropertiesChanged", function (body, bodyMarkup, iconStatic) notify_send("Got DBUS Notification!!!") end)
+	-- dbus.request_name("session", "org.freedesktop.NetworkManager.Device.Wireless.PropertiesChanged")
+
+	-- dbus.request_name("system", "org.freedesktop.NetworkManager.Device.Wireless")
+	-- dbus.add_match("system", "interface='org.freedesktop.NetworkManager.Device.Wireless',member='PropertiesChanged'")
+	-- dbus.connect_signal("org.freedesktop.NetworkManager.Device.Wireless", function(first, property, ...)
+	-- 	ipAddress = property["Ip4Adress"]
+	-- 	if ipAddress then
+	-- 		notify_send(ipAddress)
+	-- 	end
+	-- 	-- notify_send(inspect(first, 3))
+	-- 	-- notify_send(inspect(property, 3))
+	-- end)
+
+	-- dbus.request_name("system", "org.freedesktop.DBus.Properties")
+	-- dbus.add_match("system", "interface='org.freedesktop.DBus.Properties',member='GetAll',string='org.freedesktop.NetworkManager.Device.Wireless")
+	-- dbus.connect_signal("org.freedesktop.DBus.Properties", function(first, property, third, fourth, fifth, ...)
+	-- 	notify_send("There is a Dog!")
+	-- 	-- ipAddress = property["Ip4Adress"]
+	-- 	if ipAddress then
+	-- 		notify_send(ipAddress)
+	-- 	end
+	-- 	-- notify_send(inspect(first, 3))
+	-- 	notify_send(inspect(property, 3))
+	-- 	notify_send(inspect(third, 3))
+	-- 	notify_send(inspect(fourth, 3))
+	-- 	notify_send(inspect(fifth, 3))
+	-- end)
+	-- 
+
+	-- Working
+	-- dbus.request_name("system", "org.freedesktop.NetworkManager")
+	-- dbus.add_match("system", "interface='org.freedesktop.NetworkManager',member='PropertiesChanged'")
+	-- dbus.connect_signal("org.freedesktop.NetworkManager", function(first, ...)
+	-- 	notify_send("FFS, It Worked!!")
+	-- 	debug_leaf(first)
+	-- end)
+end
+
 -- Titlebar
-function isTitlebarEnabledForClient(c)
+local function isTitlebarEnabledForClient(c)
 	-- or c.type == "dialog"
 	if not (c.type == "normal") then
 		return false
@@ -97,18 +158,16 @@ function toggleClientTitlebar(c)
 		-- titlebar
 	end
 end
-function addTitlebarToClient(c, titlebar)
+local function addTitlebarToClient(c, titlebar)
 	local titlebar = titlebar or awful.titlebar(c)
 	-- buttons for the titlebar
 	local buttons = awful.util.table.join(
 	  awful.button({}, 1, function()
 		client.focus = c
-		c:raise()
 		awful.mouse.client.move(c)
 	  end),
 	  awful.button({}, 3, function()
 		client.focus = c
-		c:raise()
 		awful.mouse.client.resize(c)
 	  end))
 
@@ -144,25 +203,28 @@ function addTitlebarToClient(c, titlebar)
 end
 
 --Signals
-function manageClient(c, startup)
-	--Mouse Over Focus
-	c:connect_signal("mouse::enter",
-	function(c)
-		if awful.client.focus.filter(c) and awful.layout.get(c.screen) ~= awful.layout.suit.magnifier then
-			client.focus = c
-			c:raise()
-		end
-	end)
+local function transientShouldBeSticky(c)
+	return (c.name:find("LEAFPAD_QUICK_NOTE")) -- or 
+end
 
+function manageClient(c, startup)
+	-- When first created
 	if not startup then
-		--Position.
+		-- Position
 		if not c.size_hints.user_position and not c.size_hints.program_position then
 			awful.placement.no_overlap(c)
 			awful.placement.no_offscreen(c)
 		end
 	end
+	
+	-- Subwindows Sticky
+	if c.transient_for and transientShouldBeSticky(c) then
+		notify_send("Transient's UNITE!")
+		c.sticky = true
+	end
 
-	--TitleBar
+	
+	-- TitleBar (If Enabled)
 	-- local titlebars_enabled = true
 	if titlebars_enabled and isTitlebarEnabledForClient(c) then
 		addTitlebarToClient(c)
@@ -180,13 +242,21 @@ function captureScreenShot()
 	awful.util.spawn_with_shell(COMMAND_SCREEN_SHOT)
 	-- Display Naughty
 	delayFunc(0.5, function()
-		wvprint("ScreenShot Taken", 1)
+		notify_send("ScreenShot Taken", 1)
 	end)
+end
+function captureScreenSnip()
+	-- TODO: Use Popen (presumable) in onder to know when it actually finishes, this way I can display the notification right after it was taken
+	-- Capture
+	awful.util.spawn_with_shell(os.date(COMMAND_SCREEN_SHOT_SELECT))
 end
 
 --Debugging
+function debug_string(object, recursion)
+	return inspect(object, recursion or 2)
+end
 function debug_editor(object, recursion, editor)
-	return awful.util.spawn_with_shell("echo \""..inspect(object, recursion or 1).."\" | "..editor)
+	return awful.util.spawn_with_shell("echo \""..debug_string(object, recursion).."\" | "..editor)
 end
 function debug_leaf(object, recursion)
 	return debug_editor(object, recursion, "leafpad")
@@ -197,18 +267,21 @@ end
 function debug_file(object, recursion, file)
 	saveFile(inspect(object, recursion or 1), file or "debug.txt")
 end
+function debug_print(object, recursion)
+	notify_send(debug_string(object, recursion))
+end
 
 --Naughty
-function wvprint(text, timeout)
+function notify_send(text, timeout)
 	naughty.notify({preset = naughty.config.presets.normal, text = text, screen = screen.count(), timeout = timeout or 0})
 end
 toggleNaughtyNotifications = toggleStateFunc(function(enabled)
 	if enabled then -- Disable Naughty
-		wvprint("Naughty Suspended", 1)
+		notify_send("Naughty Suspended", 1)
 		naughty.suspend()
 	else -- Enable Naughty
 		naughty.resume()
-		wvprint("Naughty Resumed", 1)
+		notify_send("Naughty Resumed", 1)
 	end
 end, true)
 

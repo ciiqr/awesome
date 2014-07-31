@@ -88,7 +88,7 @@ end
 ColorDisplayWidget:connect_signal("mouse::enter",
 	function(self, t)
 		-- Debug
-		-- wvprint(inspect(self))
+		-- notify_send(inspect(self))
 
 		-- Redraw
 		self:emit_signal("widget::updated")
@@ -101,21 +101,21 @@ ColorDisplayWidget:connect_signal("mouse::leave",
 ColorDisplayWidget:connect_signal("button::press",
 	function(self, x, y, button, t)
 		if button == 1 then
-			wvprint("Left Click")
+			notify_send("Left Click")
 		elseif button == 2 then
-			wvprint("Middle Click")
+			notify_send("Middle Click")
 		elseif button == 3 then
-			wvprint("Right Click")
+			notify_send("Right Click")
 		elseif button == 8 then
-			wvprint("Back Click")
+			notify_send("Back Click")
 		elseif button == 9 then
-			wvprint("Forward Click")
+			notify_send("Forward Click")
 		elseif button == 5 then
-			wvprint("Scroll Towards Me")
+			notify_send("Scroll Towards Me")
 		elseif button == 4 then
-			wvprint("Scroll Away From Me")
+			notify_send("Scroll Away From Me")
 		else
-			wvprint(button)
+			notify_send(button)
 		end
 
 
@@ -131,8 +131,8 @@ ColorDisplayWidget:connect_signal("button::release",
 
 
 -- Testinf
--- wvprint(inspect(require('oocairo')))
--- wvprint(inspect(os.date('%I')))
+-- notify_send(inspect(require('oocairo')))
+-- notify_send(inspect(os.date('%I')))
 
 -- Return Created Instance
 return ColorDisplayWidget
