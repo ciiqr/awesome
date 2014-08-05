@@ -48,7 +48,7 @@ function goToLayout(direction) -- -1 for back, 1 for forward
 end
 
 -- Client
--- TODO: Determine if I can make the window adjust when the screen's working area changes
+-- TODO: Determine if I can make the window adjust when the screen's working area changes, add listener when fullscreen, remove when not
 function toggleClientMultiFullscreen(c)
      awful.client.floating.toggle(c)
      if awful.client.floating.get(c) then

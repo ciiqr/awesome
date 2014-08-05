@@ -17,7 +17,6 @@ local mountMenu =
 	{"iPad",		PERSONAL_BIN.."mount-toggle/ipad"},
 	-- {"Open-Tech",		PERSONAL_BIN.."mount-toggle/open-tech"},
 	{"Data-Server",		PERSONAL_BIN.."mount-toggle/data-server"}
-	-- TODO: The Rest
 }
 -- TODO: ? Change to generated, function which takes the display-name & ssh-args
 local sshMenu = {
