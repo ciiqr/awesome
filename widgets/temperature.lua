@@ -47,6 +47,7 @@ temperature:connect_signal("button::press", function(self, x, y, button, t)
 			self:reload()
 			
 		elseif button == 3 then -- Right
+			-- TODO: Show that control is disabled
 			self.controlEnabled = not self.controlEnabled
 		end
 

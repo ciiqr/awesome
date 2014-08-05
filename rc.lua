@@ -1,7 +1,7 @@
 -- Awesome Window Manager Configuration --
 ------------------------------------------
 -- Author:			William Villeneuve	--
--- Date Modified:	  March 9, 2014		--
+-- Date Modified:	  August 4, 2014	--
 --------------------------------------------------------------------------------------
 -- Description:	This is the main file for my awesome configuration. I have put a	--
 -- large focus on cleaning up this file and modularizing different aspects of it.	--
@@ -27,9 +27,6 @@
 -- DFTBA Everyone!																	--
 --------------------------------------------------------------------------------------
 -- Bugs:																			--
--- - Demaximizing in the reverse direction goes to the floating layout even though	--
---		I do not have that layout in my layouts. Unsure of exact reason, maybe it	--
---		can't figure out what layout to switch to.									--
 -- - Modules like ColorDisplayWidget do not create new instaces if required again.	--
 --------------------------------------------------------------------------------------
 -- Required:																		--
@@ -72,7 +69,7 @@ bWibox={} -- Persistent
 infoWibox={} -- Persistent
 local name_callback = {}  -- Persistent
 --Widgets
-local wvWidgets = require("wvWidgets")
+local widget_manager = require("WidgetManager")
 --Misc
 --PopupTerminal
 local quake_terminal = {}
@@ -92,7 +89,7 @@ layouts = {
 	,awful.layout.suit.fair.horizontal
 }
 
--- Per-Screen Setup (Wallpapers, Tags, Pop-down Terminal/Htop/Note, Maximized Layouts, Bars)
+-- Per-Screen Setup (Wallpapers, Tags, Pop-down Terminal/Htop/Note, Maximized Layouts, Top/BottomBars)
 for s = 1, screen.count() do
 	local top_layout	= wibox.layout.align.horizontal()
 	local left_layout	= wibox.layout.fixed.horizontal()
@@ -107,15 +104,12 @@ for s = 1, screen.count() do
 	end
 	
 	--Tags
-	local fLay = layouts[1]
-	local sLay = layouts[2]
-	awful.tag({"➊ Browsing","➋ ❴❵","➌ Learn","➍ iOS","➎ Site","➏ School","➐ ⚙","➑ Ent.","➒ ♫"}, s,
-						{sLay, fLay, fLay, fLay, fLay, fLay, fLay, fLay, fLay}) --🌐 --{} ⌥
-
+	local tileLay = layouts[1]
+	awful.tag(SCREEN_TAGS, s, {layouts[2], tileLay, tileLay, tileLay, tileLay, tileLay, tileLay, tileLay, tileLay}) 
 
 	-- Quake Terminal
-	-- TODO: Move to wvWidgets, wvWidgets:getDropdownTerminal(s), wvWidgets:getDropdownCPU(s), wvWidgets:getDropdownMemory(s), wvWidgets:getDropdownNote(s)
-			-- Then functions to toggle them wvWidgets:toggleDropdownTerminal(s)
+	-- TODO: Move to widget_manager, widget_manager:getDropdownTerminal(s), widget_manager:getDropdownCPU(s), widget_manager:getDropdownMemory(s), widget_manager:getDropdownNote(s)
+			-- Then functions to toggle them widget_manager:toggleDropdownTerminal(s=mouse.screen)
 	quake_terminal[s] = quake({ terminal = TERMINAL, height = 0.35, screen = s, width = 0.5})
 	quake_htop_cpu_terminal[s] = quake({terminal=TERMINAL, argname="-name %s -e "..COMMAND_TASK_MANAGER_CPU, name="QUAKE_COMMAND_TASK_MANAGER_CPU", height=0.75, screen=s, width=0.5, horiz="right"})
 	quake_htop_mem_terminal[s] = quake({terminal=TERMINAL, argname="-name %s -e "..COMMAND_TASK_MANAGER_MEM, name="QUAKE_COMMAND_TASK_MANAGER_MEM", height=0.75, screen=s, width=0.5, horiz="left"})
@@ -126,14 +120,14 @@ for s = 1, screen.count() do
 	--Left Widgets
 	-- Main Menu Button
 	if s == 1
-		then left_layout:add(wvWidgets:getMainMenuButton())
+		then left_layout:add(widget_manager:getMainMenuButton())
 	end
 	-- Tag List
-	left_layout:add(wvWidgets:getTagsList(s))
+	left_layout:add(widget_manager:getTagsList(s))
 
 	--Middle Widget
 	-- IP
-	middle_layout:add(wvWidgets:getIP())
+	middle_layout:add(widget_manager:getIP())
 
 	--Right Widgets
 	if s == screen.count() then -- Main Widgets on Far Right
@@ -143,27 +137,27 @@ for s = 1, screen.count() do
 		-- right_layout:add(require("testWidget"):init())
 		
 		-- Temperature
-		right_layout:add(wvWidgets:getTemperature())
+		right_layout:add(widget_manager:getTemperature())
 		-- Net Usage
-		right_layout:add(wvWidgets:getNetUsage())
+		right_layout:add(widget_manager:getNetUsage())
 		-- Battery Widget
 		if IS_LAPTOP then
-			right_layout:add(wvWidgets:getBatteryWidget())
+			right_layout:add(widget_manager:getBatteryWidget())
 		end
 		-- Volume
-		right_layout:add(wvWidgets:getVolume())
+		right_layout:add(widget_manager:getVolume())
 		--Memory
-		right_layout:add(wvWidgets:getMemory())
+		right_layout:add(widget_manager:getMemory())
 		--CPU
-		right_layout:add(wvWidgets:getCPU())
+		right_layout:add(widget_manager:getCPU())
 		-- System Tray
-		right_layout:add(wvWidgets:getSystemTray())
+		right_layout:add(widget_manager:getSystemTray())
 		-- Clock
-		right_layout:add(wvWidgets:getTextClock())
+		right_layout:add(widget_manager:getTextClock())
 	end
 
 	-- Layout Box
-	right_layout:add(wvWidgets:getLayoutBox(s))
+	right_layout:add(widget_manager:getLayoutBox(s))
 
 	--Add Layouts to Master Layout & Set tWibox Widget to Master Layout
 	top_layout:set_left(left_layout)
@@ -183,7 +177,7 @@ for s = 1, screen.count() do
 	end
 	
 	-- Task List
-	bottomLayout:set_middle(wvWidgets:getTaskBox(s))
+	bottomLayout:set_middle(widget_manager:getTaskBox(s))
 	--bWibox
 	bWibox[s] = awful.wibox({position = "bottom", screen = s, height = 22})
 	bWibox[s]:set_widget(bottomLayout)
@@ -193,10 +187,10 @@ for s = 1, screen.count() do
 	-- Info Widgets & Time
 	-- infoLayout:set_first(require("awedock"):init())
 	-- infoLayout:set_middle(require("ColorDisplayWidget"):init({"5A667F", "b0d54e", "5f8787", "69b2b2", "FF0000", "de5705", "00ff00"})) -- This overrides the previous
-	infoLayout:add(wvWidgets:getTaskBox(s, true))
+	infoLayout:add(widget_manager:getTaskBox(s, true))
 
 	-- Info Wibox
-	infoWibox[s] = wvWidgets:getInfoWibox(s, infoLayout)
+	infoWibox[s] = widget_manager:getInfoWibox(s, infoLayout)
 end
 
 --Global Key Bindings
@@ -268,9 +262,14 @@ globalKeys = awful.util.table.join(
 	--Change Number of Columns(Only on splitup side)
 	-- awful.key({SUPER, CONTROL}, "h", function() awful.tag.incncol( 1) end),
 	-- awful.key({SUPER, CONTROL}, "l", function() awful.tag.incncol(-1) end),
+	
+	-- Switch beteen screens
+	-- TODO: Make it depend on the number of attached screens
+	awful.key({SUPER}, "F1", function () awful.screen.focus(1) end),
+	awful.key({SUPER}, "F2", function () awful.screen.focus(2) end),
 
 	--Popups
-	awful.key({SUPER}, "w", function() wvWidgets.mainMenu:show({coords = {x = 1, y = 1}}) end),
+	awful.key({SUPER}, "w", function() widget_manager.mainMenu:show({coords = {x = 1, y = 1}}) end),
 	awful.key({SUPER}, "p", function() awful.util.spawn_with_shell(string.format(COMMAND_LAUNCHER, screen[mouse.screen].workarea.y)) end),
 	awful.key({SUPER}, "o", function() awful.util.spawn_with_shell(string.format(COMMAND_FILE_OPENER, screen[mouse.screen].workarea.y)) end),
 	-- Terminal
@@ -296,10 +295,10 @@ globalKeys = awful.util.table.join(
 
 	--System
 	--Volume
-	awful.key({}, "XF86AudioLowerVolume", function() wvWidgets:changeVolume("-") end),
-	awful.key({}, "XF86AudioRaiseVolume", function() wvWidgets:changeVolume("+") end),
-	awful.key({SHIFT}, "XF86AudioLowerVolume", function() wvWidgets:changeVolume("-", VOLUME_CHANGE_SMALL) end),
-	awful.key({SHIFT}, "XF86AudioRaiseVolume", function() wvWidgets:changeVolume("+", VOLUME_CHANGE_SMALL) end),
+	awful.key({}, "XF86AudioLowerVolume", function() widget_manager:changeVolume("-") end),
+	awful.key({}, "XF86AudioRaiseVolume", function() widget_manager:changeVolume("+") end),
+	awful.key({SHIFT}, "XF86AudioLowerVolume", function() widget_manager:changeVolume("-", VOLUME_CHANGE_SMALL) end),
+	awful.key({SHIFT}, "XF86AudioRaiseVolume", function() widget_manager:changeVolume("+", VOLUME_CHANGE_SMALL) end),
 
 	--Brightness
 	awful.key({}, "XF86MonBrightnessUp", function() changeBrightness("+", BRIGHTNESS_CHANGE_NORMAL) end),
@@ -317,7 +316,10 @@ globalKeys = awful.util.table.join(
 	awful.key({SUPER}, "Print", captureScreenSnip),
 
 	--Cycle Displays
-	awful.key({SUPER}, "F11", xrandr)
+	awful.key({SUPER}, "F11", xrandr),
+	
+	-- Pasteboard paste
+	awful.key({}, "Insert", function() notify_send("Insert", 0.5) ;awful.util.spawn("xdotool click 2") end) -- put 'keycode 118 = ' back in .Xmodmap if I no longer use this
 
 	--Switch Focus
 	-- awful.key({SUPER}, "j",
@@ -424,7 +426,7 @@ awful.rules.rules = {
 	}
 	,{ -- Floating
 		rule_any = {
-			class = {"Speedcrunch", "pinentry", "MPlayer", "Plugin-container", "Exe", "Gtimer", "Vmware-modconfig", "freerdp", "Seafile-applet", "mainframe"},
+			class = {"Speedcrunch", "pinentry", "MPlayer", "Plugin-container", "Exe", "Gtimer", "Vmware-modconfig", "freerdp", "Seafile-applet", "Pavucontrol", "mainframe", "Redshiftgui"},
 			name = {"Tab Organizer"},
 			type = {"dialog"},
 			role = {"pop-up"}
@@ -603,6 +605,25 @@ awful.rules.rules = {
 	}
 	,{
 		rule = {
+			class = "Pavucontrol"
+		},
+		properties = {
+			callback = function(c)
+				local existingDimens = c:geometry()
+				screenDimens = screen[mouse.screen].workarea
+				local width = existingDimens.width
+				local height = existingDimens.height
+				c:geometry({
+					x = screenDimens.width - width,
+					y = screenDimens.y,
+					width = width,
+					height = height
+				})
+			end
+		}
+	}
+	,{
+		rule = {
 			name = "PlayOnLinux Warning"
 		},
 		properties = {
@@ -671,6 +692,7 @@ awful.rules.rules = {
 	--}
 }
 
+-- TODO: Move to config
 --Signals
 --Client
 client.connect_signal("manage", manageClient)
@@ -682,8 +704,11 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 client.connect_signal("property::floating", function(c) c.ontop = awful.client.floating.get(c) end)
 --Mouse Over Focus
 client.connect_signal("mouse::enter", function(c)
-	if awful.client.focus.filter(c) then --  and awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
-		client.focus = c
+	-- NOTE: Experimental support for not changing focus from transient back to it's parent
+	-- NOTE: If there is anpther client on screen then we can still switch to that client then back to the parent...
+	-- NOTE: ALSO: Experimental support for not changing focus to fullscreen windows automatically, intended to help with the fact that fullscreen windows are displayed over top of wiboxes
+	if awful.client.focus.filter(c) and client.focus.transient_for ~= c and (not c.fullscreen) then --  and awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
+			client.focus = c
 	end
 end)
 

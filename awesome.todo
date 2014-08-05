@@ -1,140 +1,62 @@
--- TODO --
-----------
--- Level 6 (Not Relevant To Awesome)
-----------
--- Character counter
--- Can you mount a device(partition) in multiple directories?
--- How to edit a package
-  -- http://stackoverflow.com/questions/4468447/how-to-download-source-code-with-pacman-on-arch-linux
-
-
--- Level 5 (WTF was I refering to?)
-----------
--- Something similar to resizing layouts
--- & Switching focus
-
-
---Level 4 (Technical)
----------------------
--- For Testing MimeTypes sudo xdg-mime query filetype  "$(locate "" | $val=dmenu -y 19 -i -p "Open" -l 20 -fn "Nimbus Sans L-10")"
--- awful.key({},KeyName,Press,Release) the release is not being called
---[[ Stop Floating Covering Wiboxes
---naughty.notify({ text=c.name })
-local geometry = c:geometry()
-wiboxGeometry = tWibox[c.screen]:geometry()
-if  geometry.y < wiboxGeometry.y + wiboxGeometry.height then
-	geometry.y = wiboxGeometry.y + wiboxGeometry.height -- + c.border_width -- It seems to already account for border width
-	c:geometry(geometry)
-end
---]]
-
-
--- Level 3 (Maybe)
-------------------
--- Mode advanced application management, only run certain applications if in specific location (wifi network based), ie. only run seafile-applet when at home(connected to Angel's ToyboxN), when get home, auto run, when leave, auto stop
--- When there is only one client in the tag (or all between all selected tags) hide the bottom bar
--- For certain things like backlight level I can store settings to they are restored when I start back up, for this I will create a folder in my awesome config called settings are create a single file for each setting and subfolder's if needed
--- Win Left Should Make Window Take up full left, right full right (There needs to be a layout that just displayes 2 windows, one on the left and one on the right)
--- Dismiss Menu's when we click in another window or the desktop
--- If Possible, when an application is run when it is already open and running does not creat a window in the current desktop(tag) switch to the desktop which it is in (if multiple make smart choice(the first one in the entire list, the closest to the current, the first to the right, etc))
--- Change Win + Up to make it change layout (instead of maximizing), then go back to the previous layout
--- XCalib, Try to make it more like I have in windows with negativeScreen or whatever
-	-- Invert Screen "xcalib -i -a"
--- Filemanager audio converter
--- Simplify Keybindings a bit
-	-- Win + z/x/c/v/b/n/m  a/s/d/f  q/w/e  Insert for different functions (Like hide wiboxes)
--- Win + Control + p should launch program even if it is already running (Or Opposite)
--- Bind then map the insert key to paste the X11 Pasteboard (Not Clipboard)
--- Create a global variable to get all variables?
--- Toggle htop with right clicks (try killing all, if it doesn't find htop then )
--- Toggle Mouse Keys ON(xkbset m) OFF(xkbset -m)
-
--- Toggle The Visibility of the SystemTray ?
--- function toggleSysTray()
--- 	wvprint(inspect(tWibox[screen.count()]._drawable._widget_geometries[22], 2))
--- 	-- Itterate tWibox[screen.count()]._drawable._widget_geometries
--- 		-- Check each widget to see if it is my systray (Check for widget.isSysTray == true)
--- 	-- Save y coord(Normal_Y_Coordinate)
--- 	-- Set y to make the widget offscreen (y =  y - height)
+- Level 1 -
+-----------
+	- Make Sublime always open new windows (With Desktop File)
+		- Check if already running, if so, run subl3 -n, else just subl3
+	- Prevent windows moving(glitching) with client side window controls (unless the window is floating)
+		- There should be a way to remove the tray widget & re-add it later (but can I re-add it at the proper index? maybe replace it with a widget I can identify OR have a wrapper (layout or whatever))
+	- Quake popups above floating
+	- Window (Expose) Search - Replace SUPER + c with it
+	- clear all naughty
+		? with SUPER + L
+	- Use DBus for things like network devices (ie. Network Manager)
+		- http://people.redhat.com/dcbw/NetworkManager/NetworkManager%20DBUS%20API.txt
+	? Coroutines (ASync Tasks) http://lua-users.org/wiki/CoroutinesTutorial
+	? Tooltip - Display nuber of clients in a tag
+	- Control + Alt + Shift + Arrows - Skip to the next/previous non-empty tag
+	- switchtotag on focus, but only for specific clients (ie. Chrome)
+	- name = "Deleting files", "Copying files", "Moving files"; class = "Spacefm" - Have always show in bottom right corner of screen
+	? XF86TouchpadOff & XF86TouchpadOn to toggle a icon indicator on the top bar
+	- Sleep icon <span face="Quivira" weight="bold">
+	- Prevent Floating Clients Covering Wiboxes, really should be part of awesome's placement module
+	- When a windows priority changes from normal to critical, as long as it is chrome OR some other window which I want to be allowed to, move to the applicable tag
 	
--- 	if sysTray.hidden then
--- 		sysTray.hidden = false
--- 	else
--- 		sysTray.hidden = true
--- 	end
--- 	sysTray:emit_signal("widget::updated")
--- end
+	- Look into: group_window, leader_window
+	- When toggling fullscreen off, set border_width
+	- Look at how awful.mouse.client.move works
+	- Re-add battery notification
+	- When only 1 window is on first tag & we restart awesome, it is not focused
+	- run-or-kill command for pavucontrol & other similar, needs to be able to pass the program name to search for seperatly (second param)
+	- awful.screen.padding(screen[mouse.screen], {top=-22, left=0, right=0, bottom=-22})
+		- May be the best alternative to hiding the wiboxes with fullscreen windows
 
+- Level 2 (Not Important) -
+---------------------------
+	- App Searcher (Lists all clients and allows switching to them)
+	- Time Different Parts of the config and determine where performance can be improved
+	- Widgets to have in my special menu (With Vicious May Be Able to unregister these widgets when not displaying menu)
+	- Look Here for more info/ideas https://github.com/Mic92/vicious
+		- vicious.widgets.cpufreq
+		- vicious.widgets.thermal
+		- vicious.widgets.uptime
+		- vicious.widgets.os
+		- vicious.widgets.fs
+		- vicious.widgets.dio
+		- vicious.widgets.hddtemp
+		- vicious.widgets.wifi
+		- vicious.widgets.pkg -- Must Manually call yaourt -Syu then exit because this widget will not be up to date otherwise, clicking this widget should display a terminal with yaourt running with command -Syu
+		- vicious.widgets.mpd if I start using it
+		- vicious.widgets.weather
+		- Maybe other
+	? make the memory update frequency the same as the cpu? or make it (and others update when pressed)
 
--- Level 2 (Not Important)
---------------------------
--- Furth Configure Default Hotkeys to My Own
-	-- Win + Shift +Arrows to move a window around the current screen
--- Make Expose ignore size hints
--- DMenu App Launcher (Replace Awesome Built in but requires icons)
--- DMenu App Searcher (Lists all clients and allows switching to them)
--- Make Sublime always open new windows (With Desktop File)
--- Time Different Parts of the config and determine where performance can be improved
--- Prevent Chrome OR general role = GtkFileChooserDialog, class = "Google-chrome", name = "Select Folder" from getting its size changes
--- When hover OR maybe Mod + Click a client in the taskList, display a preview
-
--- Widgets to have in my special menu (With Vicious May Be Able to unregister these widgets when not displaying menu)
--- Look Here for more info/ideas https://github.com/Mic92/vicious
--- vicious.widgets.cpufreq
--- vicious.widgets.thermal
--- vicious.widgets.uptime
--- vicious.widgets.os
--- vicious.widgets.fs
--- vicious.widgets.dio
--- vicious.widgets.hddtemp
--- vicious.widgets.wifi
--- vicious.widgets.pkg -- Must Manually call yaourt -Syu then exit because this widget will not be up to date otherwise, clicking this widget should display a terminal with yaourt running with command -Syu
--- vicious.widgets.mpd if I start using it
--- vicious.widgets.weather
--- Maybe other
-
--- make the memory update frequency the same as the cpu? or make it (and others update when pressed) 
-
--- Level 1
-----------
--- Modularize
-	-- lua
-	function split(str, pat)
-
-	-- Awesome
-	function toggleClient(c)
-	
--- Prevent windows moving/glitching with client side window controls (unless the window is floating)
--- Hidable system tray & general widgets
-	-- There should be a way to remove the tray widget & readd it later (but can I re-add it at the proper index? maybe replace it with a widget I can identify OR have a wrapper (layout or whatever))
-
-- Quake popups shoulf be above floating
-? Specify size for role=GtkFileChooserDialog & similar windows
-
--- Window (Expose) Search - Replace SUPER + c with it
--- Add AlsoMixerGui (gnome-alsamixer) to toggleable quake console
--- Add ip addr show to toggleable quake console (Except that I want to close it when it is hidden...)
-
--- clear all naughty with SUPER + L
--- Rule: class = "midori", size_hints.program_position = {x = 0, y = 0}
-
--- kill quake consoles on stop (Even if just restarting, unless there was a way to reuse then)
--- Use DBus for things like network devices (ie. Network Manager)
---		http://people.redhat.com/dcbw/NetworkManager/NetworkManager%20DBUS%20API.txt
-
--- Coroutines (ASync Tasks) http://lua-users.org/wiki/CoroutinesTutorial
--- Tooltip - Display nuber of clients in a tag
--- Copy "function toggleTag(tagNum)"'s syntax
--- Control + Alt + Shift + Arrows - Skip to the next/previous non-empty tag
--- switchtotag on focus
--- sudo rfkill (un)block wifi Widget
-
--- ^^ I think it would be best for right click to update widgets and left click to do something with it (ie. display htop)
-
--- awful.key({SUPER, CONTROL, ALT}, "#" .. i + 9, function() toggleClientTag(i) end)) -- Change to Control, Alt Shift to be more like mod shift for toggleing a tag visibility
--- "Gnome-mplayer" Gnome MPlayer - when unfocus hide, always located in the upper right corner, sticky
--- name = "Deleting files", "Copying files", "Moving files"; class = "Spacefm" - Have always show in bottom right corner of screen
--- XF86TouchpadOff & XF86TouchpadOn to toggle a icon indicator on the top bar
--- Take Screenshot - After Taking a screen shot display an icon on that top bar for a few seconds after it is saved
-
--- Sleep icon <span face="Quivira" weight="bold">
+- Level 3 (Maybe) -
+-------------------
+	? Mode advanced application management, only run certain applications if in specific location (wifi network based), ie. only run seafile-applet when at home(connected to Angel's ToyboxN), when get home, auto run, when leave, auto stop
+	? When there is only one client in the tag (or all between all selected tags) hide the bottom bar
+	? Store certain settings so they are restored on startup, for this I will create a folder in my awesome config called settings are create a single file for each setting and subfolder's if needed
+	? Dismiss Menu's when we click in another window or the desktop
+	? If Possible, when an application is run when it is already open and running does not creat a window in the current desktop(tag) switch to the desktop which it is in (if multiple make smart choice(the first one in the entire list, the closest to the current, the first to the right, etc))
+	? Audio converter
+	? Simplify Keybindings a bit
+		- Win + z/x/c/v/b/n/m  a/s/d/f  q/w/e
+	? Win + Control + p launch program even if it is already running (Or Opposite)

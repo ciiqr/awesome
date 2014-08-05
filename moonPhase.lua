@@ -33,7 +33,7 @@ end
 
 moonPhase.original_draw = moonPhase.draw
 moonPhase.draw = function(self, wibox, cr, width, height)
--- wvprint(inspect(wibox, 1))
+-- notify_send(inspect(wibox, 1))
 	-- Background
 	-- cr:save()
 	-- 	cr:set_source_rgba(63/255, 63/255, 63/255, 1)
@@ -99,7 +99,7 @@ moonPhase:connect_signal("button::press",
             -- Start Timer
             self.timer:start()
         elseif button == 3 then
-            wvprint("Reloading Moon Phase...")
+            notify_send("Reloading Moon Phase...")
 			self:reload()
             -- self:emit_signal("widget::updated")
 		end
