@@ -5,28 +5,28 @@
 local vicious = vicious or require("vicious")
 local beautiful = beautiful or require("beautiful")
 
-local wvWidgets = {}
+local WidgetManager = {}
 
 if IS_LAPTOP then
-	wvWidgets.wifiDevice = "wlp9s0"
-	wvWidgets.ethDevice = "enp8s0"
+	WidgetManager.wifiDevice = "wlp9s0"
+	WidgetManager.ethDevice = "enp8s0"
 else
-	wvWidgets.wifiDevice = "wlp0s29u1u7"
-	wvWidgets.ethDevice = "enp2s0" -- OR enp7s4
+	WidgetManager.wifiDevice = "wlp0s29u1u7"
+	WidgetManager.ethDevice = "enp2s0" -- OR enp7s4
 end
 
 -- Volume
-function wvWidgets:getVolume()
+function WidgetManager:getVolume()
 	self.volume = wibox.widget.textbox() -- 🔇 -- Mute icon --
 	self.volume:buttons(awful.util.table.join(
-		awful.button({}, 4, function() wvWidgets:changeVolume("+", 1) end),
-		awful.button({}, 5, function() wvWidgets:changeVolume("-", 1) end),
-		awful.button({}, 1, function() awful.util.spawn("alsamixergui") end)
+		awful.button({}, 4, function() WidgetManager:changeVolume("+", 1) end),
+		awful.button({}, 5, function() WidgetManager:changeVolume("-", 1) end),
+		awful.button({}, 1, function() run_once("pavucontrol") end)
 	))
 	self:changeVolume("+", 0)
 	return self.volume
 end
-function wvWidgets:changeVolume(incORDec, change)
+function WidgetManager:changeVolume(incORDec, change)
 	local change = change or VOLUME_CHANGE_NORMAL
 
 	-- Get mixer control contents
@@ -49,7 +49,7 @@ function wvWidgets:changeVolume(incORDec, change)
 		self:setVolumeWidget(volu or "")
 	end
 end
-function wvWidgets:setVolumeWidget(vol)
+function WidgetManager:setVolumeWidget(vol)
 	-- TODO: volIcon
 	-- Snippets
 	-- vol = tonumber(vol)
@@ -61,7 +61,7 @@ function wvWidgets:setVolumeWidget(vol)
 	self.volume:set_markup('<span foreground="#ffaf5f" weight="bold">🔈 '..vol.."%  "..'</span>')
 end
 
-function wvWidgets:getMemory()
+function WidgetManager:getMemory()
 	self.memory = wibox.widget.textbox()
 	vicious.register(self.memory, vicious.widgets.mem, "<span fgcolor='#138dff'>$1% $2MB</span>  ", 13) --DFDFDF
 	self.memory:buttons(awful.util.table.join(
@@ -70,7 +70,7 @@ function wvWidgets:getMemory()
 	return self.memory
 end
 
-function wvWidgets:getCPU()
+function WidgetManager:getCPU()
 	local cpuwidget = awful.widget.graph()
 	cpuwidget:set_width(50)
 	cpuwidget:set_background_color("#494B4F00") --55
@@ -82,7 +82,7 @@ function wvWidgets:getCPU()
 	return cpuwidget
 end
 
-function wvWidgets:getSystemTray()
+function WidgetManager:getSystemTray()
 	self.sysTray = wibox.widget.systray()
 	self.sysTray.isSysTray = true
 	self.sysTray.orig_fit = self.sysTray.fit
@@ -100,7 +100,7 @@ function wvWidgets:getSystemTray()
 	return self.sysTray
 end
 
-function wvWidgets:getIP()
+function WidgetManager:getIP()
 	local ip = retrieveIPAddress(self.wifiDevice)
 	if not ip or ip == "" then
 		ip = retrieveIPAddress(self.ethDevice)
@@ -110,12 +110,12 @@ function wvWidgets:getIP()
 	self.ip:set_align("center")
 
 	self.ip:buttons(awful.util.table.join(
-		awful.button({}, 1, function() awful.util.spawn_with_shell(TERMINAL_EXEC.."ip addr show; read -n") end)
+		awful.button({}, 1, function() awful.util.spawn_with_shell(TERMINAL_EXEC.."'ip addr show; read -n'") end)
 	))
 	return self.ip
 end
 
-function wvWidgets:getMainMenuButton()
+function WidgetManager:getMainMenuButton()
 	self.mainMenu = require("MainMenu")
 	self.mainMenuButton = awful.widget.launcher({image = beautiful.arch_icon, menu = self.mainMenu, coords = {x = 0, y = 0}})
 	-- TODO: Why do I have this line?
@@ -124,7 +124,7 @@ function wvWidgets:getMainMenuButton()
 end
 
 -- Promp Box
-function wvWidgets:getPromptBoxes()
+function WidgetManager:getPromptBoxes()
 	-- TODO: Consider Revising
 	if not self.promptBox then
 		self.promptBox = require("widgets.multi-prompt-box")
@@ -133,7 +133,7 @@ function wvWidgets:getPromptBoxes()
 end
 
 -- Text Clock
-function wvWidgets:getTextClock()
+function WidgetManager:getTextClock()
 	self.textClock = awful.widget.textclock('  <span foreground="#94738c">%A, %B %d</span>  <span foreground="#ecac13">%I:%M %p</span>  ', 10)
 	-- Add Calendar
 	require("cal").register(self.textClock, '<span weight="bold" foreground="'..(beautiful.taglist_fg_focus or beautiful.fg_focus or "")..'" underline="single">%s</span>')
@@ -141,8 +141,8 @@ function wvWidgets:getTextClock()
 end
 
 -- TaskList
-function wvWidgets:getTaskBox(screen, is_vertical)
-	-- TODO: These need to be seperate per screen, therefore I need a list for each, ie. wvWidgets.verticalTaskBoxes, wvWidgets.horizontalTaskBoxes
+function WidgetManager:getTaskBox(screen, is_vertical)
+	-- TODO: These need to be seperate per screen, therefore I need a list for each, ie. WidgetManager.verticalTaskBoxes, WidgetManager.horizontalTaskBoxes
 	local buttons = awful.util.table.join(
 		awful.button({}, 1, toggleClient),
 		awful.button({}, 3, function() toggleWibox(infoWibox) end)--toggleClientsList)
@@ -163,7 +163,7 @@ function wvWidgets:getTaskBox(screen, is_vertical)
 	end
 end
 
-function wvWidgets:getInfoWibox(s, widget)
+function WidgetManager:getInfoWibox(s, widget)
 	local screenDimens = screen[s].workarea
 	-- local aWibox = wibox({position = "left", screen = s, width = 100, height = 1080-122*2, y = 100})--awful.wibox({position = "left", screen = s, width = 100, height = 1080-122-122, y = 100})
 	local aWibox = wibox({position = "left", screen = s, width = 300, height = screenDimens.height, y = screenDimens.y}) -- 836 should be dynamic, on task list change it should update height, never more than screen height - (t/b)wiboxes, normally a multiple of 31-33.44 -- TODO: That << lol
@@ -181,7 +181,7 @@ function wvWidgets:getInfoWibox(s, widget)
 end
 
 -- TagsList
-function wvWidgets:getTagsList(screen)
+function WidgetManager:getTagsList(screen)
 	-- TODO: Consider Moving
 	local buttons = awful.util.table.join(
 		awful.button({}, 1, awful.tag.viewonly), -- Switch to This Tag
@@ -200,7 +200,7 @@ function wvWidgets:getTagsList(screen)
 end
 
 -- LayoutBox
-function wvWidgets:getLayoutBox(screen)
+function WidgetManager:getLayoutBox(screen)
 	-- TODO: CHange so it stores the layoutBoxes for all screens
 	self.layoutBox = awful.widget.layoutbox(screen)
 	self.layoutBox:buttons(awful.util.table.join(
@@ -212,18 +212,18 @@ function wvWidgets:getLayoutBox(screen)
 end
 
 -- Temperature
-function wvWidgets:getTemperature()
+function WidgetManager:getTemperature()
 	self.temperature = require("widgets.temperature"):init()
 	return self.temperature
 end
 
 -- Net Usage
-function wvWidgets:getNetUsage()
+function WidgetManager:getNetUsage()
 	-- TODO: Make some changes
 	self.netwidget = wibox.widget.textbox()
-	vicious.register(self.netwidget, vicious.widgets.net, '<span foreground="#97D599" weight="bold">↑${'..wvWidgets.wifiDevice..' up_kb}</span> <span foreground="#CE5666" weight="bold">↓${'..wvWidgets.wifiDevice..' down_kb}</span>  ', 1) --#585656
+	vicious.register(self.netwidget, vicious.widgets.net, '<span foreground="#97D599" weight="bold">↑${'..WidgetManager.wifiDevice..' up_kb}</span> <span foreground="#CE5666" weight="bold">↓${'..WidgetManager.wifiDevice..' down_kb}</span>  ', 1) --#585656
 	self.netwidget:buttons(awful.util.table.join(
-		awful.button({}, 1, function() awful.util.spawn(TERMINAL_EXEC.." sudo nethogs "..wvWidgets.wifiDevice.."") end)
+		awful.button({}, 1, function() awful.util.spawn(TERMINAL_EXEC.." sudo nethogs "..WidgetManager.wifiDevice.."") end)
 	))
 
 	-- TODO
@@ -240,17 +240,31 @@ end
 
 
 -- Battery
-function wvWidgets:getBatteryWidget()
+function WidgetManager:getBatteryWidget()
 	-- TODO: Make so we can update from acpi
 	self.battery = wibox.widget.textbox()
-	vicious.register(self.battery, vicious.widgets.bat, '<span foreground="#ffcc00" weight="bold"> $1$2% $3</span>  ', 120, "BAT1") --585656
-	self.battery.bg = "#cac6ce"
-	-- function customWrapper(...) -- format, warg
+	function customWrapper(...) -- format, warg
 
-	-- 	local retval = vicious.widgets.bat(...)
-	-- 	local batteryPercent = retval[2]
-	-- 	if batteryPercent < BATTERY_LOW_PERCENT and retval[1] == ""
+		local retval = vicious.widgets.bat(...)
+		local batteryPercent = retval[2]
+		-- On Battery
+		if retval[1] == "−" then
+			local function notify_battery_warning(level)
+				notify_send(level.." Battery: "..batteryPercent.."% !", 0, naughty.config.presets.critical)
+			end
+			-- Low Battery
+			if batteryPercent < BATTERY_PERCENT_LOW then
+				notify_battery_warning("Low")
+			elseif batteryPercent < BATTERY_PERCENT_CRITICAL then
+				notify_battery_warning("Critical")
+			end
+		end
+		return retval
+	end
+	vicious.register(self.battery, customWrapper, '<span foreground="#ffcc00" weight="bold"> $1$2% $3</span>  ', 120, "BAT1") --585656
+	self.battery.bg = "#cac6ce"
+	
 	return self.battery
 end
 
-return wvWidgets
+return WidgetManager

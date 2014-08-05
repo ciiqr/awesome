@@ -147,17 +147,6 @@ local function isTitlebarEnabledForClient(c)
 	end
 	return true
 end
-function toggleClientTitlebar(c)
-	local titlebar = awful.titlebar(c)
-	if titlebar.visible == true then
-		titlebar.visible = false
-		awful.titlebar(c, {size = 0})
-	else
-		addTitlebarToClient(c, titlebar)
-		titlebar.visible = true
-		-- titlebar
-	end
-end
 local function addTitlebarToClient(c, titlebar)
 	local titlebar = titlebar or awful.titlebar(c)
 	-- buttons for the titlebar
@@ -201,10 +190,21 @@ local function addTitlebarToClient(c, titlebar)
 	titlebar:set_widget(layout)
 	titlebar.visible = true
 end
+function toggleClientTitlebar(c)
+	local titlebar = awful.titlebar(c)
+	if titlebar.visible == true then
+		titlebar.visible = false
+		awful.titlebar(c, {size = 0})
+	else
+		addTitlebarToClient(c, titlebar)
+		titlebar.visible = true
+		-- titlebar
+	end
+end
 
 --Signals
 local function transientShouldBeSticky(c)
-	return (c.name:find("LEAFPAD_QUICK_NOTE")) -- or 
+	return (c.name and c.name:find("LEAFPAD_QUICK_NOTE")) -- or 
 end
 
 function manageClient(c, startup)
@@ -272,8 +272,11 @@ function debug_print(object, recursion)
 end
 
 --Naughty
-function notify_send(text, timeout)
-	naughty.notify({preset = naughty.config.presets.normal, text = text, screen = screen.count(), timeout = timeout or 0})
+function notify_send(text, timeout, preset)
+	naughty.notify({preset=preset or naughty.config.presets.normal,
+					  text=text,
+					screen=screen.count(),
+				   timeout=timeout or 0})
 end
 toggleNaughtyNotifications = toggleStateFunc(function(enabled)
 	if enabled then -- Disable Naughty
