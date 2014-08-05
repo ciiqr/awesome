@@ -21,13 +21,18 @@ function toggleStateFunc(functionToToggle, state)
 end
 
 -- Delay
--- TODO: Allow passing of arguments
-function delayFunc(delayTime, func)
+function delayFunc(delayTime, func, ...)
+	-- Store additional arguments
+	local bound_args = table.pack(...);
+	-- Create Timer
 	delayTimer = timer({timeout = delayTime})
 	delayTimer:connect_signal("timeout", function()
-		func()
+		-- Unpack arguments & call function with them
+		func(unpack(bound_args))
+		-- Stop the timer
 		delayTimer:stop()
 	end)
+	-- Start Timer
 	delayTimer:start()
 end
 

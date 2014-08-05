@@ -1,9 +1,6 @@
--- todo: retrieve theme
--- todo: volume
--- todo: setVolumeWidget is on desktop
-
-local vicious = vicious or require("vicious")
 local beautiful = beautiful or require("beautiful")
+local vicious = vicious or require("vicious")
+local quake = quake or require("quake")
 
 local WidgetManager = {}
 
@@ -12,7 +9,75 @@ if IS_LAPTOP then
 	WidgetManager.ethDevice = "enp8s0"
 else
 	WidgetManager.wifiDevice = "wlp0s29u1u7"
-	WidgetManager.ethDevice = "enp2s0" -- OR enp7s4
+	WidgetManager.ethDevice = "enp2s0"
+end
+
+-- Popup Terminal
+function WidgetManager:initPopupTerminal(s)
+	-- Ensure we have a table
+	if not self.quake_terminal then
+		self.quake_terminal = {}
+	end
+	
+	-- Create Popup Terminal
+	self.quake_terminal[s] = quake({ terminal = TERMINAL, height = 0.35, screen = s, width = 0.5})
+	
+	return self.quake_terminal[s]
+end
+function WidgetManager:togglePopupTerminal(s)
+	-- Toggle Popup
+	self.quake_terminal[s or mouse.screen]:toggle()
+end
+
+-- Popup CPU
+function WidgetManager:initPopupCPU(s)
+	-- Ensure we have a table
+	if not self.quake_htop_cpu_terminal then
+		self.quake_htop_cpu_terminal = {}
+	end
+	
+	-- Create Popup CPU
+	self.quake_htop_cpu_terminal[s] = quake({terminal=TERMINAL, argname="-name %s -e "..COMMAND_TASK_MANAGER_CPU, name="QUAKE_COMMAND_TASK_MANAGER_CPU", height=0.75, screen=s, width=0.5, horiz="right"})
+	
+	return self.quake_htop_cpu_terminal[s]
+end
+function WidgetManager:togglePopupCPU(s)
+	-- Toggle Popup
+	self.quake_htop_cpu_terminal[s or mouse.screen]:toggle()
+end
+
+-- Popup Memory
+function WidgetManager:initPopupMemory(s)
+	-- Ensure we have a table
+	if not self.quake_htop_mem_terminal then
+		self.quake_htop_mem_terminal = {}
+	end
+	
+	-- Create Popup Memory
+	self.quake_htop_mem_terminal[s] = quake({terminal=TERMINAL, argname="-name %s -e "..COMMAND_TASK_MANAGER_MEM, name="QUAKE_COMMAND_TASK_MANAGER_MEM", height=0.75, screen=s, width=0.5, horiz="left"})
+	
+	return self.quake_htop_mem_terminal[s]
+end
+function WidgetManager:togglePopupMemory(s)
+	-- Toggle Popup
+	self.quake_htop_mem_terminal[s or mouse.screen]:toggle()
+end
+
+-- Popup Notes
+function WidgetManager:initPopupNotes(s)
+	-- Ensure we have a table
+	if not self.quake_leafpad_quick_note then
+		self.quake_leafpad_quick_note = {}
+	end
+	
+	-- Create Popup Notes
+	self.quake_leafpad_quick_note[s] = quake({terminal = "leafpad", argname="--name=%s", name="LEAFPAD_QUICK_NOTE", height = 0.35, screen = s, width = 0.5})
+	
+	return self.quake_leafpad_quick_note[s]
+end
+function WidgetManager:togglePopupNotes(s)
+	-- Toggle Popup
+	self.quake_leafpad_quick_note[s or mouse.screen]:toggle()
 end
 
 -- Volume
@@ -61,15 +126,17 @@ function WidgetManager:setVolumeWidget(vol)
 	self.volume:set_markup('<span foreground="#ffaf5f" weight="bold">🔈 '..vol.."%  "..'</span>')
 end
 
+-- Memory
 function WidgetManager:getMemory()
 	self.memory = wibox.widget.textbox()
 	vicious.register(self.memory, vicious.widgets.mem, "<span fgcolor='#138dff'>$1% $2MB</span>  ", 13) --DFDFDF
 	self.memory:buttons(awful.util.table.join(
-		awful.button({}, 1, function() quake_htop_mem_terminal[mouse.screen]:toggle() end)
+		awful.button({}, 1, function() self:togglePopupMemory() end)
 	))
 	return self.memory
 end
 
+-- CPU
 function WidgetManager:getCPU()
 	local cpuwidget = awful.widget.graph()
 	cpuwidget:set_width(50)
@@ -77,11 +144,12 @@ function WidgetManager:getCPU()
 	cpuwidget:set_color({ type = "linear", from = { 25, 0 }, to = { 25,22 }, stops = { {0, "#FF0000" }, {0.5, "#de5705"}, {1, "#00ff00"} }  })
 	vicious.register(cpuwidget, vicious.widgets.cpu, "$1")
 	cpuwidget:buttons(awful.util.table.join(
-		awful.button({}, 1, function() quake_htop_cpu_terminal[mouse.screen]:toggle() end)
+		awful.button({}, 1, function() self:togglePopupCPU() end)
 	))
 	return cpuwidget
 end
 
+-- System Tray
 function WidgetManager:getSystemTray()
 	self.sysTray = wibox.widget.systray()
 	self.sysTray.isSysTray = true
@@ -100,6 +168,7 @@ function WidgetManager:getSystemTray()
 	return self.sysTray
 end
 
+-- IP
 function WidgetManager:getIP()
 	local ip = retrieveIPAddress(self.wifiDevice)
 	if not ip or ip == "" then
@@ -115,21 +184,11 @@ function WidgetManager:getIP()
 	return self.ip
 end
 
+-- Main Menu Button
 function WidgetManager:getMainMenuButton()
 	self.mainMenu = require("MainMenu")
 	self.mainMenuButton = awful.widget.launcher({image = beautiful.arch_icon, menu = self.mainMenu, coords = {x = 0, y = 0}})
-	-- TODO: Why do I have this line?
-	self.mainMenuButton.visible = false
 	return self.mainMenuButton
-end
-
--- Promp Box
-function WidgetManager:getPromptBoxes()
-	-- TODO: Consider Revising
-	if not self.promptBox then
-		self.promptBox = require("widgets.multi-prompt-box")
-	end
-	return self.promptBox
 end
 
 -- Text Clock
@@ -165,18 +224,11 @@ end
 
 function WidgetManager:getInfoWibox(s, widget)
 	local screenDimens = screen[s].workarea
-	-- local aWibox = wibox({position = "left", screen = s, width = 100, height = 1080-122*2, y = 100})--awful.wibox({position = "left", screen = s, width = 100, height = 1080-122-122, y = 100})
-	local aWibox = wibox({position = "left", screen = s, width = 300, height = screenDimens.height, y = screenDimens.y}) -- 836 should be dynamic, on task list change it should update height, never more than screen height - (t/b)wiboxes, normally a multiple of 31-33.44 -- TODO: That << lol
-	-- TODO: Think of a decent way to 
+	local aWibox = wibox({position = "left", screen = s, width = 300, height = screenDimens.height, y = screenDimens.y}) -- TODO: on task list change it should update height, never more than workarea
 	aWibox:set_widget(widget)
 	aWibox.ontop = true
 	-- Start Hidden
 	aWibox.visible = false
-	
-	aWibox:connect_signal("property::visible", function()
-		-- debug_leaf(aWibox, 5)
-		-- notify_send(inspect(verticalTaskBox.widgets, 2))
-	end)
 	return aWibox
 end
 
@@ -227,7 +279,7 @@ function WidgetManager:getNetUsage()
 	))
 
 	-- TODO
--- dbus.connect_signal("org.freedesktop.Notifications", function(signal, value)
+	-- dbus.connect_signal("org.freedesktop.Notifications", function(signal, value)
 
 		-- notify_send("org.freedesktop.Notifications")
 	 --    notify_send(inspect({signal, value}, 2))
@@ -238,10 +290,9 @@ function WidgetManager:getNetUsage()
 	return self.netwidget
 end
 
-
 -- Battery
 function WidgetManager:getBatteryWidget()
-	-- TODO: Make so we can update from acpi
+	-- TODO: Make so we can update from acpi, ie. DBus acpi notifications
 	self.battery = wibox.widget.textbox()
 	function customWrapper(...) -- format, warg
 

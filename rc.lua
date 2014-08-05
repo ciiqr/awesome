@@ -47,9 +47,7 @@ naughty		= require("naughty")
 -- Config
 require("declarations")
 if DEBUG then inspect = require("inspect") end
-quake		= require("quake")
 xrandr		= require("utils.xrandr")
-			  -- TODO: Re-decide which things should really have been included in lua & awesome
 			  require("utils.lua")
 			  require("utils.awesome")
 			  require("utils.config")
@@ -70,15 +68,6 @@ infoWibox={} -- Persistent
 local name_callback = {}  -- Persistent
 --Widgets
 local widget_manager = require("WidgetManager")
---Misc
---PopupTerminal
-local quake_terminal = {}
---Popup htop CPU
-quake_htop_cpu_terminal = {}
---Popup htop Mem
-quake_htop_mem_terminal = {}
---Leafpad Quick Note
-quake_leafpad_quick_note = {}
 
 -- Setup --
 -----------
@@ -107,13 +96,11 @@ for s = 1, screen.count() do
 	local tileLay = layouts[1]
 	awful.tag(SCREEN_TAGS, s, {layouts[2], tileLay, tileLay, tileLay, tileLay, tileLay, tileLay, tileLay, tileLay}) 
 
-	-- Quake Terminal
-	-- TODO: Move to widget_manager, widget_manager:getDropdownTerminal(s), widget_manager:getDropdownCPU(s), widget_manager:getDropdownMemory(s), widget_manager:getDropdownNote(s)
-			-- Then functions to toggle them widget_manager:toggleDropdownTerminal(s=mouse.screen)
-	quake_terminal[s] = quake({ terminal = TERMINAL, height = 0.35, screen = s, width = 0.5})
-	quake_htop_cpu_terminal[s] = quake({terminal=TERMINAL, argname="-name %s -e "..COMMAND_TASK_MANAGER_CPU, name="QUAKE_COMMAND_TASK_MANAGER_CPU", height=0.75, screen=s, width=0.5, horiz="right"})
-	quake_htop_mem_terminal[s] = quake({terminal=TERMINAL, argname="-name %s -e "..COMMAND_TASK_MANAGER_MEM, name="QUAKE_COMMAND_TASK_MANAGER_MEM", height=0.75, screen=s, width=0.5, horiz="left"})
-	quake_leafpad_quick_note[s] = quake({terminal = "leafpad", argname="--name=%s", name="LEAFPAD_QUICK_NOTE", height = 0.35, screen = s, width = 0.5})
+	-- Popup Terminal/Process Info/Notes
+	widget_manager:initPopupTerminal(s)
+	widget_manager:initPopupCPU(s)
+	widget_manager:initPopupMemory(s)
+	widget_manager:initPopupNotes(s)
 
 
 	--Wiboxes w/ Widgets
@@ -273,12 +260,12 @@ globalKeys = awful.util.table.join(
 	awful.key({SUPER}, "p", function() awful.util.spawn_with_shell(string.format(COMMAND_LAUNCHER, screen[mouse.screen].workarea.y)) end),
 	awful.key({SUPER}, "o", function() awful.util.spawn_with_shell(string.format(COMMAND_FILE_OPENER, screen[mouse.screen].workarea.y)) end),
 	-- Terminal
-	awful.key({SUPER, SHIFT}, "t", function() quake_terminal[mouse.screen]:toggle() end),
+	awful.key({SUPER, SHIFT}, "t", function() widget_manager:togglePopupTerminal() end),
 	-- Quick Note
-	awful.key({SUPER, SHIFT}, "n", function() quake_leafpad_quick_note[mouse.screen]:toggle() end),
+	awful.key({SUPER, SHIFT}, "n", function() widget_manager:togglePopupNotes() end),
 	-- Htop
-	awful.key({SUPER, SHIFT}, "c", function() quake_htop_cpu_terminal[mouse.screen]:toggle() end),
-	awful.key({SUPER, SHIFT}, "m", function() quake_htop_mem_terminal[mouse.screen]:toggle() end),
+	awful.key({SUPER, SHIFT}, "c", function() widget_manager:togglePopupCPU() end),
+	awful.key({SUPER, SHIFT}, "m", function() widget_manager:togglePopupMemory() end),
 
 	--Programs
 	-- Terminal
