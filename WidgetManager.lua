@@ -4,13 +4,8 @@ local quake = quake or require("quake")
 
 local WidgetManager = {}
 
-if IS_LAPTOP then
-	WidgetManager.wifiDevice = "wlp9s0"
-	WidgetManager.ethDevice = "enp8s0"
-else
-	WidgetManager.wifiDevice = "wlp0s29u1u7"
-	WidgetManager.ethDevice = "enp2s0"
-end
+WidgetManager.wifiDevice = "wlp9s0"
+WidgetManager.ethDevice = "enp8s0"
 
 -- Popup Terminal
 function WidgetManager:initPopupTerminal(s)
@@ -80,6 +75,22 @@ function WidgetManager:togglePopupNotes(s)
 	self.quake_leafpad_quick_note[s or mouse.screen]:toggle()
 end
 
+function WidgetManager:initKeepass(s)
+	-- Ensure we have a table
+	if not self.quake_keepass then
+		self.quake_keepass = {}
+	end
+	
+	-- Create Popup Notes
+	self.quake_keepass[s] = quake({terminal = "keepassx", name="keepassx", height = 0.75, screen = s, width = 0.5}) -- argname="--name=%s", 
+	
+	return self.quake_keepass[s]
+end
+function WidgetManager:toggleKeepass(s)
+	-- Toggle Popup
+	self.quake_keepass[s or mouse.screen]:toggle()
+end
+
 -- Volume
 function WidgetManager:getVolume()
 	self.volume = wibox.widget.textbox() -- 🔇 -- Mute icon --
@@ -88,42 +99,36 @@ function WidgetManager:getVolume()
 		awful.button({}, 5, function() WidgetManager:changeVolume("-", 1) end),
 		awful.button({}, 1, function() run_once("pavucontrol") end)
 	))
-	self:changeVolume("+", 0)
+	self:displayVolume()
 	return self.volume
 end
 function WidgetManager:changeVolume(incORDec, change)
 	local change = change or VOLUME_CHANGE_NORMAL
 
-	-- Get mixer control contents
-	local f = io.popen("amixer set Master "..change.."%"..incORDec)
-	local mixer = f:read("*all")
-	f:close()
-
+	-- Change with amixer
+	awful.util.spawn("amixer set Master "..change.."%"..incORDec)
+end
+function WidgetManager:displayVolume(vol)
+	self.volume:set_markup('<span foreground="#ffaf5f" weight="bold">🔈 '..(vol or self:retrieveSystemVolumeLevel()).."%  "..'</span>')
+end
+function WidgetManager:retrieveSystemVolumeLevel()
+	local mixer = execForOutput("amixer get Master")
+	
 	-- Capture mixer control state:          [5%] ... ... [on]
 	local volu, mute = string.match(mixer, "([%d]+)%%.*%[([%l]*)")
 	-- Handle mixers without data
 	if volu == nil then
-		self:setVolumeWidget("Off")
-		return
+		volu = "Off" -- TODO: Fix this for startup
 	end
 
-	-- Handle mixers without mute  -- Handle mixers that are muted
-	if (mute == "" and volu == "0")  or mute == "off" then
-		self:setVolumeWidget("Muted")--mute = mixer_state["off"]
-	else
-		self:setVolumeWidget(volu or "")
-	end
-end
-function WidgetManager:setVolumeWidget(vol)
-	-- TODO: volIcon
-	-- Snippets
-	-- vol = tonumber(vol)
-	-- if vol == 0 or vol == nil then
-  		-- volIcon = "
-	-- self.volume:set_markup('<span foreground="#ffaf5f" weight="bold">'..volIcon..' '..vol.."%  "..'</span>') \nend
-
-	-- TODO: Temp
-	self.volume:set_markup('<span foreground="#ffaf5f" weight="bold">🔈 '..vol.."%  "..'</span>')
+	-- -- Handle mixers without mute  -- Handle mixers that are muted
+	-- if (mute == "" and volu == "0")  or mute == "off" then
+	-- 	self:displayVolume("Muted")--mute = mixer_state["off"]
+	-- else
+	-- 	self:displayVolume(volu or "")
+	-- end
+	
+	return volu
 end
 
 -- Memory
@@ -170,45 +175,95 @@ end
 
 -- IP
 function WidgetManager:getIP()
-	local ip = retrieveIPAddress(self.wifiDevice)
-	if not ip or ip == "" then
-		ip = retrieveIPAddress(self.ethDevice)
-	end
-
-	self.ip = wibox.widget.textbox(ip)
+	self.ip = wibox.widget.textbox()
 	self.ip:set_align("center")
+	
+	self:updateIP()
 
 	self.ip:buttons(awful.util.table.join(
 		awful.button({}, 1, function() awful.util.spawn_with_shell(TERMINAL_EXEC.."'ip addr show; read -n'") end)
+		-- ,awful.button({}, 3, function() self.ip:updateIP() end)
 	))
 	return self.ip
 end
 
--- Main Menu Button
-function WidgetManager:getMainMenuButton()
-	self.mainMenu = require("MainMenu")
-	self.mainMenuButton = awful.widget.launcher({image = beautiful.arch_icon, menu = self.mainMenu, coords = {x = 0, y = 0}})
-	return self.mainMenuButton
+function WidgetManager:updateIP()
+	local ip = retrieveIPAddress(self.ethDevice)
+	if ip == "" then
+		ip = retrieveIPAddress(self.wifiDevice)
+	end
+	self.ip:set_text(ip)
 end
 
 -- Text Clock
-function WidgetManager:getTextClock()
+function WidgetManager:getTextClock() -- .textClock:set_font()
 	self.textClock = awful.widget.textclock('  <span foreground="#94738c">%A, %B %d</span>  <span foreground="#ecac13">%I:%M %p</span>  ', 10)
 	-- Add Calendar
 	require("cal").register(self.textClock, '<span weight="bold" foreground="'..(beautiful.taglist_fg_focus or beautiful.fg_focus or "")..'" underline="single">%s</span>')
 	return self.textClock
 end
 
--- TaskList
+-- TaskList						  widg, buttons, label, data, clients
+function vertical_tasklist_update(widg, buttons, label, data, objects)
+    -- update the widgets, creating them if needed
+    widg:reset()
+    for i, o in ipairs(objects) do
+        local cache = data[o]
+        local ib, tb, bgb, m, l
+        if cache then
+            ib = cache.ib
+            tb = cache.tb
+            bgb = cache.bgb
+            m   = cache.m
+        else
+            ib = wibox.widget.imagebox()
+            tb = wibox.widget.textbox()
+            bgb = wibox.widget.background()
+            m = wibox.layout.margin(tb, 4, 4)
+            l = wibox.layout.fixed.horizontal()
+
+            -- All of this is added in a fixed widget
+            l:fill_space(true)
+            l:add(ib)
+            l:add(m)
+
+            -- And all of this gets a background
+            bgb:set_widget(l)
+
+            local common = common or require("awful.widget.common")
+            bgb:buttons(common.create_buttons(buttons, o))
+
+            data[o] = {
+                ib = ib,
+                tb = tb,
+                bgb = bgb,
+                m   = m
+            }
+        end
+
+        local text, bg, bg_image, icon = label(o)
+        -- The text might be invalid, so use pcall
+        if not pcall(tb.set_markup, tb, text) then
+            tb:set_markup("<i>&lt;Invalid text&gt;</i>")
+        end
+        bgb:set_bg(bg)
+        if type(bg_image) == "function" then
+            bg_image = bg_image(tb,o,m,objects,i)
+        end
+        bgb:set_bgimage(bg_image)
+        ib:set_image(icon)
+        widg:add(bgb)
+   end
+end
 function WidgetManager:getTaskBox(screen, is_vertical)
 	-- TODO: These need to be seperate per screen, therefore I need a list for each, ie. WidgetManager.verticalTaskBoxes, WidgetManager.horizontalTaskBoxes
 	local buttons = awful.util.table.join(
 		awful.button({}, 1, toggleClient),
-		awful.button({}, 3, function() toggleWibox(infoWibox) end)--toggleClientsList)
+		awful.button({}, 3, function() toggleWibox(infoWibox) end)
 	)
 	if is_vertical then
 		local layout = wibox.layout.flex.vertical()
-		local widget = awful.widget.tasklist(screen, awful.widget.tasklist.filter.allscreen, buttons, nil, nil, layout) -- Vertical 
+		local widget = awful.widget.tasklist(screen, awful.widget.tasklist.filter.allscreen, buttons, nil, vertical_tasklist_update, layout) -- Vertical 
 		-- layout:fit_widget(widget, 100, 100)
 		layout:fit(100, 100)
 		widget:fit(100, 100)
@@ -217,6 +272,7 @@ function WidgetManager:getTaskBox(screen, is_vertical)
 		-- notify_send(inspect(widget, 2))
 		return widget
 	else
+		-- TODO: Consider minimizedcurrenttags for filter, it's pretty interesting, though, I would want it to hide if the bottom if there we're no items, or maybe move it back to the top bar & get rid of the bottom entirely...
 		return awful.widget.tasklist(screen, awful.widget.tasklist.filter.currenttags, buttons) -- Normal
 		-- allscreen,  All on Screen, Normal
 	end

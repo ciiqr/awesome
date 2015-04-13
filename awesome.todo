@@ -1,5 +1,7 @@
 - Level 1 -
 -----------
+	- try out mooni moonscript, see if it'd be appropriate to port my config (much simpler syntax, variables local by default,)
+		- http://moonscript.org/reference/
 	- Make Sublime always open new windows (With Desktop File)
 		- Check if already running, if so, run subl3 -n, else just subl3
 	- Prevent windows moving(glitching) with client side window controls (unless the window is floating)
@@ -12,7 +14,7 @@
 		- http://people.redhat.com/dcbw/NetworkManager/NetworkManager%20DBUS%20API.txt
 	? Coroutines (ASync Tasks) http://lua-users.org/wiki/CoroutinesTutorial
 	? Tooltip - Display nuber of clients in a tag
-	- Control + Alt + Shift + Arrows - Skip to the next/previous non-empty tag
+	? Control + Alt + Shift + Arrows - Skip to the next/previous non-empty tag
 	- switchtotag on focus, but only for specific clients (ie. Chrome)
 	- name = "Deleting files", "Copying files", "Moving files"; class = "Spacefm" - Have always show in bottom right corner of screen
 	? XF86TouchpadOff & XF86TouchpadOn to toggle a icon indicator on the top bar
@@ -28,6 +30,8 @@
 	- run-or-kill command for pavucontrol & other similar, needs to be able to pass the program name to search for seperatly (second param)
 	- awful.screen.padding(screen[mouse.screen], {top=-22, left=0, right=0, bottom=-22})
 		- May be the best alternative to hiding the wiboxes with fullscreen windows
+	- VMWare not recieving focus when launched as the only client on a tag
+
 
 - Level 2 (Not Important) -
 ---------------------------
@@ -60,3 +64,9 @@
 	? Simplify Keybindings a bit
 		- Win + z/x/c/v/b/n/m  a/s/d/f  q/w/e
 	? Win + Control + p launch program even if it is already running (Or Opposite)
+	
+	? if there are ANY fullsceen windows on the current tab, hide the top/bottom wiboxes, when it is no longer on the tab OR minimized OR closed, restore the state that the wiboxes were
+		- There are a lot of issues with this idea
+			- We need to go through ALL of the windows with the current tag
+			- We need to store the starting state
+			- We need to detect when a new window is added

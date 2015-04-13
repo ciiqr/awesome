@@ -5,7 +5,7 @@
 
 -- Errors --
 ------------
--- Startup
+-- Startup (Only if this is the fallback config)
 if awesome.startup_errors then
 	naughty.notify({preset = naughty.config.presets.critical, title = "Errors Occured During Startup!", text = awesome.startup_errors})
 end
@@ -34,16 +34,17 @@ function run_once(prg)
 		if match == "sudo" then
 			isRoot = true
 		else
-			programName = match
+			programName = basename(match)
 			break
 		end
 	end
+	-- VERY useful for Debugging
 	-- notify_send(prg .. "\n" .. programName)
 
 	-- checks if program is running
 		-- if program is root then checks root, otherwise checks current user
 	-- if it's not running then run it
-	awful.util.spawn_with_shell("pgrep -u "..ternary(isRoot, "root", "$USER").." -x "..programName.." || ("..prg..")")
+	awful.util.spawn_with_shell(COMMAND_IS_RUNNING.." "..programName.." "..ternary(isRoot, "root", USER).." || ("..prg..")")
 end
 
 -- Mouse
@@ -172,6 +173,13 @@ function switchToFirstTag()
 		awful.tag.viewonly(tag)
 	end
 	return tag
+end
+function increaseMwfact(add, t)
+	local new_mwfact = awful.tag.getmwfact(t) + add
+	-- Only change the mwfact if it's not going to make things invisible
+    if new_mwfact < 1 and new_mwfact > 0 then
+    	awful.tag.incmwfact(add, t)
+    end
 end
 
 -- Wibox

@@ -1,5 +1,6 @@
 -- Directories
 HOME_DIR = os.getenv("HOME")
+USER = os.getenv("USER")
 CONFIG_DIR = HOME_DIR.."/.config/awesome/"
 PERSONAL_BIN = HOME_DIR.."/.local/bin/"
 
@@ -10,13 +11,13 @@ THEME_PATH = CONFIG_DIR..THEME_NAME.."/theme.lua"
 -- Mode
 DEBUG = true
 
--- Device
-IS_LAPTOP = true
-
 -- Adjustment Values
-BRIGHTNESS_CHANGE_NORMAL = 527
-BRIGHTNESS_CHANGE_SMALL = 52
-VOLUME_CHANGE_NORMAL = 9
+-- TODO: Could list all devices in /sys/class/backlight/, maybe device/type can be used to exclude the improper one
+-- TODO: When adjusting, if it would add up to over max or less than 0, adjust to those values
+BRIGHTNESS_MAX = readFile("/sys/class/backlight/intel_backlight/max_brightness")
+BRIGHTNESS_CHANGE_NORMAL = round(BRIGHTNESS_MAX/10)
+BRIGHTNESS_CHANGE_SMALL = round(BRIGHTNESS_MAX/100)
+VOLUME_CHANGE_NORMAL = 10
 VOLUME_CHANGE_SMALL = 1
 
 -- Battery
@@ -28,6 +29,7 @@ TERMINAL="xterm"
 TERMINAL_EXEC=TERMINAL.." -e "
 FILE_MANAGER="spacefm"
 EDITOR="subl3"
+GRAPHICAL_SUDO="gksudo"
 
 -- Keys
 SUPER="Mod4"
@@ -35,13 +37,8 @@ ALT="Mod1"
 CONTROL="Control"
 SHIFT="Shift"
 
--- Widgets
--- local PROMPT_BASE = "| %s: "
--- LUA_PROMPT = string.format(PROMPT_BASE, "Lua")
--- RUN_PROMPT = string.format(PROMPT_BASE, "Run")
-
 -- Tags
-SCREEN_TAGS = {"➊ Browsing","➋ ❴❵","➌ Learn","➍ iOS","➎ Site","➏ School","➐ ⚙","➑ Ent.","➒ ♫"} --🌐 --{} ⌥
+SCREEN_TAGS = {"➊ Default","➋ ❴❵","➌ AIMS","➍ FAHM","➎ VM","➏ Social","➐ ⚙","➑ Ent.","➒ ♫"} --🌐 --{} ⌥ --➌ Learn -- TODO: Switch back to 'School' in September
 
 -- Commands
 COMMAND_SLEEP = "systemctl suspend"
@@ -49,35 +46,45 @@ COMMAND_SCREEN_SHOT = "scrot ~/Random/Screens/%Y-%m-%d-%T-screen.png"
 COMMAND_SCREEN_SHOT_SELECT = "import ~/Random/Screens/%Y-%m-%d-%T-screen.png"
 COMMAND_SCREEN_INVERT = "xcalib -i -a"
 COMMAND_FILE_OPENER = "xdg-open \"$(locate \"\" | dmenu -y %s -i -p Open -l 20 -fn \"Nimbus Sans L-10\" -dim 0.75)\"" -- MUST Replace %s using string.format, with y Height -- -x 480 -w 960 -f
+COMMAND_WINDOW_SWITCHER = "DMENU_OPTIONS='-y %s -i -p Open -l 20 -dim 0.75' FONT=\"Nimbus Sans L-10\" wmgo"
 COMMAND_TASK_MANAGER_MEM = "sudo htop -s PERCENT_MEM"
 COMMAND_TASK_MANAGER_CPU = "sudo htop -s PERCENT_CPU"
-COMMAND_LAUNCHER = "/home/william/Programming/Python/Projects/QuickLaunch/".."QuickLaunch.py -y %s" -- TODO: Change back 
+-- COMMAND_LAUNCHER = PERSONAL_BIN.."quick-launch-py -y %s" -- TODO: Remove when I'm happy
+COMMAND_LAUNCHER = HOME_DIR.."/Projects/QuickLaunch/QuickLaunch/bin/Debug/QuickLaunch.exe --plugins=Applications -y %s 2>/dev/null"
+COMMAND_LAUNCHER_ALTERNATE = HOME_DIR.."/Projects/QuickLaunch/QuickLaunch/bin/Debug/QuickLaunch.exe --plugins=Applications -y %s -x 760 -w 400 -h 540 --orientation=v 2>/dev/null"
+COMMAND_LAUNCHER_MENU = HOME_DIR.."/Projects/QuickLaunch/QuickLaunch/bin/Debug/QuickLaunch.exe --plugins=Commands -y %s -x 760 -w 400 -h 540 --orientation=v 2>/dev/null"
+COMMAND_IS_RUNNING = PERSONAL_BIN.."is-running"
 
 -- Startup
 STARTUP_PROGRAMS = {
-	"sudo seaf-cli start",		-- Seafile Files Syncer (Root)
-	-- "wmname LG3D",			-- wmname LG3D: Fix Java Issues, HOWEVER it causes issues with chrome/chromium, and chrome will always be more important so untill I have a good alternative it is being disabled, (NOTE: I Can probably just change what WM it immitates)
-	-- "xcompmgr",				-- Composition Manager (Transparency)
-	"compton --config ~/.compton.conf", -- Composition Manager (Transparency, Inactive Window Dimming, Visual Glitch Fix)
-	"feh --randomize --bg-fill "..CONFIG_DIR..THEME_NAME.."/backgrounds/*", -- Random Background
-
-	-- VMWare (Systemd Doesnt seem to like these guys, at least some of them are not running automatically
-	"sudo systemctl start vmware-usb vmware-vmci vmware-vmnet vmware-vmsock vmware-vmmon vmware-usbarbitrator",
-
-	-- "synergyc 192.168.1.102",-- Share Mouse & Keyboard with Desktop
-	-- "xkbset m",				-- Mouse Keys
-	FILE_MANAGER.." -d",	-- File Manager
-
-	"skype",
-	"dropboxd",
-
-	-- "system-config-printer-applet", -- Printer Applet
+	-- Awesome
+	-- ,"wmname LG3D"			-- wmname LG3D: Fix Java Issues, HOWEVER it causes issues with chrome/chromium, and chrome will always be more important so untill I have a good alternative it is being disabled, (NOTE: I Can probably just change what WM it immitates)
+	-- ,"xcompmgr"				-- Composition Manager (Transparency)
+	PERSONAL_BIN.."awesome/pa-server.py" -- Updates volume widget when volume changes
+	,"compton --config ~/.compton.conf" -- Composition Manager (Transparency, Inactive Window Dimming, Visual Glitch Fix)
+	,"feh --randomize --bg-fill "..CONFIG_DIR..THEME_NAME.."/backgrounds/*" -- Random Background
 	
-	"seafile-applet",		-- Seafile Files Syncer
-	"redshiftgui --min",	-- Orange Screen at Night
-	"nm-applet"				-- Wireless
+	-- System
+	,"sudo systemctl start vmware-usb vmware-vmci vmware-vmnet vmware-vmsock vmware-vmmon vmware-usbarbitrator" -- VMWare (Systemd Doesnt seem to like these guys, at least some of them are not running automatically
+	,"sudo seaf-cli start"		-- Seafile Files Syncer (Root)
 
-	-- Issues with run once
-	-- awful.util.spawn_with_shell("(ksuperkey -e 'Super_L=Alt_L|F1;Super_R=Alt_L|F1' &)")
-	-- "ksuperkey -e 'Super_L=Alt_L|F1;Super_R=Alt_L|F1'" -- Release Mod Keys to open application menu
+	-- Daemons
+	-- ,"synergyc 192.168.1.102"-- Share Mouse & Keyboard with Desktop
+	,FILE_MANAGER.." -d"
+
+	-- Tray's
+	,"redshiftgui --min"
+	,"nm-applet"
+	,"skype"
+	,"dropbox"
+	,"keepass"
+	-- ,"seafile-applet"
+	-- ,"system-config-printer-applet"
+
 }
+
+
+-- Issues with run once
+-- awful.util.spawn_with_shell("(ksuperkey -e 'Super_L=Alt_L|F1;Super_R=Alt_L|F1' &)")
+-- "ksuperkey -e 'Super_L=Alt_L|F1;Super_R=Alt_L|F1'" -- Release Mod Keys to open application menu
+
