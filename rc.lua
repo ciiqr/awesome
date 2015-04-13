@@ -1,23 +1,23 @@
 -- Awesome Window Manager Configuration --
 ------------------------------------------
 -- Author:			William Villeneuve	--
--- Date Modified:	  August 4, 2014	--
+-- Date Modified:	  April 02, 2015	--
 --------------------------------------------------------------------------------------
 -- Description:	This is the main file for my awesome configuration. I have put a	--
 -- large focus on cleaning up this file and modularizing different aspects of it.	--
--- Some of the more interesting aspects are: a seperate key binding for going into	--
+-- Some of the more interesting aspects are: a separate key binding for going into	--
 -- out of the maximized layout, this means that the maximized layout is not in my	--
--- layouts array and that some midifications are necessary to the switch layout		--
+-- layouts array and that some modifications are necessary to the switch layout		--
 -- function so that it can get you out of maximized. When maximizing, the current	--
--- layout for the given tag/screen is saved and upon demaximizing it is restored to	--
--- that layout. Displays Configure time in milliseconds on startup/restart. Few		--
--- inline functions (Declared at the top or in seperate files). Many Constants.		--
+-- layout for the given tag/screen is saved and upon de-maximizing it is restored	--
+-- to that layout. Displays Configure time in milliseconds on startup/restart. Few	--
+-- inline functions (Declared at the top or in separate files). Many Constants.		--
 -- Toggle-able wiboxes. Widgets for: ip address, temperature, network usage,		--
 -- battery level & charge state, volume (with keybindings for course & fine			--
 -- adjustment), memory usage, cpu graph, time w/ popup-calendar. Special toggleable	--
 -- side wibox (W.I.P.) which will display additional information which shouldn't be	--
 -- on the main wiboxes (Currently just a custom minimalist clock). Selection		--
--- screenshots. Default mouse location on startup, Seperate module for creation of	--
+-- screenshots. Default mouse location on startup, Separate module for creation of	--
 -- widgets. Window debug information (useful for creation of rules). Toggle-able	--
 -- titlebar which is disabled by default.											--
 -- NOTE: I use this configuration on a 1920x1080 15" screen, you may need to adjust	--
@@ -27,11 +27,13 @@
 -- DFTBA Everyone!																	--
 --------------------------------------------------------------------------------------
 -- Bugs:																			--
--- - Modules like ColorDisplayWidget do not create new instaces if required again.	--
+-- - Modules like ColorDisplayWidget do not create new instances if required again.	--
 --------------------------------------------------------------------------------------
 -- Required:																		--
 -- xterm, sublime text(subl3), systemd(systemctl), scrot, import, python2, xdg-open --
 --------------------------------------------------------------------------------------
+-- procname(via arch OR pip) required for pulseaudio-update-server.py
+-- TODO: Modify the above, Should say "Any programs specified in declarations aswell as..."
 
 -- Include --
 -------------
@@ -45,12 +47,14 @@ wibox		= require("wibox")
 beautiful 	= require("beautiful"); 
 naughty		= require("naughty")
 -- Config
-require("declarations")
-if DEBUG then inspect = require("inspect") end
 xrandr		= require("utils.xrandr")
 			  require("utils.lua")
 			  require("utils.awesome")
 			  require("utils.config")
+			  require("declarations")
+if DEBUG then
+	inspect = require("inspect")
+end
 -- Beautiful Theme
 beautiful.init(THEME_PATH)
 
@@ -67,7 +71,7 @@ bWibox={} -- Persistent
 infoWibox={} -- Persistent
 local name_callback = {}  -- Persistent
 --Widgets
-local widget_manager = require("WidgetManager")
+widget_manager = require("WidgetManager")
 
 -- Setup --
 -----------
@@ -101,14 +105,10 @@ for s = 1, screen.count() do
 	widget_manager:initPopupCPU(s)
 	widget_manager:initPopupMemory(s)
 	widget_manager:initPopupNotes(s)
-
+	widget_manager:initKeepass(s)
 
 	--Wiboxes w/ Widgets
 	--Left Widgets
-	-- Main Menu Button
-	if s == 1
-		then left_layout:add(widget_manager:getMainMenuButton())
-	end
 	-- Tag List
 	left_layout:add(widget_manager:getTagsList(s))
 
@@ -118,29 +118,24 @@ for s = 1, screen.count() do
 
 	--Right Widgets
 	if s == screen.count() then -- Main Widgets on Far Right
-		-- Moon
-		-- right_layout:add(require("moonPhase"):init())
-		-- Test Widget
-		-- right_layout:add(require("testWidget"):init())
-		
-		-- Temperature
-		right_layout:add(widget_manager:getTemperature())
-		-- Net Usage
-		right_layout:add(widget_manager:getNetUsage())
-		-- Battery Widget
-		if IS_LAPTOP then
-			right_layout:add(widget_manager:getBatteryWidget())
+		local right_widgets = {
+			-- right_layout:add(require("moonPhase"):init()),
+			-- right_layout:add(require("testWidget"):init()),
+			-- require("ColorDisplayWidget"):init({"5A667F", "b0d54e", "5f8787", "69b2b2", "FF0000", "de5705", "00ff00"}),
+			-- require("tester"):init(),
+			widget_manager:getNetUsage(),
+			widget_manager:getTemperature(),
+			widget_manager:getBatteryWidget(),
+			widget_manager:getVolume(),
+			widget_manager:getMemory(),
+			widget_manager:getCPU(),
+			widget_manager:getSystemTray(),
+			widget_manager:getTextClock()
+		}
+
+		for _,widget in pairs(right_widgets) do
+			right_layout:add(widget)
 		end
-		-- Volume
-		right_layout:add(widget_manager:getVolume())
-		--Memory
-		right_layout:add(widget_manager:getMemory())
-		--CPU
-		right_layout:add(widget_manager:getCPU())
-		-- System Tray
-		right_layout:add(widget_manager:getSystemTray())
-		-- Clock
-		right_layout:add(widget_manager:getTextClock())
 	end
 
 	-- Layout Box
@@ -169,11 +164,7 @@ for s = 1, screen.count() do
 	bWibox[s] = awful.wibox({position = "bottom", screen = s, height = 22})
 	bWibox[s]:set_widget(bottomLayout)
 
-
 	-- Info Wibox Layout
-	-- Info Widgets & Time
-	-- infoLayout:set_first(require("awedock"):init())
-	-- infoLayout:set_middle(require("ColorDisplayWidget"):init({"5A667F", "b0d54e", "5f8787", "69b2b2", "FF0000", "de5705", "00ff00"})) -- This overrides the previous
 	infoLayout:add(widget_manager:getTaskBox(s, true))
 
 	-- Info Wibox
@@ -236,15 +227,13 @@ globalKeys = awful.util.table.join(
 		end
 	end),
 	
-	--Change Position (NOTE: never use)
-	awful.key({SUPER}, "Left",	function() awful.client.swap.bydirection("left") end), 
-	awful.key({SUPER}, "Right",function() awful.client.swap.bydirection("right") end),
-	-- awful.key({SUPER, CONTROL}, "Up",	function() awful.client.swap.bydirection("up") end), 
-	-- awful.key({SUPER, CONTROL}, "Down",	function() awful.client.swap.bydirection("down") end),
+	--Change Position (NOTE: rarely use)
+	awful.key({SUPER}, "Left", function() awful.client.swap.byidx(-1) end), -- Was bydirection instead of byidx but that wasn't necessarily the most efficient way
+	awful.key({SUPER}, "Right", function() awful.client.swap.byidx(1) end),
 
 	--Move Middle
-	-- awful.key({SUPER}, "l", function() awful.tag.incmwfact(0.05) end),
-	-- awful.key({SUPER}, "h", function() awful.tag.incmwfact(-0.05) end),
+	awful.key({SUPER, SHIFT}, "Left", function() increaseMwfact(-0.05) end),
+	awful.key({SUPER, SHIFT}, "Right", function() increaseMwfact(0.05) end),
 
 	--Change Number of Columns(Only on splitup side)
 	-- awful.key({SUPER, CONTROL}, "h", function() awful.tag.incncol( 1) end),
@@ -252,73 +241,73 @@ globalKeys = awful.util.table.join(
 	
 	-- Switch beteen screens
 	-- TODO: Make it depend on the number of attached screens
+		-- Could just have a function that loops through the screen count & calls this the given number of times with the different numbers & joins them to a list
+	-- perScreen(function(s)
+	-- 	return awful.key({SUPER}, "F"..s, function () notify_send(s) end)
+	-- end),
 	awful.key({SUPER}, "F1", function () awful.screen.focus(1) end),
 	awful.key({SUPER}, "F2", function () awful.screen.focus(2) end),
+	awful.key({SUPER}, "F3", function () awful.screen.focus(3) end),
 
 	--Popups
-	awful.key({SUPER}, "w", function() widget_manager.mainMenu:show({coords = {x = 1, y = 1}}) end),
-	awful.key({SUPER}, "p", function() awful.util.spawn_with_shell(string.format(COMMAND_LAUNCHER, screen[mouse.screen].workarea.y)) end),
-	awful.key({SUPER}, "o", function() awful.util.spawn_with_shell(string.format(COMMAND_FILE_OPENER, screen[mouse.screen].workarea.y)) end),
-	-- Terminal
+	-- Launcher Style
+	awful.key({SUPER}, "w", function() awful.util.spawn_with_shell(insertScreenWorkingAreaYIntoFormat(COMMAND_LAUNCHER_MENU)) end),
+	awful.key({SUPER}, "p", function() awful.util.spawn_with_shell(insertScreenWorkingAreaYIntoFormat(COMMAND_LAUNCHER)) end),
+	awful.key({SUPER}, "u", function() awful.util.spawn_with_shell(insertScreenWorkingAreaYIntoFormat(COMMAND_LAUNCHER_ALTERNATE)) end),
+	awful.key({SUPER}, "o", function() awful.util.spawn_with_shell(insertScreenWorkingAreaYIntoFormat(COMMAND_FILE_OPENER)) end),
+	awful.key({SUPER}, "s", function() awful.util.spawn_with_shell(insertScreenWorkingAreaYIntoFormat(COMMAND_WINDOW_SWITCHER)) end),
+	-- Quake Style
 	awful.key({SUPER, SHIFT}, "t", function() widget_manager:togglePopupTerminal() end),
-	-- Quick Note
 	awful.key({SUPER, SHIFT}, "n", function() widget_manager:togglePopupNotes() end),
-	-- Htop
 	awful.key({SUPER, SHIFT}, "c", function() widget_manager:togglePopupCPU() end),
 	awful.key({SUPER, SHIFT}, "m", function() widget_manager:togglePopupMemory() end),
+	awful.key({SUPER, SHIFT}, "k", function() widget_manager:toggleKeepass() end),
 
 	--Programs
-	-- Terminal
 	awful.key({SUPER}, "t", function() awful.util.spawn(TERMINAL) end),
 	
-	-- File Manager
 	awful.key({SUPER}, "Return", function() awful.util.spawn(FILE_MANAGER) end),
-	awful.key({SUPER, SHIFT}, "Return", function() awful.util.spawn("sudo "..FILE_MANAGER) end),
+	awful.key({SUPER, SHIFT}, "Return", function() awful.util.spawn(GRAPHICAL_SUDO.." "..FILE_MANAGER) end),
 
 	--Awesome
 	awful.key({SUPER, CONTROL}, "r", awesome.restart),
-	-- NOTE: never use
-	-- awful.key({SUPER, SHIFT}, "q", awesome.quit),
 
 	--System
-	--Volume
+	-- Volume
 	awful.key({}, "XF86AudioLowerVolume", function() widget_manager:changeVolume("-") end),
 	awful.key({}, "XF86AudioRaiseVolume", function() widget_manager:changeVolume("+") end),
 	awful.key({SHIFT}, "XF86AudioLowerVolume", function() widget_manager:changeVolume("-", VOLUME_CHANGE_SMALL) end),
 	awful.key({SHIFT}, "XF86AudioRaiseVolume", function() widget_manager:changeVolume("+", VOLUME_CHANGE_SMALL) end),
 
-	--Brightness
+	-- Brightness
 	awful.key({}, "XF86MonBrightnessUp", function() changeBrightness("+", BRIGHTNESS_CHANGE_NORMAL) end),
 	awful.key({}, "XF86MonBrightnessDown", function() changeBrightness("-", BRIGHTNESS_CHANGE_NORMAL) end),
 	awful.key({SHIFT}, "XF86MonBrightnessUp", function() changeBrightness("+", BRIGHTNESS_CHANGE_SMALL) end),
 	awful.key({SHIFT}, "XF86MonBrightnessDown", function() changeBrightness("-", BRIGHTNESS_CHANGE_SMALL) end),
+	-- TODO: Clean up
+	-- TODO: Consider, Or in then mythical future when I write lfwm, use the code that xbacklight uses
+	-- awful.key({}, "XF86MonBrightnessUp", function() awful.util.spawn("xbacklight -inc 10 -time 0") end),
+	-- awful.key({}, "XF86MonBrightnessDown", function() awful.util.spawn("xbacklight -dec 10 -time 0") end),
+	-- awful.key({SHIFT}, "XF86MonBrightnessUp", function() awful.util.spawn("xbacklight -inc 1 -time 0") end),
+	-- awful.key({SHIFT}, "XF86MonBrightnessDown", function() awful.util.spawn("xbacklight -dec 1 -time 0") end),
 	
-	--Invert Screen
+	-- Invert Screen
 	awful.key({SUPER}, "i", function() awful.util.spawn_with_shell(COMMAND_SCREEN_INVERT) end),
 	
-	--PrintScreen
+	-- Print Screen
 	awful.key({}, "Print", captureScreenShot),
 
-	--PrintScreen (Select Area)
+	-- Print Screen (Select Area)
 	awful.key({SUPER}, "Print", captureScreenSnip),
 
-	--Cycle Displays
+	-- Cycle Displays
 	awful.key({SUPER}, "F11", xrandr),
 	
 	-- Pasteboard paste
 	awful.key({}, "Insert", function() notify_send("Insert", 0.5) ;awful.util.spawn("xdotool click 2") end) -- put 'keycode 118 = ' back in .Xmodmap if I no longer use this
 
-	--Switch Focus
-	-- awful.key({SUPER}, "j",
-	--  function()
-	--	awful.client.focus.byidx( 1)
-	--  end),
-	-- awful.key({ SUPER,		   }, "k",
-	--  function()
-	--	awful.client.focus.byidx(-1)
-	--  end),
-
 	-- -- Run or raise applications with dmenu
+	-- TODO: Client itteration code may be useful, but otherwise I could probably implement this with QuickLaunch
 	-- ,awful.key({SUPER, CONTROL}, "p", function()
 	-- 	local f_reader = io.popen( "dmenu_run | dmenu -b -nb '".. beautiful.bg_normal .."' -nf '".. beautiful.fg_normal .."' -sb '#955'")
 	-- 	local command = assert(f_reader:read('*a'))
@@ -351,7 +340,7 @@ for i = 1, numberOfTags do
 		
 		-- NOTE: Never Used
 		awful.key({SUPER, SHIFT},		iKey, function() toggleTag(i) end),
-		awful.key({SUPER, CONTROL, ALT},iKey, function() toggleClientTag(i) end)) -- TODO: Change to Control, Alt Shift to be more like mod shift for toggleing a tag visibility
+		awful.key({SUPER, CONTROL, ALT},iKey, function() toggleClientTag(i) end)) -- TODO: Change to Control, Alt Shift to be more like mod shift for toggling a tag visibility
 end
 
 --Set Global Keys
@@ -402,7 +391,7 @@ awful.rules.rules = {
 			border_width = beautiful.border_width,
 			border_color = beautiful.border_normal,
 			-- Focus
-			focus = awful.client.focus.filter,
+			focus = awful.client.focus.filter, -- TODO: This is probably the reason that a tingle window isn't focused when we reload, FIX ME
 			-- Interaction
 			keys = clientkeys,
 			buttons = clientButtons,
@@ -413,10 +402,10 @@ awful.rules.rules = {
 	}
 	,{ -- Floating
 		rule_any = {
-			class = {"Speedcrunch", "pinentry", "MPlayer", "Plugin-container", "Exe", "Gtimer", "Vmware-modconfig", "freerdp", "Seafile-applet", "Pavucontrol", "mainframe", "Redshiftgui"},
+			class = {"Speedcrunch", "pinentry", "MPlayer", "Plugin-container", "Exe", "Gtimer", "Vmware-modconfig", "freerdp", "Seafile-applet", "Pavucontrol", "mainframe", "Redshiftgui", "Fuzzy-windows"},
 			name = {"Tab Organizer"},
-			type = {"dialog"},
-			role = {"pop-up"}
+			type = {"dialog", "menu"},
+			role = {"toolbox_window", "pop-up"} -- TODO: Decide if I really like pop-up, cause honestly a lot of things are pop-up's & it's rather annoying ("pop-up")
 		},
 		properties = {
 			floating = true
@@ -428,7 +417,16 @@ awful.rules.rules = {
 			class = {"XTerm", "Ghb"}
 		},
 		properties = {
-			size_hints_honor = false
+			size_hints_honor = false -- TODO: Consider this for the default rule set, probably won't like, but worth a try anyways
+		}
+	}
+	,{ -- Popover dialogs will not recieve borders
+		rule = {
+			type = "dialog",
+			skip_taskbar = true
+		},
+		properties = {
+			border_width = 0
 		}
 	}
 	,{
@@ -437,6 +435,32 @@ awful.rules.rules = {
 		},
 		properties = {
 			opacity = 0.8
+		}
+	}
+	,{
+		rule = {
+			class = "XTerm",
+			name = "MonoDevelop External Console"
+		},
+		properties = {
+			floating = true,
+			callback = function(c)
+				local winDimens = c:geometry()
+				local screenDimens = screen[mouse.screen].workarea
+				c:geometry({
+					x = screenDimens.width - winDimens.width,
+					y = screenDimens.y
+				})
+			end
+		}
+	}
+	,{
+		rule = {
+			class = "MonoDevelop",
+			skip_taskbar = true
+		},
+		properties = {
+			border_width = 0
 		}
 	}
 	,{
@@ -530,39 +554,45 @@ awful.rules.rules = {
 		properties = {
 			switchtotag = true
 			,callback = function(c)
-				local targetTag = nil
-				-- Client Info
-				local clientScreen = c.screen
 				local clientName = c.name
-
 				if clientName then
-					-- Get Tags
-					local tags = awful.tag.gettags(clientScreen)
 					
-					-- Determine Tag
-					if clientName:find("%(QuickLaunch%)") or clientName:find("%(Dame%)") then
-						targetTag = tags[2]
-						
-					elseif clientName:find("%(Random%)") then
-						targetTag = tags[3]
-						
-					elseif clientName:find("%(Dame, Testing%)") then
-						targetTag = tags[2]
-						
-					-- elseif clientName:find("%(Website%)") then
-					-- 	targetTag = tags[5]
-
-					-- elseif clientName:find("%(School%)") then
-					-- 	targetTag = tags[6]
-
-					elseif clientName:find("%(.awesome%)") then
-						targetTag = tags[7]
-
+					local sublime_window_rules = {
+						{
+							name = "Nim",
+							tag = 2
+						}
+						,{
+							name = "AIMS",
+							tag = 3
+						}
+						,{
+							name = "bmarks",
+							tag = 5
+						}
+						,{
+							name = "4",
+							tag = 6
+						}
+						,{
+							name = "awesome, awesome",
+							tag = 7
+						}
+					}
+					
+					-- Find the name in the client's name
+					local find_window = function(name)
+						return clientName:find("%("..name.."%)");
 					end
-
-					-- Move client to tag
-					if targetTag then
-						awful.client.toggletag(targetTag, c)
+					
+					-- Get Tags
+					local tags = awful.tag.gettags(c.screen)
+					-- Move to Tag
+					for _,rule in pairs(sublime_window_rules) do
+						if find_window(rule.name) then
+							awful.client.toggletag(tags[rule.tag], c);
+							break
+						end
 					end
 				end
 			end
@@ -577,15 +607,30 @@ awful.rules.rules = {
 		properties = {
 			border_width = 0,
 			callback = function(c)
-				-- existingDimens = c:geometry()
-				screenDimens = screen[mouse.screen].workarea
-				local width = 302
+				local screenDimens = screen[mouse.screen].workarea
+				local width = 322 -- TODO: Should probably get the actual size OR the actual minimum
 				local height = 883
 				c:geometry({
 					x = screenDimens.width - width,
 					y = screenDimens.y,
 					width = width,
 					height = height
+				})
+			end
+		}
+	}
+	,{
+		rule = {
+			class = "Seafile-applet",
+			type = "dialog"
+		},
+		properties = {
+			callback = function(c)
+				local screenDimens = screen[mouse.screen].workarea
+				local clientDimens = c:geometry()
+				c:geometry({
+					x = (screenDimens.width - clientDimens.width) / 2,
+					y = (screenDimens.height - clientDimens.height) / 2
 				})
 			end
 		}
@@ -608,6 +653,22 @@ awful.rules.rules = {
 				})
 			end
 		}
+	}
+	,{
+		rule = {
+			class = "Fuzzy-windows"
+		},
+		properties = {
+			callback = function(c)
+				local screenDimens = screen[mouse.screen].workarea
+				local clientDimens = c:geometry()
+				c:geometry({
+					x = (screenDimens.width - clientDimens.width) / 2,
+					y = (screenDimens.height - clientDimens.height) / 2,
+					width = 700, height = 235
+				})
+			end -- 
+		},
 	}
 	,{
 		rule = {
@@ -635,6 +696,15 @@ awful.rules.rules = {
 	}
 	,{
 		rule = {
+			class = "Nautilus",
+			name = "File Operations"
+		},
+		properties = {
+			ontop = true
+		}
+	}
+	,{
+		rule = {
 			class = "Plugin-container"
 		},
 		properties = {
@@ -646,7 +716,7 @@ awful.rules.rules = {
 			class = "Vmware"
 		},
 		properties = {
-			tag = awful.tag.gettags(mouse.screen)[4]
+			tag = awful.tag.gettags(mouse.screen)[5]
 		}
 	}
 	,{
@@ -669,17 +739,18 @@ awful.rules.rules = {
 			end
 		}
 	}
+	
 	--,{
 	--	rule = {
 	--		class = "Eclipse"
 	--	},
 	--	properties = {
-	--		tag = awful.tag.gettags[1][2]
+	--		tag = awful.tag.gettags(mouse.screen)[2]
 	--	}
 	--}
 }
 
--- TODO: Move to config
+-- TODO: Move to end of config.lua? Probably not
 --Signals
 --Client
 client.connect_signal("manage", manageClient)
@@ -694,16 +765,23 @@ client.connect_signal("mouse::enter", function(c)
 	-- NOTE: Experimental support for not changing focus from transient back to it's parent
 	-- NOTE: If there is anpther client on screen then we can still switch to that client then back to the parent...
 	-- NOTE: ALSO: Experimental support for not changing focus to fullscreen windows automatically, intended to help with the fact that fullscreen windows are displayed over top of wiboxes
-	if awful.client.focus.filter(c) and client.focus.transient_for ~= c and (not c.fullscreen) then --  and awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
+	-- NOTE: Also with the fullscreen note above, the or current client floating means that I can quickly switch between a fullscreen window & say my calculator
+	if (not client.focus) or awful.client.focus.filter(c) and ((not client.focus) or client.focus.transient_for ~= c) and (not c.fullscreen or awful.client.floating.get(client.focus)) then --  and awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
 			client.focus = c
 	end
 end)
+
+-- Setup network connectivity change listener
+setup_network_connectivity_change_listener()
 
 -- Programs -- (run_once takes a while, probably due to system calls, try making a script that takes a list of files and runs them with the same commands as before)
 --------------
 for _,i in pairs(STARTUP_PROGRAMS) do
 	run_once(i)
 end
+
+-- Default first item in tag history
+awful.tag.history.update(screen[1])
 
 -- End Configuring --
 ---------------------

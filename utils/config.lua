@@ -76,7 +76,15 @@ function debugClient(c)
 	-- Window Info
 	-- notify_send("size_hints: "..inspect(c.size_hints))
 	
-	debug_print(c.transient_for)
+	debug_print("name: " .. (c.name or "null"))
+	debug_print("class: " .. (c.class or "null"))
+	debug_print("role: " .. (c.role or "null"))
+	debug_print("type: " .. inspect(c.type))
+	if c.transient_for then
+		name = c.transient_for.name or "null"
+		debug_print("transient for: " .. inspect(name))
+	end
+	-- debug_print("type: " .. inspect(c.type))
 	
 	-- Object Info
 	-- notify_send("InfoWibox:"..inspect(infoWibox[mouse.screen], 2))
@@ -129,10 +137,63 @@ function debugClient(c)
 	-- Working
 	-- dbus.request_name("system", "org.freedesktop.NetworkManager")
 	-- dbus.add_match("system", "interface='org.freedesktop.NetworkManager',member='PropertiesChanged'")
-	-- dbus.connect_signal("org.freedesktop.NetworkManager", function(first, ...)
-	-- 	notify_send("FFS, It Worked!!")
-	-- 	debug_leaf(first)
+	-- dbus.connect_signal("org.freedesktop.NetworkManager", function(first, second, ...) -- Doesn't seem to be a third
+	-- 	-- debug_leaf(first)
+	-- 	-- debug_leaf(second)
+		
+	-- 	if second.Connectivity and second.Connectivity == 4 then
+	-- 		notify_send("DBUS: Connected to WIFI");
+	-- 	elseif second.Connectivity and second.Connectivity == 1 then
+	-- 		notify_send("DBUS: Disconnected from WIFI");
+	-- 	end
 	-- end)
+	
+end
+
+function setup_network_connectivity_change_listener()
+	dbus.request_name("system", "org.freedesktop.NetworkManager")
+	dbus.add_match("system", "interface='org.freedesktop.NetworkManager',member='PropertiesChanged'")
+	dbus.connect_signal("org.freedesktop.NetworkManager", function(first, second, ...) -- Doesn't seem to be a third
+		-- Change ip widget
+		widget_manager:updateIP()
+	end)
+end
+
+-- TODO: Implement a similar function for pulse audio
+-- function setup_network_connectivity_change_listener()
+-- 	-- TODO: Clean up
+-- 	dbus.request_name("system", "org.freedesktop.NetworkManager")
+-- 	dbus.add_match("system", "interface='org.freedesktop.NetworkManager',member='PropertiesChanged'")
+-- 	dbus.connect_signal("org.freedesktop.NetworkManager", function(first, second, ...) -- Doesn't seem to be a third
+-- 		-- local is_connected;
+		
+-- 		-- if second.Connectivity and second.Connectivity == 4 then
+-- 		-- 	is_connected = true
+-- 		-- elseif second.Connectivity and second.Connectivity == 1 then
+-- 		-- 	is_connected = false
+-- 		-- else
+-- 		-- 	return
+-- 		-- end
+		
+-- 		-- Change ip widget
+-- 		widget_manager:updateIP()
+		
+-- 		-- TODO: Have a table to contain all of the callbacks & itterate through & run them
+		
+-- 		-- TODO: find a way to grab the ssid info
+-- 			-- Probably with 'nmcli d', maybe 'nmcli d | grep wifi', though that does limit it to wifi (though that is the only realistic use case, aside from determining when we're sharing our internet through ethernet)
+-- 			-- 'nmcli d | grep -E "wifi|ethernet"' would also work but then we need to identify the applicable networks
+-- 	end)
+-- end
+
+-- TODO: Get this working with 
+function perScreen(callback)
+	local returnValues = {}
+	for s = 1, screen.count() do
+		awful.util.table.join(returnValues, callback(s))
+	end
+	debug_leaf(inspect(screen.count()))
+	return returnValues
 end
 
 -- Titlebar
@@ -229,6 +290,11 @@ function manageClient(c, startup)
 	if titlebars_enabled and isTitlebarEnabledForClient(c) then
 		addTitlebarToClient(c)
 	end
+	
+	-- If a client is auto-matically floating, make it ontop
+	if awful.client.floating.get(c) then
+		c.ontop = true
+	end
 end
 
 --Utility
@@ -249,6 +315,10 @@ function captureScreenSnip()
 	-- TODO: Use Popen (presumable) in onder to know when it actually finishes, this way I can display the notification right after it was taken
 	-- Capture
 	awful.util.spawn_with_shell(os.date(COMMAND_SCREEN_SHOT_SELECT))
+end
+
+function insertScreenWorkingAreaYIntoFormat(format)
+	return string.format(format, screen[mouse.screen].workarea.y)
 end
 
 --Debugging
@@ -297,11 +367,7 @@ function changeBrightness(incORDec, amount)
 end
 -- IP
 function retrieveIPAddress(device)
-	local ip
-	local tempProcess = io.popen("ip addr show dev "..device.." | awk '/([0-9].){4}/ {print $2}'")
-	ip = tempProcess:read("*all")
-	tempProcess:close()
-	return ip
+	return execForOutput("ip addr show dev "..device.." | awk '/([0-9].){4}/ {print $2}'")
 end
 
 

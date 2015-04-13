@@ -27,13 +27,13 @@ local themePath = CONFIG_DIR..THEME_NAME.."/"
 
 -- Styles --
 --========--
-theme.font      = "sans 10"
+theme.font      = "DejaVu Sans Book 9"
 -- theme.font_bold = "sans bold 10"
 
 
 -- Colors --
 --========--
-local lightColour = "#DE7712"
+local lightColour = "#FFC629"
 	--97281C - Red
 	--DE7712 - Orange
 	--F4E210 - Yellow
@@ -45,7 +45,7 @@ local lightColour = "#DE7712"
 	--23CDC0 - Sea
 	--f08080 - Calm
 	--FFC629 - Red, Yellow Highlights
-local darkColour = "#C96508"
+local darkColour = "#5A0000"
 	--581109 - Red
 	--C96508 - Orange
 	--bf7900 - Yellow
@@ -132,42 +132,44 @@ theme.exit_icon = themePath .. "exit.png"
 theme.menu_submenu_icon      = "/usr/share/awesome/themes/default/submenu.png"
 
 -- Layout
-theme.layout_tile       = themePath .. "layouts/tile.png"
-theme.layout_tileleft   = themePath .. "layouts/tileleft.png"
-theme.layout_tilebottom = themePath .. "layouts/tilebottom.png"
-theme.layout_tiletop    = themePath .. "layouts/tiletop.png"
-theme.layout_fairv      = themePath .. "layouts/fairv.png"
-theme.layout_fairh      = themePath .. "layouts/fairh.png"
-theme.layout_spiral     = themePath .. "layouts/spiral.png"
-theme.layout_dwindle    = themePath .. "layouts/dwindle.png"
-theme.layout_max        = themePath .. "layouts/max.png"
-theme.layout_fullscreen = themePath .. "layouts/fullscreen.png"
-theme.layout_magnifier  = themePath .. "layouts/magnifier.png"
-theme.layout_floating   = themePath .. "layouts/floating.png"
+local themePathLayouts	= themePath .. "layouts/"
+theme.layout_tile       = themePathLayouts .. "tile.png"
+theme.layout_tileleft   = themePathLayouts .. "tileleft.png"
+theme.layout_tilebottom = themePathLayouts .. "tilebottom.png"
+theme.layout_tiletop    = themePathLayouts .. "tiletop.png"
+theme.layout_fairv      = themePathLayouts .. "fairv.png"
+theme.layout_fairh      = themePathLayouts .. "fairh.png"
+theme.layout_spiral     = themePathLayouts .. "spiral.png"
+theme.layout_dwindle    = themePathLayouts .. "dwindle.png"
+theme.layout_max        = themePathLayouts .. "max.png"
+theme.layout_fullscreen = themePathLayouts .. "fullscreen.png"
+theme.layout_magnifier  = themePathLayouts .. "magnifier.png"
+theme.layout_floating   = themePathLayouts .. "floating.png"
 
 -- Titlebar
-theme.titlebar_close_button_focus  = themePath .. "titlebar/close_focus.png"
-theme.titlebar_close_button_normal = themePath .. "titlebar/close_normal.png"
+local themePathTitlebar = themePath .. "titlebar/"
+theme.titlebar_close_button_focus  = themePathTitlebar .. "close_focus.png"
+theme.titlebar_close_button_normal = themePathTitlebar .. "close_normal.png"
 
-theme.titlebar_ontop_button_focus_active  = themePath .. "titlebar/ontop_focus_active.png"
-theme.titlebar_ontop_button_normal_active = themePath .. "titlebar/ontop_normal_active.png"
-theme.titlebar_ontop_button_focus_inactive  = themePath .. "titlebar/ontop_focus_inactive.png"
-theme.titlebar_ontop_button_normal_inactive = themePath .. "titlebar/ontop_normal_inactive.png"
+theme.titlebar_ontop_button_focus_active  = themePathTitlebar .. "ontop_focus_active.png"
+theme.titlebar_ontop_button_normal_active = themePathTitlebar .. "ontop_normal_active.png"
+theme.titlebar_ontop_button_focus_inactive  = themePathTitlebar .. "ontop_focus_inactive.png"
+theme.titlebar_ontop_button_normal_inactive = themePathTitlebar .. "ontop_normal_inactive.png"
 
-theme.titlebar_sticky_button_focus_active  = themePath .. "titlebar/sticky_focus_active.png"
-theme.titlebar_sticky_button_normal_active = themePath .. "titlebar/sticky_normal_active.png"
-theme.titlebar_sticky_button_focus_inactive  = themePath .. "titlebar/sticky_focus_inactive.png"
-theme.titlebar_sticky_button_normal_inactive = themePath .. "titlebar/sticky_normal_inactive.png"
+theme.titlebar_sticky_button_focus_active  = themePathTitlebar .. "sticky_focus_active.png"
+theme.titlebar_sticky_button_normal_active = themePathTitlebar .. "sticky_normal_active.png"
+theme.titlebar_sticky_button_focus_inactive  = themePathTitlebar .. "sticky_focus_inactive.png"
+theme.titlebar_sticky_button_normal_inactive = themePathTitlebar .. "sticky_normal_inactive.png"
 
-theme.titlebar_floating_button_focus_active  = themePath .. "titlebar/floating_focus_active.png"
-theme.titlebar_floating_button_normal_active = themePath .. "titlebar/floating_normal_active.png"
-theme.titlebar_floating_button_focus_inactive  = themePath .. "titlebar/floating_focus_inactive.png"
-theme.titlebar_floating_button_normal_inactive = themePath .. "titlebar/floating_normal_inactive.png"
+theme.titlebar_floating_button_focus_active  = themePathTitlebar .. "floating_focus_active.png"
+theme.titlebar_floating_button_normal_active = themePathTitlebar .. "floating_normal_active.png"
+theme.titlebar_floating_button_focus_inactive  = themePathTitlebar .. "floating_focus_inactive.png"
+theme.titlebar_floating_button_normal_inactive = themePathTitlebar .. "floating_normal_inactive.png"
 
-theme.titlebar_maximized_button_focus_active  = themePath .. "titlebar/maximized_focus_active.png"
-theme.titlebar_maximized_button_normal_active = themePath .. "titlebar/maximized_normal_active.png"
-theme.titlebar_maximized_button_focus_inactive  = themePath .. "titlebar/maximized_focus_inactive.png"
-theme.titlebar_maximized_button_normal_inactive = themePath .. "titlebar/maximized_normal_inactive.png"
+theme.titlebar_maximized_button_focus_active  = themePathTitlebar .. "maximized_focus_active.png"
+theme.titlebar_maximized_button_normal_active = themePathTitlebar .. "maximized_normal_active.png"
+theme.titlebar_maximized_button_focus_inactive  = themePathTitlebar .. "maximized_focus_inactive.png"
+theme.titlebar_maximized_button_normal_inactive = themePathTitlebar .. "maximized_normal_inactive.png"
 
 -- Exit & Return Module
 return theme

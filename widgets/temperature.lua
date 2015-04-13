@@ -1,14 +1,11 @@
 temperature = wibox.widget.textbox()
+-- TODO: Move to delcarations
 TEMPERATURE_UPDATE_INTERVAL = 10
-TEMPERATURE_FAN_TEMP=50
+TEMPERATURE_FAN_TEMP=45
 
 temperature.reload = function(self)
 	-- Run 'sensors'
-	local tempProcess = io.popen("sensors")
-	-- Read All Output
-	local output = tempProcess:read("*all")
-	-- Close Process
-	tempProcess:close()
+	local output = execForOutput("sensors")
 
 	-- Parse Temperature
 	local temperature = string.match(split(output, ":%s*%+")[3] or "", "%d*")
@@ -18,7 +15,7 @@ temperature.reload = function(self)
 
 	-- Modulate Temperature (Only if enabled)
 	if (self.controlEnabled and tonumber(temperature) >= TEMPERATURE_FAN_TEMP) then
-		awful.util.spawn_with_shell("/home/william/.local/bin/FanSpeed")
+		awful.util.spawn_with_shell("/home/william/.local/bin/FanSpeed") -- TODO: Change to a constant, or even better, remove from here, cause it's not really applicable...
 	end
 end
 
