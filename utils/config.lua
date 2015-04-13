@@ -196,73 +196,6 @@ function perScreen(callback)
 	return returnValues
 end
 
--- Titlebar
-local function isTitlebarEnabledForClient(c)
-	-- or c.type == "dialog"
-	if not (c.type == "normal") then
-		return false
-	elseif c.class == "Plugin-container" then
-		return false
-	elseif c.class == "XTerm" then
-		return false
-	end
-	return true
-end
-local function addTitlebarToClient(c, titlebar)
-	local titlebar = titlebar or awful.titlebar(c)
-	-- buttons for the titlebar
-	local buttons = awful.util.table.join(
-	  awful.button({}, 1, function()
-		client.focus = c
-		awful.mouse.client.move(c)
-	  end),
-	  awful.button({}, 3, function()
-		client.focus = c
-		awful.mouse.client.resize(c)
-	  end))
-
-	-- Widgets that are aligned to the left
-	local left_layout = wibox.layout.fixed.horizontal()
-	left_layout:add(awful.titlebar.widget.iconwidget(c))
-	left_layout:buttons(buttons)
-
-	-- Widgets that are aligned to the right
-	right_layout = wibox.layout.fixed.horizontal()
-	right_layout:add(awful.titlebar.widget.floatingbutton(c)) -- WAV: Replace with Key
-	--right_layout:add(awful.titlebar.widget.maximizedbutton(c))
-	right_layout:add(awful.titlebar.widget.stickybutton(c)) -- Dog (Stays with you whereever you go :p)
-	-- WAV: Remove On Top
-	--right_layout:add(awful.titlebar.widget.ontopbutton(c))
-	right_layout:add(awful.titlebar.widget.closebutton(c)) -- Win + Q
-
-	-- The title goes in the middle
-	local middle_layout = wibox.layout.flex.horizontal()
-	local title = awful.titlebar.widget.titlewidget(c, {fg_focus = "#FFFFFF"})
-	title:set_align("center")
-	middle_layout:add(title)
-	middle_layout:buttons(buttons)
-
-	-- Now bring it all together
-	local layout = wibox.layout.align.horizontal()
-	layout:set_left(left_layout)
-	layout:set_right(right_layout)
-	layout:set_middle(middle_layout)
-	
-	titlebar:set_widget(layout)
-	titlebar.visible = true
-end
-function toggleClientTitlebar(c)
-	local titlebar = awful.titlebar(c)
-	if titlebar.visible == true then
-		titlebar.visible = false
-		awful.titlebar(c, {size = 0})
-	else
-		addTitlebarToClient(c, titlebar)
-		titlebar.visible = true
-		-- titlebar
-	end
-end
-
 --Signals
 local function transientShouldBeSticky(c)
 	return (c.name and c.name:find("LEAFPAD_QUICK_NOTE")) -- or 
@@ -282,13 +215,6 @@ function manageClient(c, startup)
 	if c.transient_for and transientShouldBeSticky(c) then
 		notify_send("Transient's UNITE!")
 		c.sticky = true
-	end
-
-	
-	-- TitleBar (If Enabled)
-	-- local titlebars_enabled = true
-	if titlebars_enabled and isTitlebarEnabledForClient(c) then
-		addTitlebarToClient(c)
 	end
 	
 	-- If a client is auto-matically floating, make it ontop
