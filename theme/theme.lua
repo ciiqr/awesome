@@ -79,13 +79,6 @@ theme.border_normal = darkGrey
 theme.border_focus  = darkColour
 theme.border_marked = lightRed
 
--- Titlebars
-theme.titlebar_bg_focus  = darkColour
-theme.titlebar_fg_focus = white
--- theme.titlebar_bg_focus  = slightlyLighterGrey
--- theme.titlebar_bg_normal = darkGrey
--- theme.titlebar_fg_focus = lightColour
-
 -- Tasklist
 theme.tasklist_bg_focus = darkColour
 theme.tasklist_fg_normal = white
@@ -124,10 +117,7 @@ theme.taglist_squares_sel   = themePath .. "taglist/squarefz.png"
 theme.taglist_squares_unsel = themePath .. "taglist/squarez.png"
 theme.taglist_squares_resize = "true"
 
--- Menu & Awesome Button
-theme.awesome_icon = themePath .. "awesome-icon.png"
-theme.arch_icon = themePath .. "arch-icon.png"--"/home/william/Downloads/arch start buttons by gabriela2400/start-here lp blue2.tif"
-theme.exit_icon = themePath .. "exit.png"
+-- Old Awesome Button icon was from "arch start buttons by gabriela2400"
 
 theme.menu_submenu_icon      = "/usr/share/awesome/themes/default/submenu.png"
 
@@ -145,31 +135,6 @@ theme.layout_max        = themePathLayouts .. "max.png"
 theme.layout_fullscreen = themePathLayouts .. "fullscreen.png"
 theme.layout_magnifier  = themePathLayouts .. "magnifier.png"
 theme.layout_floating   = themePathLayouts .. "floating.png"
-
--- Titlebar
-local themePathTitlebar = themePath .. "titlebar/"
-theme.titlebar_close_button_focus  = themePathTitlebar .. "close_focus.png"
-theme.titlebar_close_button_normal = themePathTitlebar .. "close_normal.png"
-
-theme.titlebar_ontop_button_focus_active  = themePathTitlebar .. "ontop_focus_active.png"
-theme.titlebar_ontop_button_normal_active = themePathTitlebar .. "ontop_normal_active.png"
-theme.titlebar_ontop_button_focus_inactive  = themePathTitlebar .. "ontop_focus_inactive.png"
-theme.titlebar_ontop_button_normal_inactive = themePathTitlebar .. "ontop_normal_inactive.png"
-
-theme.titlebar_sticky_button_focus_active  = themePathTitlebar .. "sticky_focus_active.png"
-theme.titlebar_sticky_button_normal_active = themePathTitlebar .. "sticky_normal_active.png"
-theme.titlebar_sticky_button_focus_inactive  = themePathTitlebar .. "sticky_focus_inactive.png"
-theme.titlebar_sticky_button_normal_inactive = themePathTitlebar .. "sticky_normal_inactive.png"
-
-theme.titlebar_floating_button_focus_active  = themePathTitlebar .. "floating_focus_active.png"
-theme.titlebar_floating_button_normal_active = themePathTitlebar .. "floating_normal_active.png"
-theme.titlebar_floating_button_focus_inactive  = themePathTitlebar .. "floating_focus_inactive.png"
-theme.titlebar_floating_button_normal_inactive = themePathTitlebar .. "floating_normal_inactive.png"
-
-theme.titlebar_maximized_button_focus_active  = themePathTitlebar .. "maximized_focus_active.png"
-theme.titlebar_maximized_button_normal_active = themePathTitlebar .. "maximized_normal_active.png"
-theme.titlebar_maximized_button_focus_inactive  = themePathTitlebar .. "maximized_focus_inactive.png"
-theme.titlebar_maximized_button_normal_inactive = themePathTitlebar .. "maximized_normal_inactive.png"
 
 -- Exit & Return Module
 return theme

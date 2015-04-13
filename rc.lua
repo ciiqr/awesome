@@ -18,8 +18,7 @@
 -- side wibox (W.I.P.) which will display additional information which shouldn't be	--
 -- on the main wiboxes (Currently just a custom minimalist clock). Selection		--
 -- screenshots. Default mouse location on startup, Separate module for creation of	--
--- widgets. Window debug information (useful for creation of rules). Toggle-able	--
--- titlebar which is disabled by default.											--
+-- widgets. Window debug information (useful for creation of rules). 				--
 -- NOTE: I use this configuration on a 1920x1080 15" screen, you may need to adjust	--
 --		certain aspects to fit well with your screen & theme.						--
 -- Overall it is a great work in progress, it is perfect for day to day use and  	--
@@ -350,24 +349,21 @@ root.keys(globalKeys) -- root.keys(musicwidget:append_global_keys(globalKeys))
 --Keys
 clientkeys = awful.util.table.join(
 	-- Move Between Tags
-	awful.key({SUPER, ALT}, "Left", moveClientLeftAndFollow),
-	awful.key({SUPER, ALT}, "Right", moveClientRightAndFollow),
-	awful.key({SUPER, ALT}, "Up", moveClientToFirstTagAndFollow),
-	awful.key({SUPER, ALT}, "Down", moveClientToLastTagAndFollow),
+	awful.key({SUPER, ALT}, "Left", moveClientLeftAndFollow)
+	,awful.key({SUPER, ALT}, "Right", moveClientRightAndFollow)
+	,awful.key({SUPER, ALT}, "Up", moveClientToFirstTagAndFollow)
+	,awful.key({SUPER, ALT}, "Down", moveClientToLastTagAndFollow)
 	--Kill
-	awful.key({SUPER}, "q", function(c) c:kill() end),
+	,awful.key({SUPER}, "q", function(c) c:kill() end)
 
 	--Fullscreen
-	awful.key({SUPER}, "f", toggleClientFullscreen),
+	,awful.key({SUPER}, "f", toggleClientFullscreen)
 	
 	-- Multi Fullscreen
-	awful.key({SUPER, SHIFT}, "f", toggleClientMultiFullscreen),
+	,awful.key({SUPER, SHIFT}, "f", toggleClientMultiFullscreen)
 
 	--Minimize
-	awful.key({SUPER, CONTROL}, "Down", minimizeClient),
-
-	--Toggle Titlebar
-	awful.key({SUPER, ALT}, "[", toggleClientTitlebar)
+	,awful.key({SUPER, CONTROL}, "Down", minimizeClient)
 
 	--Floating
 	,awful.key({SUPER, ALT}, "space", awful.client.floating.toggle)
