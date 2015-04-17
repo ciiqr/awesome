@@ -349,7 +349,7 @@ root.keys(globalKeys) -- root.keys(musicwidget:append_global_keys(globalKeys))
 --Keys
 clientkeys = awful.util.table.join(
 	-- Move Between Tags
-	awful.key({SUPER, ALT}, "Left", moveClientLeftAndFollow)
+	 awful.key({SUPER, ALT}, "Left", moveClientLeftAndFollow)
 	,awful.key({SUPER, ALT}, "Right", moveClientRightAndFollow)
 	,awful.key({SUPER, ALT}, "Up", moveClientToFirstTagAndFollow)
 	,awful.key({SUPER, ALT}, "Down", moveClientToLastTagAndFollow)
@@ -368,7 +368,7 @@ clientkeys = awful.util.table.join(
 	--Floating
 	,awful.key({SUPER, ALT}, "space", awful.client.floating.toggle)
 	
-	--Debug Info (F12)
+	--Debug Info
 	,awful.key({SUPER}, "g", ternary(DEBUG, debugClient, function()end))
 )
 --Buttons
