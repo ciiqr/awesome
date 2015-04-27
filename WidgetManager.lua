@@ -4,8 +4,8 @@ local quake = quake or require("quake")
 
 local WidgetManager = {}
 
-WidgetManager.wifiDevice = "wlp9s0"
-WidgetManager.ethDevice = "enp8s0"
+WidgetManager.wifiDevice = "wlan0"
+WidgetManager.ethDevice = "eth0"
 
 -- Popup Terminal
 function WidgetManager:initPopupTerminal(s)
