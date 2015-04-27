@@ -117,24 +117,15 @@ theme.taglist_squares_sel   = themePath .. "taglist/squarefz.png"
 theme.taglist_squares_unsel = themePath .. "taglist/squarez.png"
 theme.taglist_squares_resize = "true"
 
--- Old Awesome Button icon was from "arch start buttons by gabriela2400"
-
-theme.menu_submenu_icon      = "/usr/share/awesome/themes/default/submenu.png"
-
 -- Layout
 local themePathLayouts	= themePath .. "layouts/"
 theme.layout_tile       = themePathLayouts .. "tile.png"
-theme.layout_tileleft   = themePathLayouts .. "tileleft.png"
-theme.layout_tilebottom = themePathLayouts .. "tilebottom.png"
-theme.layout_tiletop    = themePathLayouts .. "tiletop.png"
 theme.layout_fairv      = themePathLayouts .. "fairv.png"
 theme.layout_fairh      = themePathLayouts .. "fairh.png"
-theme.layout_spiral     = themePathLayouts .. "spiral.png"
-theme.layout_dwindle    = themePathLayouts .. "dwindle.png"
 theme.layout_max        = themePathLayouts .. "max.png"
-theme.layout_fullscreen = themePathLayouts .. "fullscreen.png"
-theme.layout_magnifier  = themePathLayouts .. "magnifier.png"
 theme.layout_floating   = themePathLayouts .. "floating.png"
 
 -- Exit & Return Module
 return theme
+
+-- Old Awesome Button icon was from "arch start buttons by gabriela2400"

@@ -303,7 +303,7 @@ globalKeys = awful.util.table.join(
 	awful.key({SUPER}, "F11", xrandr),
 	
 	-- Pasteboard paste
-	awful.key({}, "Insert", function() notify_send("Insert", 0.5) ;awful.util.spawn("xdotool click 2") end) -- put 'keycode 118 = ' back in .Xmodmap if I no longer use this
+	awful.key({}, "Insert", function() awful.util.spawn("xdotool click 2") end) -- put 'keycode 118 = ' back in .Xmodmap if I no longer use this
 
 	-- -- Run or raise applications with dmenu
 	-- TODO: Client itteration code may be useful, but otherwise I could probably implement this with QuickLaunch
@@ -393,7 +393,7 @@ awful.rules.rules = {
 			buttons = clientButtons,
 			-- Prevent Clients Maximized on Start
 			maximized_vertical   = false,
- 			maximized_horizontal = false
+			maximized_horizontal = false
 		}
 	}
 	,{ -- Floating
@@ -409,14 +409,14 @@ awful.rules.rules = {
 	}
 	,{ -- Ignore Size Hints
 		rule_any = {
-			name = {"FrostWire", "MonoDevelop", "7zFM", "Vmware"},
-			class = {"XTerm", "Ghb"}
+			name = {"MonoDevelop", "7zFM", "Vmware", "FrostWire"},
+			class = {"XTerm", "Ghb", "Skype", "Google-chrome-stable", "Chromium", "Subl3"}
 		},
 		properties = {
 			size_hints_honor = false -- TODO: Consider this for the default rule set, probably won't like, but worth a try anyways
 		}
 	}
-	,{ -- Popover dialogs will not recieve borders
+	,{ -- Popover dialogs will not receive borders
 		rule = {
 			type = "dialog",
 			skip_taskbar = true
@@ -470,10 +470,18 @@ awful.rules.rules = {
 	}
 	,{
 		rule = {
-			class = "Google-chrome"
+			name = "xev-is-special"
+		},
+		properties = {
+			floating = true
+		}
+	}
+	,{
+		rule = {
+			class = "Google-chrome-stable"
 		},
 		rule_any = {
-			name = {"Edit Bookmark", "Bookmark All Tabs"}
+			name = {"Edit Bookmark", "Bookmark All Tabs"} -- TODO: Remove this because chrome now prevents you from resizing them (but also sizes them decently)
 		},
 		except_any = {
 			name = {"Save File", "Open Files"}
@@ -680,14 +688,14 @@ awful.rules.rules = {
 
 		},
 		properties = {
+			tag = awful.tag.gettags(mouse.screen)[6]
 			-- callback = function(c)
 			-- 	-- Floating Windows have a north west gravity, others have static
 			-- 	-- False Assumption
 			-- 	-- if c.size_hints.win_gravity == "north_west" then
 			-- 	-- 	awful.client.floating.set(c, true)
 			-- 	-- end
-			-- end,
-			size_hints_honor = false
+			-- end
 		}
 	}
 	,{
@@ -759,7 +767,7 @@ client.connect_signal("property::floating", function(c) c.ontop = awful.client.f
 --Mouse Over Focus
 client.connect_signal("mouse::enter", function(c)
 	-- NOTE: Experimental support for not changing focus from transient back to it's parent
-	-- NOTE: If there is anpther client on screen then we can still switch to that client then back to the parent...
+	-- NOTE: If there is another client on screen then we can still switch to that client then back to the parent...
 	-- NOTE: ALSO: Experimental support for not changing focus to fullscreen windows automatically, intended to help with the fact that fullscreen windows are displayed over top of wiboxes
 	-- NOTE: Also with the fullscreen note above, the or current client floating means that I can quickly switch between a fullscreen window & say my calculator
 	if (not client.focus) or awful.client.focus.filter(c) and ((not client.focus) or client.focus.transient_for ~= c) and (not c.fullscreen or awful.client.floating.get(client.focus)) then --  and awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
