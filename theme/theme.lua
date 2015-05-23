@@ -10,7 +10,7 @@
 -- [taglist|tasklist]_[bg|fg]_[focus|urgent]
 -- titlebar_[normal|focus]
 -- tooltip_[font|opacity|fg_color|bg_color|border_width|border_color]
--- theme.taglist_bg_focus = "#CC9393"
+-- theme.taglist_bg_focus = "#CC9393"f
 
 
 -- To TRY
@@ -20,9 +20,7 @@
 -- Variables --
 --===========--
 local theme = {}
-local themePath = CONFIG_DIR..THEME_NAME.."/"
-
--- theme.wallpaper = themePath .. "Background.jpg"
+-- theme.wallpaper = THEME_PATH .. "Background.jpg"
 -- BAR_TRANSPARENCY = true
 
 -- Styles --
@@ -45,7 +43,7 @@ local lightColour = "#FFC629"
 	--23CDC0 - Sea
 	--f08080 - Calm
 	--FFC629 - Red, Yellow Highlights
-local darkColour = "#5A0000"
+local darkColour = "#005577"
 	--581109 - Red
 	--C96508 - Orange
 	--bf7900 - Yellow
@@ -113,12 +111,12 @@ theme.awesompd_bg_normal = black
 -- Icons --
 --=======--
 -- Taglist
-theme.taglist_squares_sel   = themePath .. "taglist/squarefz.png"
-theme.taglist_squares_unsel = themePath .. "taglist/squarez.png"
+theme.taglist_squares_sel   = THEME_PATH .. "taglist/squarefz.png"
+theme.taglist_squares_unsel = THEME_PATH .. "taglist/squarez.png"
 theme.taglist_squares_resize = "true"
 
 -- Layout
-local themePathLayouts	= themePath .. "layouts/"
+local themePathLayouts	= THEME_PATH .. "layouts/"
 theme.layout_tile       = themePathLayouts .. "tile.png"
 theme.layout_fairv      = themePathLayouts .. "fairv.png"
 theme.layout_fairh      = themePathLayouts .. "fairh.png"
