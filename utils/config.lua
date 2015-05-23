@@ -217,9 +217,42 @@ function manageClient(c, startup)
 		c.sticky = true
 	end
 	
-	-- If a client is auto-matically floating, make it ontop
-	if awful.client.floating.get(c) then
-		c.ontop = true
+	-- TODO: 2 below, this is also in property-change/event-handlers & it would be nice if it was only in one location...
+	-- If a client is automatically floating, make it ontop
+	clientDidChangeFloating(c)
+	
+	if client.focus == c then
+		clientDidFocus(c)
+	end
+end
+
+function clientDidFocus(c)
+	c.border_color = beautiful.border_focus
+	c:raise()
+end
+
+function clientDidLoseFocus(c)
+	c.border_color = beautiful.border_normal
+end
+
+function clientDidChangeFloating(c)
+	c.ontop = awful.client.floating.get(c)
+end
+
+function clientDidMouseEnter(c)
+	if not c.minimized then
+		clientShouldAttemptFocus(c)
+	end
+end
+
+function clientShouldAttemptFocus(c)
+	-- NOTE: Experimental support for not changing focus from transient back to it's parent
+	-- NOTE: If there is another client on screen then we can still switch to that client then back to the parent...
+	-- NOTE: ALSO: Experimental support for not changing focus to fullscreen windows automatically, intended to help with the fact that fullscreen windows are displayed over top of wiboxes
+	-- NOTE: Also with the fullscreen note above, the or current client floating means that I can quickly switch between a fullscreen window & say my calculator
+	-- DEFAULT: and awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
+	if (not client.focus) or awful.client.focus.filter(c) and ((not client.focus) or client.focus.transient_for ~= c) and (not c.fullscreen or awful.client.floating.get(client.focus)) then
+		client.focus = c
 	end
 end
 

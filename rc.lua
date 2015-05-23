@@ -55,7 +55,7 @@ if DEBUG then
 	inspect = require("inspect")
 end
 -- Beautiful Theme
-beautiful.init(THEME_PATH)
+beautiful.init(THEME_FILE_PATH)
 
 -- Variables --
 ---------------
@@ -80,6 +80,18 @@ layouts = {
 	,awful.layout.suit.fair
 	,awful.layout.suit.fair.horizontal
 }
+
+--Signals
+--Client
+client.connect_signal("manage", manageClient)
+-- Change Border Colours
+-- Raise on focus
+client.connect_signal("focus", clientDidFocus)
+client.connect_signal("unfocus", clientDidLoseFocus)
+-- Floating always means ontop
+client.connect_signal("property::floating", clientDidChangeFloating)
+-- Mouse Over Focus
+client.connect_signal("mouse::enter", clientDidMouseEnter)
 
 -- Per-Screen Setup (Wallpapers, Tags, Pop-down Terminal/Htop/Note, Maximized Layouts, Top/BottomBars)
 for s = 1, screen.count() do
@@ -146,13 +158,13 @@ for s = 1, screen.count() do
 	top_layout:set_right(right_layout)
 
 	--tWibox
-	tWibox[s] = awful.wibox({position = "top", screen = s, height = 22})
+	tWibox[s] = awful.wibox({position = "top", screen = s, height = PANEL_HEIGHT})
 	tWibox[s]:set_widget(top_layout)
 
 	-- Wibox Buttons
 	if DEBUG then
 		tWibox[s]._drawable.widget:buttons(awful.util.table.join(
-			awful.button({SUPER}, 1, function() tWibox[s]:geometry({height = 22}) end),
+			awful.button({SUPER}, 1, function() tWibox[s]:geometry({height = PANEL_HEIGHT}) end),
 			awful.button({SUPER}, 3, function() tWibox[s]:geometry({height = 100}) end)
 		))
 	end
@@ -160,7 +172,7 @@ for s = 1, screen.count() do
 	-- Task List
 	bottomLayout:set_middle(widget_manager:getTaskBox(s))
 	--bWibox
-	bWibox[s] = awful.wibox({position = "bottom", screen = s, height = 22})
+	bWibox[s] = awful.wibox({position = "bottom", screen = s, height = PANEL_HEIGHT})
 	bWibox[s]:set_widget(bottomLayout)
 
 	-- Info Wibox Layout
@@ -398,8 +410,8 @@ awful.rules.rules = {
 	}
 	,{ -- Floating
 		rule_any = {
-			class = {"Speedcrunch", "pinentry", "MPlayer", "Plugin-container", "Exe", "Gtimer", "Vmware-modconfig", "freerdp", "Seafile-applet", "Pavucontrol", "mainframe", "Redshiftgui", "Fuzzy-windows"},
-			name = {"Tab Organizer"},
+			class = {"Speedcrunch", "pinentry", "MPlayer", "Plugin-container", "Exe", "Gtimer", "Vmware-modconfig", "freerdp", "Seafile-applet", "Pavucontrol", "mainframe", "Fuzzy-windows"},
+			name = {"Tab Organizer", "Firefox Preferences"},
 			type = {"dialog", "menu"},
 			role = {"toolbox_window", "pop-up"} -- TODO: Decide if I really like pop-up, cause honestly a lot of things are pop-up's & it's rather annoying ("pop-up")
 		},
@@ -410,7 +422,7 @@ awful.rules.rules = {
 	,{ -- Ignore Size Hints
 		rule_any = {
 			name = {"MonoDevelop", "7zFM", "Vmware", "FrostWire"},
-			class = {"XTerm", "Ghb", "Skype", "Google-chrome-stable", "Chromium", "Subl3"}
+			class = {"XTerm", "Ghb", "Skype", "Google-chrome-stable", "Chromium", "Subl3", "SmartSVN", "SmartGit"}
 		},
 		properties = {
 			size_hints_honor = false -- TODO: Consider this for the default rule set, probably won't like, but worth a try anyways
@@ -561,29 +573,6 @@ awful.rules.rules = {
 				local clientName = c.name
 				if clientName then
 					
-					local sublime_window_rules = {
-						{
-							name = "Nim",
-							tag = 2
-						}
-						,{
-							name = "AIMS",
-							tag = 3
-						}
-						,{
-							name = "bmarks",
-							tag = 5
-						}
-						,{
-							name = "4",
-							tag = 6
-						}
-						,{
-							name = "awesome, awesome",
-							tag = 7
-						}
-					}
-					
 					-- Find the name in the client's name
 					local find_window = function(name)
 						return clientName:find("%("..name.."%)");
@@ -592,9 +581,9 @@ awful.rules.rules = {
 					-- Get Tags
 					local tags = awful.tag.gettags(c.screen)
 					-- Move to Tag
-					for _,rule in pairs(sublime_window_rules) do
-						if find_window(rule.name) then
-							awful.client.toggletag(tags[rule.tag], c);
+					for name,tag in pairs(sublime_window_rules) do
+						if find_window(name) then
+							awful.client.toggletag(tags[tag], c);
 							break
 						end
 					end
@@ -753,27 +742,6 @@ awful.rules.rules = {
 	--	}
 	--}
 }
-
--- TODO: Move to end of config.lua? Probably not
---Signals
---Client
-client.connect_signal("manage", manageClient)
--- Change Border Colours
--- Raise on focus
-client.connect_signal("focus",	 function(c) c.border_color = beautiful.border_focus; c:raise() end)
-client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
--- Floating always means ontop
-client.connect_signal("property::floating", function(c) c.ontop = awful.client.floating.get(c) end)
---Mouse Over Focus
-client.connect_signal("mouse::enter", function(c)
-	-- NOTE: Experimental support for not changing focus from transient back to it's parent
-	-- NOTE: If there is another client on screen then we can still switch to that client then back to the parent...
-	-- NOTE: ALSO: Experimental support for not changing focus to fullscreen windows automatically, intended to help with the fact that fullscreen windows are displayed over top of wiboxes
-	-- NOTE: Also with the fullscreen note above, the or current client floating means that I can quickly switch between a fullscreen window & say my calculator
-	if (not client.focus) or awful.client.focus.filter(c) and ((not client.focus) or client.focus.transient_for ~= c) and (not c.fullscreen or awful.client.floating.get(client.focus)) then --  and awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
-			client.focus = c
-	end
-end)
 
 -- Setup network connectivity change listener
 setup_network_connectivity_change_listener()

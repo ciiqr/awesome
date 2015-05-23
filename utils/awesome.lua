@@ -44,7 +44,7 @@ function run_once(prg)
 	-- checks if program is running
 		-- if program is root then checks root, otherwise checks current user
 	-- if it's not running then run it
-	awful.util.spawn_with_shell(COMMAND_IS_RUNNING.." "..programName.." "..ternary(isRoot, "root", USER).." || ("..prg..")")
+	awful.util.spawn_with_shell(COMMAND_IS_RUNNING.." "..programName.." "..ternary(isRoot, "root", "$USER").." || ("..prg..")")
 end
 
 -- Mouse
@@ -54,15 +54,15 @@ end
 
 -- Clients
 function minimizeClient(c)
-	-- Prevents Windows Being Minimized if they arn't on the task bar
-	if c.skip_taskbar then
-		return
+	-- Prevents Windows Being Minimized if they aren't on the task bar
+	if not c.skip_taskbar then
+		-- Minimize
+		c.minimized = true
 	end
-	-- Minimize
-	c.minimized = true
 end
 function restoreClient()
 	local c = awful.client.restore()
+	-- Ensure unminimized client is the new focused client
 	if c then
 		client.focus = c
 	end
@@ -183,7 +183,18 @@ function increaseMwfact(add, t)
 end
 
 -- Wibox
-function toggleWibox(wibox)
-	local lwibox = wibox[mouse.screen]
+function toggleWibox(wibox, s)
+	local s = s or mouse.screen
+	local lwibox = wibox[s]
 	lwibox.visible = not lwibox.visible
+	
+	-- Adjust the infoWibox's height when the top/bottom wiboxes are resized
+	-- TODO: Move this to the signal handler for "property::visible"
+	-- OR more reasonably "property::workarea" of the screen
+	local position = awful.wibox.get_position(lwibox)
+	if position == "top" or position == "bottom" then
+		
+		infoWibox[s].y = screen[s].workarea.y
+		infoWibox[s].height = screen[s].workarea.height
+	end
 end

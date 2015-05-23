@@ -279,12 +279,24 @@ function WidgetManager:getTaskBox(screen, is_vertical)
 end
 
 function WidgetManager:getInfoWibox(s, widget)
-	local screenDimens = screen[s].workarea
-	local aWibox = wibox({position = "left", screen = s, width = 300, height = screenDimens.height, y = screenDimens.y}) -- TODO: on task list change it should update height, never more than workarea
+	-- 'awful.wibox' to have it affect the workarea
+	local aWibox = wibox({
+		position = "left",
+		screen = s,
+		width = 300,
+		ontop = true,
+		visible = false})
 	aWibox:set_widget(widget)
-	aWibox.ontop = true
-	-- Start Hidden
-	aWibox.visible = false
+	
+	-- TODOL: Get this working to replace code in awesome.lua's toggleWibox
+	-- local screen = screen[s]
+	-- screen:connect_signal("property::workarea", function(s)
+	-- 	aWibox.y = s.workarea.y
+	-- 	aWibox.height = s.workarea.height
+	-- end)
+	
+	
+	-- TODO: on task list change it should update height, never more than workarea
 	return aWibox
 end
 
@@ -296,8 +308,6 @@ function WidgetManager:getTagsList(screen)
 		awful.button({SUPER}, 1, awful.client.movetotag), -- Move Window to This Tag
 		awful.button({}, 3, awful.tag.viewtoggle), -- Toggle This Tag 
 		awful.button({SUPER}, 3, awful.client.toggletag)--, -- Toggle This Tag For The current Window
-		-- awful.button({}, 4, function(t) awful.tag.viewnext(awful.tag.getscreen(t)) end), -- Scroll To Switch Tags
-		-- awful.button({}, 5, function(t) awful.tag.viewprev(awful.tag.getscreen(t)) end)
 	)
 
 	--TagList
