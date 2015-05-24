@@ -42,6 +42,14 @@ ALT="Mod1"
 CONTROL="Control"
 SHIFT="Shift"
 
+-- Mouse Buttons
+MOUSE_LEFT = 1
+MOUSE_RIGHT = 3
+
+-- Direction
+FORWARDS = 1
+BACKWARDS = -1
+
 -- Tags
 SCREEN_TAGS = {"➊ Default","➋ ❴❵","➌ AIMS","➍ FAHM","➎ VM","➏ Social","➐ ⚙","➑ Ent.","➒ ♫"} --🌐 --{} ⌥ --➌ Learn -- TODO: Switch back to 'School' in September
 

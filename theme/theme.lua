@@ -43,7 +43,7 @@ local lightColour = "#FFC629"
 	--23CDC0 - Sea
 	--f08080 - Calm
 	--FFC629 - Red, Yellow Highlights
-local darkColour = "#005577"
+local darkColour = "#5A0000"
 	--581109 - Red
 	--C96508 - Orange
 	--bf7900 - Yellow

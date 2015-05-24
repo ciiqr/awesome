@@ -164,8 +164,8 @@ for s = 1, screen.count() do
 	-- Wibox Buttons
 	if DEBUG then
 		tWibox[s]._drawable.widget:buttons(awful.util.table.join(
-			awful.button({SUPER}, 1, function() tWibox[s]:geometry({height = PANEL_HEIGHT}) end),
-			awful.button({SUPER}, 3, function() tWibox[s]:geometry({height = 100}) end)
+			awful.button({SUPER}, MOUSE_LEFT, function() tWibox[s]:geometry({height = PANEL_HEIGHT}) end),
+			awful.button({SUPER}, MOUSE_RIGHT, function() tWibox[s]:geometry({height = 100}) end)
 		))
 	end
 	
@@ -197,19 +197,19 @@ globalKeys = awful.util.table.join(
 	awful.key({SUPER}, "c", function() toggleWibox(infoWibox) end),
 
 	--Modify Layout (NOTE: never use)
-	awful.key({SUPER, SHIFT}, "h", function() awful.tag.incnmaster(1) end),
-	awful.key({SUPER, SHIFT}, "l", function() awful.tag.incnmaster(-1) end),
+	awful.key({SUPER, SHIFT}, "h", function() awful.tag.incnmaster(FORWARDS) end),
+	awful.key({SUPER, SHIFT}, "l", function() awful.tag.incnmaster(BACKWARDS) end),
 
 	--Switch Layout
-	awful.key({SUPER}, "space", function() goToLayout(1) end),
-	awful.key({SUPER, SHIFT}, "space", function() goToLayout(-1) end),
+	awful.key({SUPER}, "space", function() goToLayout(FORWARDS) end),
+	awful.key({SUPER, SHIFT}, "space", function() goToLayout(BACKWARDS) end),
 
 	--Swtich Window
-	awful.key({SUPER}, "Tab", function() switchClient(1) end),
-	awful.key({SUPER, SHIFT}, "Tab", function() switchClient(-1) end),
+	awful.key({SUPER}, "Tab", function() switchClient(FORWARDS) end),
+	awful.key({SUPER, SHIFT}, "Tab", function() switchClient(BACKWARDS) end),
 	-- Alternatively With Page Up/Down
-	awful.key({SUPER}, "Next", function() switchClient(1) end),
-	awful.key({SUPER}, "Prior", function() switchClient(-1) end),
+	awful.key({SUPER}, "Next", function() switchClient(FORWARDS) end),
+	awful.key({SUPER}, "Prior", function() switchClient(BACKWARDS) end),
 	
 	--ClientRestore
 	awful.key({SUPER, CONTROL}, "Up", restoreClient),
@@ -238,17 +238,17 @@ globalKeys = awful.util.table.join(
 		end
 	end),
 	
-	--Change Position (NOTE: rarely use)
-	awful.key({SUPER}, "Left", function() awful.client.swap.byidx(-1) end), -- Was bydirection instead of byidx but that wasn't necessarily the most efficient way
-	awful.key({SUPER}, "Right", function() awful.client.swap.byidx(1) end),
+	--Change Position
+	awful.key({SUPER}, "Left", function() awful.client.swap.byidx(BACKWARDS) end),
+	awful.key({SUPER}, "Right", function() awful.client.swap.byidx(FORWARDS) end),
 
 	--Move Middle
 	awful.key({SUPER, SHIFT}, "Left", function() increaseMwfact(-0.05) end),
 	awful.key({SUPER, SHIFT}, "Right", function() increaseMwfact(0.05) end),
 
 	--Change Number of Columns(Only on splitup side)
-	-- awful.key({SUPER, CONTROL}, "h", function() awful.tag.incncol( 1) end),
-	-- awful.key({SUPER, CONTROL}, "l", function() awful.tag.incncol(-1) end),
+	-- awful.key({SUPER, CONTROL}, "h", function() awful.tag.incncol(FORWARDS) end),
+	-- awful.key({SUPER, CONTROL}, "l", function() awful.tag.incncol(BACKWARDS) end),
 	
 	-- Switch beteen screens
 	-- TODO: Make it depend on the number of attached screens
@@ -344,7 +344,7 @@ globalKeys = awful.util.table.join(
 -- Uses keycodes to make it works on any keyboard layout
 local numberOfTags = #(awful.tag.gettags(mouse.screen))
 for i = 1, numberOfTags do
-	local iKey = "#"..(i + numberOfTags)
+	local iKey = "#"..(i + 9)
 	globalKeys = awful.util.table.join(globalKeys,
 		awful.key({ALT, CONTROL},		iKey, function() switchToTag(i) end),
 		awful.key({SUPER, ALT},			iKey, function() moveClientToTagAndFollow(i) end),
@@ -385,12 +385,14 @@ clientkeys = awful.util.table.join(
 )
 --Buttons
 clientButtons = awful.util.table.join(
-	awful.button({}, 1, function(c) client.focus = c; c:raise() end),-- Click Focuses & Raises
-	awful.button({SUPER}, 1, awful.mouse.client.move),				 -- Super + Left Moves
-	awful.button({SUPER}, 3, awful.mouse.client.resize)				 -- Super + Right Resizes
+	awful.button({}, MOUSE_LEFT, function(c) client.focus = c; c:raise() end),-- Click Focuses & Raises
+	awful.button({SUPER}, MOUSE_LEFT, awful.mouse.client.move),				 -- Super + Left Moves
+	awful.button({SUPER}, MOUSE_RIGHT, awful.mouse.client.resize)				 -- Super + Right Resizes
 )
 
 --Rules
+-- TODO: Use the rules.lua file
+-- NOTE: class in the normal rule table can be an array as well, which presumable means it must have all specified classes
 awful.rules.rules = {
 	{
 		rule = {},
@@ -733,23 +735,49 @@ awful.rules.rules = {
 		}
 	}
 	
-	--,{
-	--	rule = {
-	--		class = "Eclipse"
-	--	},
-	--	properties = {
-	--		tag = awful.tag.gettags(mouse.screen)[2]
-	--	}
-	--}
+	,{
+		rule = {
+			class = "Vlc"
+			,name = "VLCINBACKGROUNDMODE"
+		},
+		properties = {
+			floating = true,
+			sticky = true,
+			below = true,
+			skip_taskbar = true,
+			border_width = 0,
+			fullscreen = true,
+			size_hints = {
+				user_position = {
+					x = 0,
+					y = 0
+				},
+				program_position = {
+					x = 0,
+					y = 0
+				},
+				user_size = {
+					width = 1920,
+					height = 1080
+				},
+				program_size = {
+					width = 1920,
+					height = 1080
+				}
+			},
+			callback = function(c)
+				c:lower()
+			end
+		}
+	}
 }
 
--- Setup network connectivity change listener
 setup_network_connectivity_change_listener()
 
 -- Programs -- (run_once takes a while, probably due to system calls, try making a script that takes a list of files and runs them with the same commands as before)
 --------------
-for _,i in pairs(STARTUP_PROGRAMS) do
-	run_once(i)
+for _,program in pairs(STARTUP_PROGRAMS) do
+	run_once(program)
 end
 
 -- Default first item in tag history
@@ -769,5 +797,3 @@ EDITOR = nil
 globalKeys = nil
 clientKeys = nil
 clientButtons = nil
-START_TIME = nil
-printEnd = nil
