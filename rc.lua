@@ -44,6 +44,7 @@ awful.rules	= require("awful.rules")
 			  require("awful.remote")
 wibox		= require("wibox")
 beautiful 	= require("beautiful"); 
+xresources 	= require("beautiful.xresources");
 naughty		= require("naughty")
 -- Config
 xrandr		= require("utils.xrandr")
@@ -101,6 +102,10 @@ for s = 1, screen.count() do
 	local right_layout	= wibox.layout.fixed.horizontal()
 	local bottomLayout	= wibox.layout.align.horizontal()
 	local infoLayout	= wibox.layout.flex.vertical()
+
+	-- TODO: It would probably bet better to have function to get/calculate these values
+	local scaling_factor = xresources.get_dpi() / 96
+	local panel_height = PANEL_HEIGHT * scaling_factor
 	
 	--Wallpapers
 	if beautiful.wallpaper then
@@ -158,13 +163,13 @@ for s = 1, screen.count() do
 	top_layout:set_right(right_layout)
 
 	--tWibox
-	tWibox[s] = awful.wibox({position = "top", screen = s, height = PANEL_HEIGHT})
+	tWibox[s] = awful.wibox({position = "top", screen = s, height = panel_height})
 	tWibox[s]:set_widget(top_layout)
 
 	-- Wibox Buttons
 	if DEBUG then
 		tWibox[s]._drawable.widget:buttons(awful.util.table.join(
-			awful.button({SUPER}, MOUSE_LEFT, function() tWibox[s]:geometry({height = PANEL_HEIGHT}) end),
+			awful.button({SUPER}, MOUSE_LEFT, function() tWibox[s]:geometry({height = panel_height}) end),
 			awful.button({SUPER}, MOUSE_RIGHT, function() tWibox[s]:geometry({height = 100}) end)
 		))
 	end
@@ -172,7 +177,7 @@ for s = 1, screen.count() do
 	-- Task List
 	bottomLayout:set_middle(widget_manager:getTaskBox(s))
 	--bWibox
-	bWibox[s] = awful.wibox({position = "bottom", screen = s, height = PANEL_HEIGHT})
+	bWibox[s] = awful.wibox({position = "bottom", screen = s, height = panel_height})
 	bWibox[s]:set_widget(bottomLayout)
 
 	-- Info Wibox Layout
