@@ -19,7 +19,7 @@
 -- config.keys.global = awful.util.table.join(
 --    config.keys.global,
 --    awful.key({ modkey }, "`",
--- 	     function () quakeconsole[mouse.screen]:toggle() end)
+-- 	     function () quakeconsole[mouse.screen.index]:toggle() end)
 
 -- If you have a rule like "awful.client.setslave" for your terminals,
 -- ensure you use an exception for
@@ -130,7 +130,7 @@ function QuakeConsole:new(config)
    config.vert     = config.vert     or "top"	       -- top, bottom or center
    config.horiz    = config.horiz    or "center"       -- left, right or center
 
-   config.screen   = config.screen or capi.mouse.screen
+   config.screen   = config.screen or capi.mouse.screen.index
    config.visible  = config.visible or false -- Initially, not visible
 
    local console = setmetatable(config, { __index = QuakeConsole })

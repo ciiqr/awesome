@@ -7,7 +7,7 @@ temperature.reload = function(self)
 	-- Parse Temperature
 	local temperature = string.match(split(output, ":%s*%+")[3] or "", "%d*")
 	-- Display Formatte Temperature
-	self:set_markup(temperature .. "° ")
+	self:set_markup('<span weight="bold">' .. temperature .. "° " .. '</span>')
 end
 
 temperature.init = function(self)

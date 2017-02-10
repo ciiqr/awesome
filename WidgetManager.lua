@@ -4,7 +4,8 @@ local quake = quake or require("quake")
 
 local WidgetManager = {}
 
-WidgetManager.wifiDevice = "wlan0"
+-- TODO: Either make this a per machine config setting or change the device names to be wlan* and eth*
+WidgetManager.wifiDevice = "wlp2s0"
 WidgetManager.ethDevice = "eth0"
 
 -- Popup Terminal
@@ -21,7 +22,7 @@ function WidgetManager:initPopupTerminal(s)
 end
 function WidgetManager:togglePopupTerminal(s)
 	-- Toggle Popup
-	self.quake_terminal[s or mouse.screen]:toggle()
+	self.quake_terminal[s or mouse.screen.index]:toggle()
 end
 
 -- Popup CPU
@@ -38,7 +39,7 @@ function WidgetManager:initPopupCPU(s)
 end
 function WidgetManager:togglePopupCPU(s)
 	-- Toggle Popup
-	self.quake_htop_cpu_terminal[s or mouse.screen]:toggle()
+	self.quake_htop_cpu_terminal[s or mouse.screen.index]:toggle()
 end
 
 -- Popup Memory
@@ -55,7 +56,7 @@ function WidgetManager:initPopupMemory(s)
 end
 function WidgetManager:togglePopupMemory(s)
 	-- Toggle Popup
-	self.quake_htop_mem_terminal[s or mouse.screen]:toggle()
+	self.quake_htop_mem_terminal[s or mouse.screen.index]:toggle()
 end
 
 -- Popup Notes
@@ -72,7 +73,7 @@ function WidgetManager:initPopupNotes(s)
 end
 function WidgetManager:togglePopupNotes(s)
 	-- Toggle Popup
-	self.quake_leafpad_quick_note[s or mouse.screen]:toggle()
+	self.quake_leafpad_quick_note[s or mouse.screen.index]:toggle()
 end
 
 function WidgetManager:initKeepass(s)
@@ -88,7 +89,7 @@ function WidgetManager:initKeepass(s)
 end
 function WidgetManager:toggleKeepass(s)
 	-- Toggle Popup
-	self.quake_keepass[s or mouse.screen]:toggle()
+	self.quake_keepass[s or mouse.screen.index]:toggle()
 end
 
 -- Volume
@@ -159,9 +160,9 @@ function WidgetManager:getSystemTray()
 	self.sysTray = wibox.widget.systray()
 	self.sysTray.isSysTray = true
 	self.sysTray.orig_fit = self.sysTray.fit
-	self.sysTray.fit = function(self, width, height)
+	self.sysTray.fit = function(self, ctx, width, height)
 		-- Original
-		local width, height = self:orig_fit(width, height)
+		local width, height = self:orig_fit(ctx, width, height)
 		
 		-- Hidden
 		if self.hidden then
@@ -203,58 +204,7 @@ function WidgetManager:getTextClock() -- .textClock:set_font()
 	return self.textClock
 end
 
--- TaskList						  widg, buttons, label, data, clients
-function vertical_tasklist_update(widg, buttons, label, data, objects)
-    -- update the widgets, creating them if needed
-    widg:reset()
-    for i, o in ipairs(objects) do
-        local cache = data[o]
-        local ib, tb, bgb, m, l
-        if cache then
-            ib = cache.ib
-            tb = cache.tb
-            bgb = cache.bgb
-            m   = cache.m
-        else
-            ib = wibox.widget.imagebox()
-            tb = wibox.widget.textbox()
-            bgb = wibox.widget.background()
-            m = wibox.layout.margin(tb, 4, 4)
-            l = wibox.layout.fixed.horizontal()
 
-            -- All of this is added in a fixed widget
-            l:fill_space(true)
-            l:add(ib)
-            l:add(m)
-
-            -- And all of this gets a background
-            bgb:set_widget(l)
-
-            local common = common or require("awful.widget.common")
-            bgb:buttons(common.create_buttons(buttons, o))
-
-            data[o] = {
-                ib = ib,
-                tb = tb,
-                bgb = bgb,
-                m   = m
-            }
-        end
-
-        local text, bg, bg_image, icon = label(o)
-        -- The text might be invalid, so use pcall
-        if not pcall(tb.set_markup, tb, text) then
-            tb:set_markup("<i>&lt;Invalid text&gt;</i>")
-        end
-        bgb:set_bg(bg)
-        if type(bg_image) == "function" then
-            bg_image = bg_image(tb,o,m,objects,i)
-        end
-        bgb:set_bgimage(bg_image)
-        ib:set_image(icon)
-        widg:add(bgb)
-   end
-end
 function WidgetManager:getTaskBox(screen, is_vertical)
 	-- TODO: These need to be seperate per screen, therefore I need a list for each, ie. WidgetManager.verticalTaskBoxes, WidgetManager.horizontalTaskBoxes
 	local buttons = awful.util.table.join(
@@ -263,10 +213,10 @@ function WidgetManager:getTaskBox(screen, is_vertical)
 	)
 	if is_vertical then
 		local layout = wibox.layout.flex.vertical()
-		local widget = awful.widget.tasklist(screen, awful.widget.tasklist.filter.allscreen, buttons, nil, vertical_tasklist_update, layout) -- Vertical 
+		local widget = awful.widget.tasklist(screen, awful.widget.tasklist.filter.allscreen, buttons, nil, nil, layout) -- Vertical
 		-- layout:fit_widget(widget, 100, 100)
-		layout:fit(100, 100)
-		widget:fit(100, 100)
+		layout:fit({}, 100, 100)
+		widget:fit({}, 100, 100)
 		-- widget = awful.widget.layoutbox(screen)
 		-- notify_send(inspect(layout, 2))
 		-- notify_send(inspect(widget, 2))
@@ -378,7 +328,8 @@ function WidgetManager:getBatteryWidget()
 		end
 		return retval
 	end
-	vicious.register(self.battery, customWrapper, '<span foreground="#ffcc00" weight="bold"> $1$2% $3</span>  ', 120, "BAT1") --585656
+	-- TODO: Have a setting for the battery to use
+	vicious.register(self.battery, customWrapper, '<span foreground="#ffcc00" weight="bold"> $1$2% $3</span>  ', 120, "BAT0") --585656
 	self.battery.bg = "#cac6ce"
 	
 	return self.battery

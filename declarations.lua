@@ -33,7 +33,7 @@ BATTERY_PERCENT_CRITICAL = 5
 TERMINAL="xterm"
 TERMINAL_EXEC=TERMINAL.." -e "
 FILE_MANAGER="spacefm"
-EDITOR="subl3"
+EDITOR="subl"
 GRAPHICAL_SUDO="gksudo"
 
 -- Keys
@@ -51,12 +51,12 @@ FORWARDS = 1
 BACKWARDS = -1
 
 -- Tags
-SCREEN_TAGS = {"➊ Default","➋ ❴❵","➌ AIMS","➍ FAHM","➎ VM","➏ Social","➐ ⚙","➑ Ent.","➒ ♫"} --🌐 --{} ⌥ --➌ Learn -- TODO: Switch back to 'School' in September
+SCREEN_TAGS = {"➊ Default","➋ ❴❵","➌ IDK","➍ Fuck, what dis?","➎ VM","➏ Social... Yah...","➐ ⚙","➑ Ent.","➒ ♫"} --🌐 --{} ⌥ --➌ Learn
 
 -- Commands
 COMMAND_SLEEP = "systemctl suspend"
 COMMAND_SCREEN_SHOT = "scrot ~/Random/Screens/%Y-%m-%d-%T-screen.png"
-COMMAND_SCREEN_SHOT_SELECT = "import ~/Random/Screens/%Y-%m-%d-%T-screen.png"
+COMMAND_SCREEN_SHOT_SELECT = "gm import ~/Random/Screens/%Y-%m-%d-%T-screen.png"
 COMMAND_SCREEN_INVERT = "xcalib -i -a"
 COMMAND_FILE_OPENER = "xdg-open \"$(locate \"\" | dmenu -y %s -i -p Open -l 20 -fn \"Nimbus Sans L-10\" -dim 0.75)\"" -- MUST Replace %s using string.format, with y Height -- -x 480 -w 960 -f
 COMMAND_WINDOW_SWITCHER = "DMENU_OPTIONS='-y %s -i -p Open -l 20 -dim 0.75' FONT=\"Nimbus Sans L-10\" wmgo"
@@ -88,8 +88,8 @@ STARTUP_PROGRAMS = {
 	-- Tray's
 	,"redshift-gtk"
 	,"nm-applet"
-	,"skype"
-	,"dropbox"
+	-- ,"skype"
+	,"dropbox start -i"
 	,"keepass"
 	-- ,"seafile-applet"
 	-- ,"system-config-printer-applet"
@@ -98,8 +98,5 @@ STARTUP_PROGRAMS = {
 
 sublime_window_rules = {
 	["william"] = 1,
-	["Nim"] = 2,
-	["AIMS"] = 3,
-	["FAHM"] = 4,
 	["awesome, awesome"] = 7
 }
