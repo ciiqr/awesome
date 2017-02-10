@@ -290,6 +290,7 @@ globalKeys = awful.util.table.join(
 
 	--System
 	-- Volume
+	awful.key({}, "XF86AudioMute", function() widget_manager:toggleMute() end),
 	awful.key({}, "XF86AudioLowerVolume", function() widget_manager:changeVolume("-") end),
 	awful.key({}, "XF86AudioRaiseVolume", function() widget_manager:changeVolume("+") end),
 	awful.key({SHIFT}, "XF86AudioLowerVolume", function() widget_manager:changeVolume("-", VOLUME_CHANGE_SMALL) end),

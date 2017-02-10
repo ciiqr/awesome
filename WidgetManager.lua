@@ -109,6 +109,9 @@ function WidgetManager:changeVolume(incORDec, change)
 	-- Change with amixer
 	awful.util.spawn("amixer set Master "..change.."%"..incORDec)
 end
+function WidgetManager:toggleMute()
+	awful.util.spawn('amixer -D pulse set Master 1+ toggle')
+end
 function WidgetManager:displayVolume(vol)
 	self.volume:set_markup('<span foreground="#ffaf5f" weight="bold">🔈 '..(vol or self:retrieveSystemVolumeLevel()).."%  "..'</span>')
 end
