@@ -28,7 +28,7 @@
 	- Re-add battery notification
 	- When only 1 window is on first tag & we restart awesome, it is not focused
 	- run-or-kill command for pavucontrol & other similar, needs to be able to pass the program name to search for seperatly (second param)
-	- awful.screen.padding(screen[mouse.screen], {top=-22, left=0, right=0, bottom=-22})
+	- awful.screen.padding(screen[mouse.screen.index], {top=-22, left=0, right=0, bottom=-22})
 		- May be the best alternative to hiding the wiboxes with fullscreen windows
 	- VMWare not recieving focus when launched as the only client on a tag
 

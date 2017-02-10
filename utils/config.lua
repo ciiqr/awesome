@@ -13,24 +13,24 @@ end
 -- Layout
 function switchToMaximizedLayout()
 	-- If No Layout Stored Then
-	if (not preMaximizeLayouts[mouse.screen][awful.tag.selected()]) then
+	if (not preMaximizeLayouts[mouse.screen.index][awful.tag.selected()]) then
 		-- Store Current Layout
-		preMaximizeLayouts[mouse.screen][awful.tag.selected()] = awful.layout.get(mouse.screen)
+		preMaximizeLayouts[mouse.screen.index][awful.tag.selected()] = awful.layout.get(mouse.screen.index)
 		-- Change to Maximized
 		awful.layout.set(awful.layout.suit.max)
 	end
 end
 function revertFromMaximizedLayout()
 	-- Revert Maximize
-	if (awful.layout.get(mouse.screen) == awful.layout.suit.max) then
-		awful.layout.set(preMaximizeLayouts[mouse.screen][awful.tag.selected()])
+	if (awful.layout.get(mouse.screen.index) == awful.layout.suit.max) then
+		awful.layout.set(preMaximizeLayouts[mouse.screen.index][awful.tag.selected()])
 		-- Nil so it is garbage collected
-		preMaximizeLayouts[mouse.screen][awful.tag.selected()] = nil
+		preMaximizeLayouts[mouse.screen.index][awful.tag.selected()] = nil
 	end
 end
 function goToLayout(direction) -- -1 for back, 1 for forward 
 	-- if maximized to go first/last layout
-	if awful.layout.get(mouse.screen) == awful.layout.suit.max then
+	if awful.layout.get(mouse.screen.index) == awful.layout.suit.max then
 		-- Determine Index
 		local index
 		if direction == -1 then
@@ -41,7 +41,7 @@ function goToLayout(direction) -- -1 for back, 1 for forward
 		--  Set Layout
 		awful.layout.set(layouts[index])
 		-- Clear Maximized Layout
-		preMaximizeLayouts[mouse.screen][awful.tag.selected()] = nil
+		preMaximizeLayouts[mouse.screen.index][awful.tag.selected()] = nil
 	else
 		awful.layout.inc(layouts, direction)
 	end
@@ -87,14 +87,14 @@ function debugClient(c)
 	-- debug_print("type: " .. inspect(c.type))
 	
 	-- Object Info
-	-- notify_send("InfoWibox:"..inspect(infoWibox[mouse.screen], 2))
+	-- notify_send("InfoWibox:"..inspect(infoWibox[mouse.screen.index], 2))
 	
-	-- notify_send("InfoLayout:"..inspect(infoWibox[mouse.screen].drawin.height, 3))
+	-- notify_send("InfoLayout:"..inspect(infoWibox[mouse.screen.index].drawin.height, 3))
 	
 	-- -- infoLayout:set_max_widget_size(100)
 	-- notify_send("InfoLayout:"..inspect(infoLayout, 3))
-	-- notify_send("Drawable:"..inspect(infoWibox[mouse.screen]._drawable, 2))
-	-- notify_send("Drawable.Widget:"..inspect(infoWibox[mouse.screen]._drawable.widget, 2))
+	-- notify_send("Drawable:"..inspect(infoWibox[mouse.screen.index]._drawable, 2))
+	-- notify_send("Drawable.Widget:"..inspect(infoWibox[mouse.screen.index]._drawable.widget, 2))
 	
 	-- Root Object Info
 	-- notify_send(inspect(root, 4))
@@ -258,7 +258,7 @@ end
 
 --Utility
 function putToSleep()
-	local screenDimens = screen[mouse.screen].workarea
+	local screenDimens = screen[mouse.screen.index].workarea
 	moveMouse(screenDimens.width / 2, screenDimens.height / 2)
 	awful.util.spawn(COMMAND_SLEEP)
 end
@@ -271,13 +271,13 @@ function captureScreenShot()
 	end)
 end
 function captureScreenSnip()
-	-- TODO: Use Popen (presumable) in onder to know when it actually finishes, this way I can display the notification right after it was taken
+	-- TODO: Use Popen (presumably) in order to know when it actually finishes, this way I can display the notification right after it was taken
 	-- Capture
 	awful.util.spawn_with_shell(os.date(COMMAND_SCREEN_SHOT_SELECT))
 end
 
 function insertScreenWorkingAreaYIntoFormat(format)
-	return string.format(format, screen[mouse.screen].workarea.y)
+	return string.format(format, screen[mouse.screen.index].workarea.y)
 end
 
 --Debugging

@@ -90,11 +90,9 @@ function cal.register(mywidget, custom_current_day_format)
 			
 			-- Keep to right edge
 			-- TODO: Modularize so we can disable/keep to any edge
-			local tooltipWibox = tooltip.wibox
-			local screenDimens = screen[mouse.screen].workarea
-			local geom = tooltipWibox:geometry()
-			geom.x = screenDimens.width - geom.width - (tooltipWibox.border_width * 2)
-			tooltipWibox:geometry(geom)
+			local screenDimens = screen[mouse.screen.index].workarea
+			tooltip.wibox.x = screenDimens.width - tooltip.wibox.width + beautiful.border_width
+			tooltip.wibox.y = screenDimens.y - beautiful.border_width
 		end
 		tooltip:update()
 	end

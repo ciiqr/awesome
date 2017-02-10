@@ -61,12 +61,12 @@ end
 --- Fit the fixed layout into the given space
 -- @param orig_width The available width.
 -- @param orig_height The available height.
-function fixed:fit(orig_width, orig_height)
+function fixed:fit(ctx, orig_width, orig_height)
     local width, height = orig_width, orig_height
     local used_in_dir, used_max = 0, 0
 
     for k, v in pairs(self.widgets) do
-        local w, h = base.fit_widget(v, width, height)
+        local w, h = base.fit_widget(ctx, v, width, height)
         local in_dir, max
         if self.dir == "y" then
             max, in_dir = w, h
