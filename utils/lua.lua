@@ -1,3 +1,11 @@
+
+-- TODO: Either force ubuntu to use a newer version of lua or... https://github.com/stevedonovan/Penlight/blob/master/lua/pl/compat.lua
+if not table.pack then
+    function table.pack (...)
+        return {n=select('#',...); ...}
+    end
+end
+
 -- Bind a method call it it's object so it can be used as a normal function with it's object always being passed
 function bindFunc(func, ...)
 	local bound_args = table.pack(...);
