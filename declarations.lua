@@ -8,7 +8,7 @@ CONFIG_DIR = HOME_DIR.."/.config/awesome/"
 THEME_NAME = "theme"
 THEME_PATH = CONFIG_DIR..THEME_NAME.."/"
 THEME_FILE_PATH = THEME_PATH.."theme.lua"
-PANEL_HEIGHT = 22/1.25
+PANEL_HEIGHT = 15
 
 -- Mode
 DEBUG = true
