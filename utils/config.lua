@@ -277,7 +277,7 @@ function captureScreenSnip()
 end
 
 function insertScreenWorkingAreaYIntoFormat(format)
-	return string.format(format, screen[mouse.screen.index].workarea.y)
+	return string.format(format, math.floor(screen[mouse.screen.index].workarea.y))
 end
 
 --Debugging
@@ -326,10 +326,18 @@ function changeBrightness(incORDec, amount)
 end
 -- IP
 function retrieveIPAddress(device)
-	return execForOutput("ip addr show dev "..device.." | awk '/([0-9].){4}/ {print $2}'")
+	return execForOutput("ip addr show dev "..device.." | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | tr -d '\n'")
+end
+-- Clipboard
+function pasteClipboardIntoPrimary()
+	awful.util.spawn("/home/william/.local/bin/paste-clipboard-to-primary")
 end
 
-
+-- TODO: Move
+function toggleInfoWiboxes()
+	toggleWibox(allWindowsWibox)
+	toggleWibox(sysInfoWibox)
+end
 
 -- Hooking --
 -------------

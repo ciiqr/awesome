@@ -181,6 +181,69 @@ function increaseMwfact(add, t)
     	awful.tag.incmwfact(add, t)
     end
 end
+-- function getClientWfact(c)
+--     local c = c or client.focus
+--     if not c then return end
+    
+--     local t = awful.tag.selected(c.screen)
+--     local w = awful.client.idx(c)
+--     local nmaster = awful.tag.getnmaster(t)
+--     local data = awful.tag.getproperty(t, "windowfact") or {}
+--     local colfact = data[w.col]
+--     return colfact[w.idx] or 1
+-- end
+-- function increaseClientWfact(add, c)
+-- 	local new_wfact = getClientWfact(c) + add
+-- 	-- Only change the wfact if it's not going to make things invisible
+--     if new_wfact < 1 and new_wfact > 0 then
+--     	awful.client.incwfact(add * (1080 / c:geometry().height), c)
+--     end
+ 
+--  	-- awful.client.incwfact(add, c)
+-- end
+-- function increaseClientWfact(add, c)
+-- 	local c = c or client.focus
+-- 	if not c then return end
+	
+-- 	local clientHeight = c:geometry().height
+-- 	local tagHeight = 1080 -- TODO: MUST CHANGE THIS, just lazy while testing/hacking
+	
+-- 	-- local newHeight = clientHeight + (tagHeight * add)
+-- 	-- Only change the wfact if it's not going to make things invisible
+-- 	-- if newHeight > 0 then
+-- 		idk(clientHeight + tagHeight * add, c)
+-- 	-- end
+-- end
+
+-- function idk(add, c)
+-- 	local c = c or client.focus
+-- 	if not c then return end
+	
+-- 	local lay = awful.layout.get(c.screen)
+-- 	local wa = screen[c.screen].workarea
+-- 	local mwfact = awful.tag.getmwfact()
+-- 	local g = c:geometry()
+-- 	-- local x,y
+	
+-- 	local fact_x = 0.05 -- (_mouse.x - wa.x) / wa.width
+-- 	local fact_y = 0.05 -- (_mouse.y - wa.y) / wa.height
+-- 	local mwfact
+
+-- 	-- we have to make sure we're not on the last visible client where we have to use different settings.
+	
+-- 	awful.client.setwfact(math.min(math.max(add,0.01), 0.99), c)
+-- end
+
+-- function increaseClientHeight(add, c)
+-- 	local clientHeight = c:geometry().height
+-- 	local tagHeight = 1080 -- TODO: MUST CHANGE THIS, just lazy while testing/hacking
+	
+-- 	local newHeight = clientHeight + (tagHeight * add)
+-- 	-- Only change the height if it's not going to make things invisible
+-- 	if newHeight > 0 then
+-- 		c:geometry({height=newHeight})
+-- 	end
+-- end
 
 -- Wibox
 function toggleWibox(wibox, s)
@@ -188,13 +251,14 @@ function toggleWibox(wibox, s)
 	local lwibox = wibox[s]
 	lwibox.visible = not lwibox.visible
 	
-	-- Adjust the infoWibox's height when the top/bottom wiboxes are resized
+	-- TODO: Consider whether I want this...
+	-- Adjust the sysInfoWibox's height when the top/bottom wiboxes are resized
 	-- TODO: Move this to the signal handler for "property::visible"
 	-- OR more reasonably "property::workarea" of the screen
 	local position = awful.wibox.get_position(lwibox)
 	if position == "top" or position == "bottom" then
 		
-		infoWibox[s].y = screen[s].workarea.y
-		infoWibox[s].height = screen[s].workarea.height
+		sysInfoWibox[s].y = screen[s].workarea.y
+		sysInfoWibox[s].height = screen[s].workarea.height
 	end
 end

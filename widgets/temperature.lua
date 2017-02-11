@@ -1,4 +1,5 @@
 temperature = wibox.widget.textbox()
+temperature:set_align("center")
 
 temperature.reload = function(self)
 	-- Run 'sensors'
@@ -7,7 +8,7 @@ temperature.reload = function(self)
 	-- Parse Temperature
 	local temperature = string.match(split(output, ":%s*%+")[3] or "", "%d*")
 	-- Display Formatte Temperature
-	self:set_markup('<span weight="bold">' .. temperature .. "° " .. '</span>')
+	self:set_markup('<span weight="bold">' .. temperature .. "°" .. '</span>')
 end
 
 temperature.init = function(self)
@@ -29,14 +30,11 @@ end
 
 -- Signals
 temperature:connect_signal("button::press", function(self, x, y, button, t)
+	self:reload()
 
-		-- if button == 1 then
-			self:reload()
-		-- end
-
-		-- Update
-		self:emit_signal("widget::updated")
-	end)
+	-- Update
+	self:emit_signal("widget::updated")
+end)
 
 -- Return Created Instance
 return temperature

@@ -1,10 +1,20 @@
+
+- Add a double the size version of the taglist indicator icon thing...
+
+- proper 3 columm layout
+- insertScreenWorkingAreaYIntoFormat to insertScreenWorkingAreaIntoFormat
+
+-- Get screen dimensions
+local workingArea = screen[mouse.screen].workarea
+-- Set window dimensions and position based on screen size...
+local newWidth = workingArea.width / 2
+
+
 - Level 1 -
 -----------
 	- try out mooni moonscript, see if it'd be appropriate to port my config (much simpler syntax, variables local by default,)
 		- http://moonscript.org/reference/
-	- Make Sublime always open new windows (With Desktop File)
-		- Check if already running, if so, run subl3 -n, else just subl3
-	- Prevent windows moving(glitching) with client side window controls (unless the window is floating)
+	? Prevent windows moving(glitching) with client side window controls (unless the window is floating)
 		- There should be a way to remove the tray widget & re-add it later (but can I re-add it at the proper index? maybe replace it with a widget I can identify OR have a wrapper (layout or whatever))
 	- Quake popups above floating
 	- Window (Expose) Search - Replace SUPER + c with it
@@ -25,37 +35,63 @@
 	- Look into: group_window, leader_window
 	- When toggling fullscreen off, set border_width
 	- Look at how awful.mouse.client.move works
-	- Re-add battery notification
-	- When only 1 window is on first tag & we restart awesome, it is not focused
 	- run-or-kill command for pavucontrol & other similar, needs to be able to pass the program name to search for seperatly (second param)
-	- awful.screen.padding(screen[mouse.screen.index], {top=-22, left=0, right=0, bottom=-22})
-		- May be the best alternative to hiding the wiboxes with fullscreen windows
-	- VMWare not recieving focus when launched as the only client on a tag
-
-
+	- acpi events to update the battery
+	- When you creatre a new dynamic tag, also add the layout to the layouts
+	- In addition to the Caps Lock Widget, I also need a Mouse Keys & a TouchPad widget
+	- Prevent windows ever displaying overtop of the wiboxes.
+		- So FLoating should hit a wall there (and consider the sides aswell)
+	- class=subl, name=Changelog, NOT floating
+	- Awesome Battery widget
+		https://thenounproject.com/term/battery/4623/
+	- Remove the special update handler in the vertical tasklist widget
+	? xbindkeys, well I mean, could potentially use it over my awesome config, especially since there is a ui & because it will work in any WM but a lot of things shouldn't go in it so it's kinda pointless...
+	? Keep wallpaper the same for a single day
+		- Cron daily & .fehbg file
+	- Play with these to make the toggleable windows above all others...
+	    above
+	    below
+	- Better Seperation of widgets (ie. One file per widget, easy interface for adding key-bindings)
+	? Sync between Devices
+		- Would need to base device dependent things on dynamically retrieved information (D-Bus partially)
+	# Have a keyboard modifier to escape unescapable apps
+		- Either part of awesome, or seperate app
+		- Have an application that grabs keyboard focus & sends it to a specific app
+		- But have a key binding that will ungrab
+		- Maybe have a key binding to start it with awesome, use a mouse pointer to specify the window,
+			- then when the application itself recieves the same keybinding, it shutsdown
+	- Better Calendar & Battery
+	? Maybe have minimized clients on the bottom wibox and all others on the top wibox...
+	? Look at how awful.client.urgent.jumpto works and see if it might be useful?...
+	- Listen to the fullscreen signal on clients in order to change the window border size, instead of how it's done now
+	- Maybe change by awesome icons for the tag list to be bars along the top and make them bigger for focussed
+	! QuakeDropdown api
+		- Should subscribe to the minimize notification so that it performs the same action as when we explicitly minimize it
+	! SUPER + SHIFT + Up/Down Should adjust the current window the same way SUPER + SHIFT + Left/Right shift the centre
+	! awesome: when leaving fullscreen, if the previous mode was floating, don't change ontop...
+	
 - Level 2 (Not Important) -
 ---------------------------
 	- App Searcher (Lists all clients and allows switching to them)
 	- Time Different Parts of the config and determine where performance can be improved
 	- Widgets to have in my special menu (With Vicious May Be Able to unregister these widgets when not displaying menu)
 	- Look Here for more info/ideas https://github.com/Mic92/vicious
-		- vicious.widgets.cpufreq
+		? vicious.widgets.cpufreq
 		- vicious.widgets.thermal
 		- vicious.widgets.uptime
 		- vicious.widgets.os
 		- vicious.widgets.fs
 		- vicious.widgets.dio
 		- vicious.widgets.hddtemp
-		- vicious.widgets.wifi
+		? vicious.widgets.wifi
 		- vicious.widgets.pkg -- Must Manually call yaourt -Syu then exit because this widget will not be up to date otherwise, clicking this widget should display a terminal with yaourt running with command -Syu
-		- vicious.widgets.mpd if I start using it
-		- vicious.widgets.weather
+		? vicious.widgets.weather
 		- Maybe other
 	? make the memory update frequency the same as the cpu? or make it (and others update when pressed)
 
 - Level 3 (Maybe) -
 -------------------
-	? Mode advanced application management, only run certain applications if in specific location (wifi network based), ie. only run seafile-applet when at home(connected to Angel's ToyboxN), when get home, auto run, when leave, auto stop
+	? Mode advanced application management, only run certain applications if in specific location (wifi network based), ie. only run seafile-applet when at home(connected to AngelsToybox), when get home, auto run, when leave, auto stop
 	? When there is only one client in the tag (or all between all selected tags) hide the bottom bar
 	? Store certain settings so they are restored on startup, for this I will create a folder in my awesome config called settings are create a single file for each setting and subfolder's if needed
 	? Dismiss Menu's when we click in another window or the desktop
@@ -70,3 +106,12 @@
 			- We need to go through ALL of the windows with the current tag
 			- We need to store the starting state
 			- We need to detect when a new window is added
+	? CPU/Memory in one graph
+		- CPU will be a line graph, memory will be a "bar" graph (like what I ahve now for cpu)
+		- If done properly, it could look rather nice
+
+
+- Level ? (Huh?) -
+------------------
+	BaseVolume
+	VolumeSteps
