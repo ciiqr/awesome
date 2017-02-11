@@ -30,7 +30,7 @@ local theme = {}
 
 -- Styles --
 --========--
-theme.font      = "DejaVu Sans Book 9"
+theme.font      = "DejaVu Sans Book 9" -- Roboto 9
 -- theme.font_bold = "sans bold 10"
 
 
@@ -91,34 +91,16 @@ theme.tasklist_fg_focus = white
 
 -- TagList
 theme.taglist_fg_focus = lightColour
+-- TODO: If I ever switch to a 1..2 px high bar, use this to show a colour on the selected tag even if there arn't any windows: theme.taglist_bg_focus = "#888888"
 
 -- System Tray
 theme.bg_systray = ternary(BAR_TRANSPARENCY, "#2b2726", black) -- bg_normal
-
--- Mouse finder
--- mouse_finder_[timeout|animate_timeout|radius|factor]
-theme.mouse_finder_color = lightRed
-
-
--- Menu
--- menu_[bg|fg]_[normal|focus]
--- menu_[border_color|border_width]
-theme.menu_fg_focus = lightColour
-theme.menu_bg_normal = black
-theme.menu_bg_focus = black
-theme.menu_border_color = darkColour
-theme.menu_height = 15
-theme.menu_width  = 500
-theme.menu_border_width = 1
-
--- Awesompd
-theme.awesompd_bg_normal = black
 
 
 -- Icons --
 --=======--
 -- Taglist
-theme.taglist_squares_sel   = THEME_PATH .. "taglist/squarefz.png"
+theme.taglist_squares_sel   = THEME_PATH .. "taglist/squarefz-double-height.png"
 theme.taglist_squares_unsel = THEME_PATH .. "taglist/squarez.png"
 theme.taglist_squares_resize = "true"
 

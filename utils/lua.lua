@@ -58,7 +58,7 @@ end
 
 -- Saves the content to the specified file name OR a default name (Over-Writes existing files)
 function saveFile(content, fileName)
-	file = io.open(fileName or "saveFile.txt", "w")
+	local file = io.open(fileName or "saveFile.txt", "w")
 	file:write(content)
 	file:close()
 end
@@ -86,8 +86,7 @@ end
 -- Base path name
 -- SOURCE: https://github.com/Donearm/scripts/blob/master/lib/basename.lua
 function basename(str)
-	local name = string.gsub(str, "(.*/)(.*)", "%2")
-	return name
+	return string.gsub(str, "(.*/)(.*)", "%2")
 end
 
 -- Round to given decimal places
@@ -95,6 +94,10 @@ end
 function round(val, decimal)
     local exp = decimal and 10^decimal or 1
     return math.ceil(val * exp - 0.5) / exp
+end
+
+function roundi(val)
+    return math.ceil(val - 0.4)
 end
 
 function execForOutput(command)
