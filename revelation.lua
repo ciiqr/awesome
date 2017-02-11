@@ -1,1 +1,0 @@
-/home/william/Development/Lua/Source/awesome-revelation/init.lua

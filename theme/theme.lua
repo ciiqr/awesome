@@ -20,7 +20,10 @@
 -- TODO: Also have a function for this, and also use it in rc.lua
 xresources 	= require("beautiful.xresources");
 local scale_factor = xresources.get_dpi() / 96
-
+local scale_factor_path = ""
+if scale_factor ~= 1 then
+	scale_factor_path = "@"..scale_factor.."x"
+end
 
 -- Variables --
 --===========--
@@ -100,8 +103,8 @@ theme.bg_systray = ternary(BAR_TRANSPARENCY, "#2b2726", black) -- bg_normal
 -- Icons --
 --=======--
 -- Taglist
-theme.taglist_squares_sel   = THEME_PATH .. "taglist/squarefz-double-height.png"
-theme.taglist_squares_unsel = THEME_PATH .. "taglist/squarez.png"
+theme.taglist_squares_sel   = THEME_PATH .. "taglist/squarefz-double-height"..scale_factor_path..".png"
+theme.taglist_squares_unsel = THEME_PATH .. "taglist/squarez"..scale_factor_path..".png"
 theme.taglist_squares_resize = "true"
 
 -- Layout
