@@ -19,7 +19,8 @@
 -- TODO: Is there a way we can set theme settings like this per-screen and update them as appropriate (when windows change screen for example, blah...)
 -- TODO: Also have a function for this, and also use it in rc.lua
 xresources 	= require("beautiful.xresources");
-local scale_factor = xresources.get_dpi() / 96
+local dpi = xresources.apply_dpi
+local scale_factor = dpi(1)
 local scale_factor_path = ""
 if scale_factor ~= 1 then
 	scale_factor_path = "@"..scale_factor.."x"
@@ -81,7 +82,7 @@ theme.bg_focus   = "#222222"..ternary(BAR_TRANSPARENCY, "00", "FF") --222222ee--
 theme.bg_urgent  = darkGrey
 
 -- Borders
-theme.border_width  = 2 * scale_factor
+theme.border_width  = dpi(2)
 theme.border_normal = darkGrey
 theme.border_focus  = darkColour
 theme.border_marked = lightRed
@@ -114,6 +115,7 @@ theme.layout_fairv      = themePathLayouts .. "fairv.png"
 theme.layout_fairh      = themePathLayouts .. "fairh.png"
 theme.layout_max        = themePathLayouts .. "max.png"
 theme.layout_floating   = themePathLayouts .. "floating.png"
+theme.layout_thrizen 	= themePathLayouts .. "thrizen.png"
 
 -- Exit & Return Module
 return theme

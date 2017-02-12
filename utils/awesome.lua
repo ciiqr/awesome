@@ -55,6 +55,7 @@ end
 -- Clients
 function minimizeClient(c)
 	-- Prevents Windows Being Minimized if they aren't on the task bar
+	-- TODO: I should consider allowing minimizing of these clients and simply causing them to show up on the taskbar (but save their skip_taskbar status and when restoring, also restore skip_taskbar to true)
 	if not c.skip_taskbar then
 		-- Minimize
 		c.minimized = true
