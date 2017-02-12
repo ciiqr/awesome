@@ -48,6 +48,7 @@ xresources 	= require("beautiful.xresources");
 naughty		= require("naughty")
 -- Config
 divider		= require("widgets.divider")
+thrizen		= require("layouts.thrizen")
 xrandr		= require("utils.xrandr")
 			  require("utils.lua")
 			  require("utils.awesome")
@@ -79,7 +80,8 @@ widget_manager = require("widgets.Manager")
 -----------
 --Layouts
 layouts = {
-	awful.layout.suit.tile
+	thrizen
+	,awful.layout.suit.tile
 	,awful.layout.suit.fair
 	-- ,awful.layout.suit.fair.horizontal
 }
@@ -105,6 +107,9 @@ for s = 1, screen.count() do
 	local bottomLayout	= wibox.layout.align.horizontal()
 	local allWindowsLayout	= wibox.layout.flex.vertical()
 	local sysInfoLayout	= wibox.layout.fixed.vertical()
+
+	-- This makes the middle widget centre on on the screen (instead of in the free space)
+	top_layout:set_expand("none")
 
 	local SPACING = require("widgets.spacer"):init(SPACER_SIZE)
 	-- local DIVIDER_VERTICAL = divider({size=2, total_size=10, orientation="vertical", end_padding=40}) -- 40 is somewhat arbitrary since the widget will just fill the available height
@@ -144,10 +149,7 @@ for s = 1, screen.count() do
 	left_layout:add(widget_manager:getTagsList(s))
 
 	--Middle Widget
-	middle_layout:add(SPACING)
-	-- middle_layout:add(require("widgets.colourDisplay"):init({"5A667F", "b0d54e", "5f8787", "69b2b2", "FF0000", "de5705", "00ff00"}))
 	middle_layout:add(widget_manager:getIP())
-	middle_layout:add(SPACING)
 
 	--Right Widgets
 	if s == screen.count() then -- Main Widgets on Far Right
@@ -208,6 +210,7 @@ for s = 1, screen.count() do
 		return label
 	end
 	local sysInfoWidgets = {
+		-- widget_manager:getSystemTray(true),
 		-- sysInfoLabel("Network"), -- SYS-INFO-TITLES
 		-- DIVIDER_HORIZONTAL, -- SYS-INFO-TITLES
 
@@ -285,7 +288,7 @@ globalKeys = awful.util.table.join(
 		-- Add Tag
 		newTag = awful.tag.add("Tag "..(#awful.tag.gettags(mouse.screen.index)) + 1)
 		-- Switch to it
-		awful.tag.viewonly(newTag)
+		newTag:view_only()
 	end),
 	
 	-- Remove Tags
@@ -455,14 +458,14 @@ clientkeys = awful.util.table.join(
 			-- Disable...
 			c.sticky = false
 			c.skip_taskbar = false
-			awful.client.floating.set(c, false)
+			c.floating = false
 		else -- Enable
 			c.sticky = true
 			c.skip_taskbar = true
-			awful.client.floating.set(c, true)
+			c.floating = true
 
 			-- Get screen dimensions
-			local screenRect = screen[mouse.screen].geometry
+			local screenRect = screen[mouse.screen.index].geometry
 			-- Set window dimensions and position based on screen size...
 			local PIP_SIZE_RATIO = 3
 			local newWidth = screenRect.width / PIP_SIZE_RATIO
@@ -521,15 +524,15 @@ awful.rules.rules = {
 			floating = true
 		}
 	}
-	,{ -- Ignore Size Hints
-		rule_any = {
-			name = {"MonoDevelop", "7zFM", "Vmware", "FrostWire"},
-			class = {"XTerm", "Ghb", "Skype", "Google-chrome-stable", "Chromium", "Subl3", "SmartSVN", "SmartGit"}
-		},
-		properties = {
-			size_hints_honor = false -- TODO: Consider this for the default rule set, probably won't like, but worth a try anyways
-		}
-	}
+	-- ,{ -- Ignore Size Hints
+	-- 	rule_any = {
+	-- 		name = {"MonoDevelop", "7zFM", "Vmware", "FrostWire"},
+	-- 		class = {"XTerm", "Ghb", "Skype", "Google-chrome-stable", "Chromium", "Subl3", "Sublime_text", "SmartSVN", "SmartGit"}
+	-- 	},
+	-- 	properties = {
+	-- 		size_hints_honor = false -- TODO: Consider this for the default rule set, probably won't like, but worth a try anyways
+	-- 	}
+	-- }
 	,{ -- Popover dialogs will not receive borders
 		rule = {
 			type = "dialog",
@@ -556,7 +559,7 @@ awful.rules.rules = {
 			floating = true,
 			callback = function(c)
 				-- Get screen dimensions
-				local workingArea = screen[mouse.screen].workarea
+				local workingArea = screen[mouse.screen.index].workarea
 				-- Set window dimensions and position based on screen size...
 				local newWidth = workingArea.width / 2
 				c:geometry({
@@ -631,8 +634,10 @@ awful.rules.rules = {
 		},
 	}
 	,{
+		rule_any = {
+			class = {"Subl3", "Sublime_text"},
+		},
 		rule = {
-			class = "Subl3",
 			type = "dialog"
 		},
 		except_any = {
@@ -651,8 +656,8 @@ awful.rules.rules = {
 		}
 	}
 	,{
-		rule = {
-			class = "Subl3"
+		rule_any = {
+			class = {"Subl3", "Sublime_text"},
 		},
 		except_any = {
 			type = {
@@ -801,7 +806,7 @@ awful.rules.rules = {
 			instance = {"TeamViewer.exe"}
 		},
 		properties = {
-			tag = awful.tag.gettags(mouse.screen)[5]
+			tag = awful.tag.gettags(mouse.screen.index)[5]
 		}
 	}
 	,{

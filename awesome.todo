@@ -1,13 +1,15 @@
 
+! TODO: Convert as much of my config as possible to use new syntax: https://awesomewm.org/apidoc/documentation/89-NEWS.md.html#v4`
+
+
 - Mute indicator for the volume widget...
 
-- Add a double the size version of the taglist indicator icon thing...
+- Convert all raster images to vectors
 
-- proper 3 columm layout
 - insertScreenWorkingAreaYIntoFormat to insertScreenWorkingAreaIntoFormat
 
 -- Get screen dimensions
-local workingArea = screen[mouse.screen].workarea
+local workingArea = screen[mouse.screen.index].workarea
 -- Set window dimensions and position based on screen size...
 local newWidth = workingArea.width / 2
 

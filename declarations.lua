@@ -93,7 +93,6 @@ STARTUP_PROGRAMS = {
 	-- Tray's
 	,"redshift-gtk"
 	,"nm-applet"
-	-- ,"skype"
 	,"dropbox start -i"
 	-- ,"keepass"
 	-- ,"seafile-applet"
@@ -102,5 +101,6 @@ STARTUP_PROGRAMS = {
 }
 
 sublime_window_rules = {
-	["awesome, awesome"] = 7
+	["awesome, lib"] = 7,
+	["machines"] = 7,
 }

@@ -181,8 +181,9 @@ function WidgetManager:getCPU(vertical)
 end
 
 -- System Tray
-function WidgetManager:getSystemTray()
+function WidgetManager:getSystemTray(vertical)
 	self.sysTray = wibox.widget.systray()
+	self.sysTray.set_horizontal(not vertical)
 	self.sysTray.isSysTray = true
 	self.sysTray.orig_fit = self.sysTray.fit
 	self.sysTray.fit = function(self, ctx, width, height)
