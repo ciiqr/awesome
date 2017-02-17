@@ -117,8 +117,7 @@ for s = 1, screen.count() do
 
 
 	-- TODO: It would probably bet better to have function to get/calculate these values
-	local scaling_factor = xresources.get_dpi(s) / 96
-	local panel_height = PANEL_HEIGHT * scaling_factor
+	local panel_height = xresources.apply_dpi(PANEL_HEIGHT, s)
 	
 	--Wallpapers
 	if beautiful.wallpaper then

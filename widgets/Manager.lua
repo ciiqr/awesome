@@ -230,7 +230,6 @@ function WidgetManager:getTextClock() -- .textClock:set_font()
 	return self.textClock
 end
 
-
 function WidgetManager:getTaskBox(screen, is_vertical)
 	-- TODO: These need to be seperate per screen, therefore I need a list for each, ie. WidgetManager.verticalTaskBoxes, WidgetManager.horizontalTaskBoxes
 	local buttons = awful.util.table.join(
@@ -255,12 +254,11 @@ function WidgetManager:getTaskBox(screen, is_vertical)
 end
 
 function WidgetManager:getAllWindowsWibox(s, widget)
-	local scaling_factor = xresources.get_dpi(s) / 96
 	-- 'awful.wibox' to have it affect the workarea
 	local aWibox = wibox({
 		position = "left",
 		screen = s,
-		width = 300 * scaling_factor,
+		width = xresources.apply_dpi(300),
 		ontop = true,
 		visible = false})
 	aWibox:set_widget(widget)
@@ -284,8 +282,7 @@ end
 
 function WidgetManager:getSysInfoWibox(s, widget)
 	local ourScreen = screen[s]
-	local scaling_factor = xresources.get_dpi(s) / 96
-	local width = 120 * scaling_factor
+	local width = xresources.apply_dpi(120)
 	-- 'awful.wibox' to have it affect the workarea
 	local aWibox = wibox({
 		position = "right",

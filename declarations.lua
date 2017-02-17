@@ -80,7 +80,6 @@ STARTUP_PROGRAMS = {
 	"pa-server.py" -- Updates volume widget when volume changes
 	,"compton --config ~/.compton.conf" -- Composition Manager (Transparency, Inactive Window Dimming, Visual Glitch Fix)
 	,"feh --randomize --bg-fill "..THEME_PATH.."backgrounds/*" -- Random Background
-	,"xbindkeys"
 	,"sudo bash ~/documents/Commands/appleKeyboard" -- TODO: This should be moved...
 	
 	-- System
