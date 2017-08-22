@@ -1,167 +1,170 @@
--- Quake like console on top
--- Similar to:
---   http://git.sysphere.org/awesome-configs/tree/scratch/drop.lua
 
--- But uses a different implementation. The main difference is that we
--- are able to detect the Quake console from its name
--- (QuakeConsoleNeedsUniqueName by default).
+--[[
+     Licensed under GNU General Public License v2
+      * (c) 2016, Luke Bonham
+      * (c) 2015, unknown
+--]]
 
--- Use:
+local awful        = require("awful")
+local capi         = { client = client }
 
--- local quake = require("quake")
--- local quakeconsole = {}
--- for s = 1, screen.count() do
---    quakeconsole[s] = quake({ terminal = config.terminal,
--- 			        height = 0.3,
---                              screen = s })
--- end
+local math         = { floor  = math.floor }
+local string       = { format = string.format }
 
--- config.keys.global = awful.util.table.join(
---    config.keys.global,
---    awful.key({ modkey }, "`",
--- 	     function () quakeconsole[mouse.screen.index]:toggle() end)
-
--- If you have a rule like "awful.client.setslave" for your terminals,
--- ensure you use an exception for
--- QuakeConsoleNeedsUniqueName. Otherwise, you may run into problems
--- with focus.
+local pairs        = pairs
+local screen       = screen
 
 local setmetatable = setmetatable
-local string = string
-local awful  = require("awful")
-local capi   = { mouse = mouse,
-		 screen = screen,
-		 client = client,
-		 timer = timer }
 
--- I use a namespace for my modules...
-module("quake")
+-- Quake-like Dropdown application spawn
+local quake = {}
 
-local QuakeConsole = {}
+-- If you have a rule like "awful.client.setslave" for your terminals,
+-- ensure you use an exception for QuakeDD. Otherwise, you may
+-- run into problems with focus.
 
--- Display
-function QuakeConsole:display()
-   -- First, we locate the terminal
-   local client = nil
-   local i = 0
-   for c in awful.client.iterate(function (c)
-				  -- c.name may be changed!
-				  return c.instance == self.name
-			       end,
-			       nil, self.screen) do
-      i = i + 1
-      if i == 1 then
-	 client = c
-      else
-	 -- Additional matching clients, let's remove the sticky bit
-	 -- which may persist between awesome restarts. We don't close
-	 -- them as they may be valuable. They will just turn into a
-	 -- classic terminal.
-	 c.sticky = false
-	 c.ontop = false
-	 c.above = false
-      end
-   end
+function quake:display()
+    if self.followtag then self.screen = awful.screen.focused() end
+    local toscan = self.screen
+    if self.onlyone then toscan = nil end
 
-   if not client and not self.visible then
-      -- The terminal is not here yet but we don't want it yet. Just do nothing.
-      return
-   end
+    -- First, we locate the client
+    local client = nil
+    local i = 0
+    for c in awful.client.iterate(function (c)
+        -- c.name may be changed!
+        return c.instance == self.name
+    end, nil, toscan)
+    do
+        i = i + 1
+        if i == 1 then
+            client = c
+        else
+            -- Additional matching clients, let's remove the sticky bit
+            -- which may persist between awesome restarts. We don't close
+            -- them as they may be valuable. They will just turn into
+            -- normal clients.
+            c.sticky = false
+            c.ontop = false
+            c.above = false
+        end
+    end
 
-   if not client then
-      -- The client does not exist, we spawn it
-      awful.util.spawn(self.terminal .. " " .. string.format(self.argname, self.name),
-		       false, self.screen)
-      return
-   end
+    if not client and not self.visible then return end
 
-   -- Comptute size
-   local geom = capi.screen[self.screen].workarea
-   local width, height = self.width, self.height
-   if width  <= 1 then width = geom.width * width end
-   if height <= 1 then height = geom.height * height end
-   local x, y
-   if     self.horiz == "left"  then x = geom.x
-   elseif self.horiz == "right" then x = geom.width + geom.x - width
-   else   x = geom.x + (geom.width - width)/2 end
-   if     self.vert == "top"    then y = geom.y
-   elseif self.vert == "bottom" then y = geom.height + geom.y - height
-   else   y = geom.y + (geom.height - height)/2 end
+    if not client then
+        -- The client does not exist, we spawn it
+        cmd = string.format("%s %s %s", self.app,
+              string.format(self.argname, self.name), self.extra)
+        awful.spawn(cmd, { tag = self.screen.selected_tag })
+        return
+    end
 
-   -- Resize
-   awful.client.floating.set(client, true)
-   client.border_width = 0
-   client.size_hints_honor = false
-   client:geometry({ x = x, y = y, width = width, height = height })
+    -- Set geometry
+    client.floating = true
+    client.border_width = self.border
+    client.size_hints_honor = false
+    client:geometry(self.geometry[self.screen] or self:compute_size())
 
-   -- Sticky and on top
-   client.ontop = true
-   client.above = true
-   client.skip_taskbar = true
-   client.sticky = true
+    -- Set not sticky and on top
+    client.sticky = false
+    client.ontop = true
+    client.above = true
+    client.skip_taskbar = true
 
-   -- This is not a normal window, don't apply any specific keyboard stuff
-   client:buttons({})
-   client:keys({})
+    -- Additional user settings
+    if self.settings then self.settings(client) end
 
-   -- Toggle display
-   if self.visible then
-      client.hidden = false
-      client:raise()
-      capi.client.focus = client
+    -- Toggle display
+    if self.visible then
+        client.hidden = false
+        client:raise()
+        self.last_tag = self.screen.selected_tag
+        client:tags({self.screen.selected_tag})
+        capi.client.focus = client
    else
-      client.hidden = true
-   end
+        client.hidden = true
+        local ctags = client:tags()
+        for i, t in pairs(ctags) do
+            ctags[i] = nil
+        end
+        client:tags(ctags)
+    end
+
+    return client
 end
 
--- Create a console
-function QuakeConsole:new(config)
-   -- The "console" object is just its configuration.
-
-   -- The application to be invoked is:
-   --   config.terminal .. " " .. string.format(config.argname, config.name)
-   config.terminal = config.terminal or "xterm" -- application to spawn
-   config.name     = config.name     or "QuakeConsoleNeedsUniqueName" -- window name
-   config.argname  = config.argname  or "-name %s"     -- how to specify window name
-
-   -- If width or height <= 1 this is a proportion of the workspace
-   config.height   = config.height   or 0.25	       -- height
-   config.width    = config.width    or 1	       -- width
-   config.vert     = config.vert     or "top"	       -- top, bottom or center
-   config.horiz    = config.horiz    or "center"       -- left, right or center
-
-   config.screen   = config.screen or capi.mouse.screen.index
-   config.visible  = config.visible or false -- Initially, not visible
-
-   local console = setmetatable(config, { __index = QuakeConsole })
-   capi.client.connect_signal("manage",
-			  function(c)
-			     if c.instance == console.name and c.screen == console.screen then
-				console:display()
-			     end
-			  end)
-   capi.client.connect_signal("unmanage",
-			  function(c)
-			     if c.instance == console.name and c.screen == console.screen then
-				console.visible = false
-			     end
-			  end)
-
-   -- "Reattach" currently running QuakeConsole. This is in case awesome is restarted.
-   local reattach = capi.timer { timeout = 0 }
-   reattach:connect_signal("timeout",
-		       function()
-			  reattach:stop()
-			  console:display()
-		       end)
-   reattach:start()
-   return console
+function quake:compute_size()
+    -- skip if we already have a geometry for this screen
+    if not self.geometry[self.screen] then
+        local geom
+        if not self.overlap then
+            geom = screen[self.screen].workarea
+        else
+            geom = screen[self.screen].geometry
+        end
+        local width, height = self.width, self.height
+        if width  <= 1 then width = math.floor(geom.width * width) - 2 * self.border end
+        if height <= 1 then height = math.floor(geom.height * height) end
+        local x, y
+        if     self.horiz == "left"  then x = geom.x
+        elseif self.horiz == "right" then x = geom.width + geom.x - width
+        else   x = geom.x + (geom.width - width)/2 end
+        if     self.vert == "top"    then y = geom.y
+        elseif self.vert == "bottom" then y = geom.height + geom.y - height
+        else   y = geom.y + (geom.height - height)/2 end
+        self.geometry[self.screen] = { x = x, y = y, width = width, height = height }
+    end
+    return self.geometry[self.screen]
 end
 
--- Toggle the console
-function QuakeConsole:toggle()
-   self.visible = not self.visible
-   self:display()
+function quake:new(config)
+    local conf = config or {}
+
+    conf.app        = conf.app       or "xterm"    -- application to spawn
+    conf.name       = conf.name      or "QuakeDD"  -- window name
+    conf.argname    = conf.argname   or "-name %s" -- how to specify window name
+    conf.extra      = conf.extra     or ""         -- extra arguments
+    conf.border     = conf.border    or 1          -- client border width
+    conf.visible    = conf.visible   or false      -- initially not visible
+    conf.followtag  = conf.followtag or false      -- spawn on currently focused screen
+    conf.onlyone    = conf.onlyone   or false      -- one instance for all screens
+    conf.overlap    = conf.overlap   or false      -- overlap wibox
+    conf.screen     = conf.screen    or awful.screen.focused()
+    conf.settings   = conf.settings
+
+    -- If width or height <= 1 this is a proportion of the workspace
+    conf.height     = conf.height    or 0.25       -- height
+    conf.width      = conf.width     or 1          -- width
+    conf.vert       = conf.vert      or "top"      -- top, bottom or center
+    conf.horiz      = conf.horiz     or "center"     -- left, right or center
+    conf.geometry   = {}                           -- internal use
+
+    local dropdown = setmetatable(conf, { __index = quake })
+
+    capi.client.connect_signal("manage", function(c)
+        if c.instance == dropdown.name and c.screen == dropdown.screen then
+            dropdown:display()
+        end
+    end)
+    capi.client.connect_signal("unmanage", function(c)
+        if c.instance == dropdown.name and c.screen == dropdown.screen then
+            dropdown.visible = false
+        end
+     end)
+
+    return dropdown
 end
 
-setmetatable(_M, { __call = function(_, ...) return QuakeConsole:new(...) end })
+function quake:toggle()
+     if self.followtag then self.screen = awful.screen.focused() end
+     local current_tag = self.screen.selected_tag
+     if current_tag and self.last_tag ~= current_tag and self.visible then
+         self:display():move_to_tag(current_tag)
+     else
+         self.visible = not self.visible
+         self:display()
+     end
+end
+
+return setmetatable(quake, { __call = function(_, ...) return quake:new(...) end })
