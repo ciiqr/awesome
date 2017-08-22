@@ -6,6 +6,18 @@ if not table.pack then
     end
 end
 
+if not table.indexOf then
+	function table.indexOf(haystack, needle)
+		for index, value in ipairs(haystack) do
+	        if value == needle then
+	            return index
+	        end
+	    end
+
+	    return nil
+	end
+end
+
 -- Bind a method call it it's object so it can be used as a normal function with it's object always being passed
 function bindFunc(func, ...)
 	local bound_args = table.pack(...);
@@ -81,6 +93,12 @@ function split(str, pat)
       table.insert(t, cap)
    end
    return t
+end
+
+-- trim string
+-- SOURCE: http://lua-users.org/wiki/StringTrim#trim6
+function trim(s)
+	return s:match'^()%s*$' and '' or s:match'^%s*(.*%S)'
 end
 
 -- Base path name

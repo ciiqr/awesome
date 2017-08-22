@@ -1,6 +1,7 @@
 
-! TODO: Convert as much of my config as possible to use new syntax: https://awesomewm.org/apidoc/documentation/89-NEWS.md.html#v4`
-
+- Switch to use vector graphics
+! Switch to use new syntax
+	! TODO: Convert as much of my config as possible to use new syntax: https://awesomewm.org/apidoc/documentation/89-NEWS.md.html#v4`
 
 - Mute indicator for the volume widget...
 

@@ -4,9 +4,8 @@ local quake = quake or require("quake")
 
 local WidgetManager = {}
 
--- TODO: Either make this a per machine config setting or change the device names to be wlan* and eth*
-WidgetManager.wifiDevice = "wlp2s0"
-WidgetManager.ethDevice = "eth0"
+WidgetManager.wifiDevice = trim(execForOutput("basename /sys/class/net/wl*"))
+WidgetManager.ethDevice = trim(execForOutput("basename /sys/class/net/e*"))
 
 -- Popup Terminal
 function WidgetManager:initPopupTerminal(s)
@@ -16,13 +15,13 @@ function WidgetManager:initPopupTerminal(s)
 	end
 	
 	-- Create Popup Terminal
-	self.quake_terminal[s] = quake({ terminal = TERMINAL, height = 0.35, screen = s, width = 0.5})
+	self.quake_terminal[s] = quake({ app = TERMINAL, height = 0.35, screen = s, width = 0.5, border=0})
 	
 	return self.quake_terminal[s]
 end
 function WidgetManager:togglePopupTerminal(s)
 	-- Toggle Popup
-	self.quake_terminal[s or mouse.screen.index]:toggle()
+	self.quake_terminal[s or mouse.screen]:toggle()
 end
 
 -- Popup CPU
@@ -33,13 +32,13 @@ function WidgetManager:initPopupCPU(s)
 	end
 	
 	-- Create Popup CPU
-	self.quake_htop_cpu_terminal[s] = quake({terminal=TERMINAL, argname="-name %s -e "..COMMAND_TASK_MANAGER_CPU, name="QUAKE_COMMAND_TASK_MANAGER_CPU", height=0.75, screen=s, width=0.5, horiz="right"})
+	self.quake_htop_cpu_terminal[s] = quake({app=TERMINAL, argname="-name %s -e "..COMMAND_TASK_MANAGER_CPU, name="QUAKE_COMMAND_TASK_MANAGER_CPU", height=0.75, screen=s, width=0.5, horiz="right", border=0})
 	
 	return self.quake_htop_cpu_terminal[s]
 end
 function WidgetManager:togglePopupCPU(s)
 	-- Toggle Popup
-	self.quake_htop_cpu_terminal[s or mouse.screen.index]:toggle()
+	self.quake_htop_cpu_terminal[s or mouse.screen]:toggle()
 end
 
 -- Popup Memory
@@ -50,13 +49,13 @@ function WidgetManager:initPopupMemory(s)
 	end
 	
 	-- Create Popup Memory
-	self.quake_htop_mem_terminal[s] = quake({terminal=TERMINAL, argname="-name %s -e "..COMMAND_TASK_MANAGER_MEM, name="QUAKE_COMMAND_TASK_MANAGER_MEM", height=0.75, screen=s, width=0.5, horiz="left"})
+	self.quake_htop_mem_terminal[s] = quake({app=TERMINAL, argname="-name %s -e "..COMMAND_TASK_MANAGER_MEM, name="QUAKE_COMMAND_TASK_MANAGER_MEM", height=0.75, screen=s, width=0.5, horiz="left", border=0})
 	
 	return self.quake_htop_mem_terminal[s]
 end
 function WidgetManager:togglePopupMemory(s)
 	-- Toggle Popup
-	self.quake_htop_mem_terminal[s or mouse.screen.index]:toggle()
+	self.quake_htop_mem_terminal[s or mouse.screen]:toggle()
 end
 
 -- Popup Notes
@@ -67,13 +66,13 @@ function WidgetManager:initPopupNotes(s)
 	end
 	
 	-- Create Popup Notes
-	self.quake_leafpad_quick_note[s] = quake({terminal = "leafpad", argname="--name=%s", name="LEAFPAD_QUICK_NOTE", height = 0.35, screen = s, width = 0.5})
+	self.quake_leafpad_quick_note[s] = quake({app = "leafpad", argname="--name=%s", name="LEAFPAD_QUICK_NOTE", height = 0.35, screen = s, width = 0.5, border=0})
 	
 	return self.quake_leafpad_quick_note[s]
 end
 function WidgetManager:togglePopupNotes(s)
 	-- Toggle Popup
-	self.quake_leafpad_quick_note[s or mouse.screen.index]:toggle()
+	self.quake_leafpad_quick_note[s or mouse.screen]:toggle()
 end
 
 function WidgetManager:initKeepass(s)
@@ -83,13 +82,13 @@ function WidgetManager:initKeepass(s)
 	end
 	
 	-- Create Popup Notes
-	self.quake_keepass[s] = quake({terminal = "keepassx", name="keepassx", height = 0.75, screen = s, width = 0.5}) -- argname="--name=%s", 
+	self.quake_keepass[s] = quake({app = "keepassx", name="keepassx", height = 0.75, screen = s, width = 0.5, border=0})
 	
 	return self.quake_keepass[s]
 end
 function WidgetManager:toggleKeepass(s)
 	-- Toggle Popup
-	self.quake_keepass[s or mouse.screen.index]:toggle()
+	self.quake_keepass[s or mouse.screen]:toggle()
 end
 
 -- Volume
@@ -100,15 +99,7 @@ function WidgetManager:getVolume()
 		awful.button({}, MOUSE_SCROLL_DOWN, function() WidgetManager:changeVolume("-", 1) end),
 		awful.button({}, 1, function() run_once("pavucontrol") end)
 	))
-	
-	-- TODO: Remove timer for this, cause I want to use a service that notifies us...
-	volTimer = timer({timeout = 5})
-	volTimer:connect_signal("timeout", function()
-		self:displayVolume()
-	end)
-	volTimer:start()
-	
-	
+
 	self:displayVolume()
 	return self.volume
 end

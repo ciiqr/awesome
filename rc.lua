@@ -135,13 +135,6 @@ for s = 1, screen.count() do
 		awful.tag.setmwfact(1/3, tag)
 	end
 
-	-- Popup Terminal/Process Info/Notes
-	widget_manager:initPopupTerminal(s)
-	widget_manager:initPopupCPU(s)
-	widget_manager:initPopupMemory(s)
-	widget_manager:initPopupNotes(s)
-	widget_manager:initKeepass(s)
-
 	--Wiboxes w/ Widgets
 	--Left Widgets
 	-- Tag List
@@ -242,6 +235,15 @@ for s = 1, screen.count() do
 	sysInfoWibox[s] = widget_manager:getSysInfoWibox(s, alignSysInfoLayout)
 end
 
+awful.screen.connect_for_each_screen(function(s)
+	-- Popup Terminal/Process Info/Notes
+	widget_manager:initPopupTerminal(s)
+	widget_manager:initPopupCPU(s)
+	widget_manager:initPopupMemory(s)
+	widget_manager:initPopupNotes(s)
+	widget_manager:initKeepass(s)
+end)
+
 --Global Key Bindings
 globalKeys = awful.util.table.join(
 	--Switch Between Tags
@@ -285,7 +287,9 @@ globalKeys = awful.util.table.join(
 	-- Add Tag
 	awful.key({SUPER}, "y", function()
 		-- Add Tag
-		newTag = awful.tag.add("Tag "..(#awful.tag.gettags(mouse.screen.index)) + 1)
+		newTag = awful.tag.add("Tag "..(#awful.tag.gettags(mouse.screen.index)) + 1, {
+			layout = thrizen,
+		})
 		-- Switch to it
 		newTag:view_only()
 	end),
@@ -517,7 +521,7 @@ awful.rules.rules = {
 			class = {"speedcrunch", "pinentry", "MPlayer", "Plugin-container", "Exe", "Gtimer", "Vmware-modconfig", "freerdp", "Seafile-applet", "Pavucontrol", "mainframe", "Fuzzy-windows"},
 			name = {"Tab Organizer", "Firefox Preferences", "xev-is-special"},
 			type = {"dialog", "menu"},
-			role = {"toolbox_window", "pop-up"} -- TODO: Decide if I really like pop-up, cause honestly a lot of things are pop-up's & it's rather annoying ("pop-up")
+			role = {"toolbox_window"} -- , "pop-up" TODO: Decide if I really like pop-up, cause honestly a lot of things are pop-up's & it's rather annoying ("pop-up")
 		},
 		properties = {
 			floating = true
@@ -633,9 +637,6 @@ awful.rules.rules = {
 		},
 	}
 	,{
-		rule_any = {
-			class = {"Subl3", "Sublime_text"},
-		},
 		rule = {
 			type = "dialog"
 		},
@@ -646,12 +647,18 @@ awful.rules.rules = {
 		},
 		properties = {
 			callback = function(c)
+				-- NOTE: except_any didn't seem to actually be behaving as I expected and was matching on a leafpad window, so we're doing the class check here instead
+				if table.indexOf({"Subl3", "Sublime_text"}, c.class) == nil then
+					return
+				end
+
 				-- TODO: Fix this up...
-				-- if c:geometry().width == 451 or c:geometry().width == 490 then
-				-- 	c:kill();
-				-- end
-				-- notify_send("Sublime\nHis name was Robert.. Oh I Mean '".. (c.name or "nil") .."'", 3);
-			end --c:geometry()
+				local geom = c:geometry()
+				if geom.width == 960 or geom.width == 451 or geom.width == 490 then
+					c:kill();
+				end
+				notify_send("Sublime\nHis name was Robert.. Oh I Mean '".. (c.name or "nil") .."'", 3);
+			end
 		}
 	}
 	,{
