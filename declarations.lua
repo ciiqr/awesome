@@ -32,7 +32,7 @@ BATTERY_PERCENT_LOW = 10
 BATTERY_PERCENT_CRITICAL = 5
 
 -- Programs
-TERMINAL = "xterm"
+TERMINAL = "rxvt-unicode"
 TERMINAL_EXEC = TERMINAL.." -e "
 FILE_MANAGER = "spacefm"
 EDITOR = "sublime"
