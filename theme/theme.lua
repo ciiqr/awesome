@@ -41,7 +41,7 @@ theme.font      = "DejaVu Sans Book 9" -- Roboto 9
 -- Colors --
 --========--
 -- TODO: Clean this up so we can define entire colour schemes at a time instead of having to manually select the light and dark colour separately... We should just have it be something that overrides the current settings in the theme variable, so we can override whatever...
-local lightColour = "#FFC629"
+local lightColour = "#23CDC0"
 	--97281C - Red
 	--DE7712 - Orange
 	--F4E210 - Yellow
@@ -53,7 +53,7 @@ local lightColour = "#FFC629"
 	--23CDC0 - Sea
 	--f08080 - Calm
 	--FFC629 - Red, Yellow Highlights
-local darkColour = "#5A0000"
+local darkColour = "#EDC9AF"
 	--581109 - Red
 	--C96508 - Orange
 	--bf7900 - Yellow
@@ -91,7 +91,7 @@ theme.border_marked = lightRed
 -- theme.tasklist_font = theme.font
 theme.tasklist_bg_focus = darkColour
 theme.tasklist_fg_normal = white
-theme.tasklist_fg_focus = white
+theme.tasklist_fg_focus = black
 
 -- TagList
 theme.taglist_fg_focus = lightColour
