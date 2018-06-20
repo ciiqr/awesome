@@ -127,6 +127,10 @@ function readFile(file)
 end
 
 function readAll(stream, dontClose)
+	if not stream then
+		return nil
+	end
+	
 	local output = stream:read("*all")
 	
 	if not dontClose then

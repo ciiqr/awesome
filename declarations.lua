@@ -18,7 +18,12 @@ DEBUG = true
 -- TODO: Could list all devices in /sys/class/backlight/, maybe device/type can be used to exclude the improper one
 -- TODO: When adjusting, if it would add up to over max or less than 0, adjust to those values
 -- TODO: Only do this is there is a backlight (and only setup keybindings if these exist...)
-BRIGHTNESS_MAX = tonumber(readFile("/sys/class/backlight/intel_backlight/max_brightness"))
+local okay_whatever = readFile("/sys/class/backlight/intel_backlight/max_brightness")
+if okay_whatever then
+	BRIGHTNESS_MAX = tonumber(okay_whatever)
+else
+	BRIGHTNESS_MAX = 1
+end
 BRIGHTNESS_CHANGE_NORMAL = roundi(BRIGHTNESS_MAX/10)
 BRIGHTNESS_CHANGE_SMALL = roundi(BRIGHTNESS_MAX/100)
 VOLUME_CHANGE_NORMAL = 10
@@ -79,7 +84,7 @@ STARTUP_PROGRAMS = {
 	-- ,"wmname Sawfish"			-- wmname LG3D|Sawfish: Fix Java Issues, HOWEVER it causes issues with chrome/chromium, and chrome will always be more important so until I have a good alternative it is being disabled, (NOTE: I Can probably just change what WM it imitates)
 	-- ,"xcompmgr"				-- Composition Manager (Transparency)
 	"pa-server.py" -- Updates volume widget when volume changes
-	,"compton" -- Composition Manager (Transparency, Inactive Window Dimming, Visual Glitch Fix)
+	-- ,"compton" -- Composition Manager (Transparency, Inactive Window Dimming, Visual Glitch Fix)
 	,"feh --randomize --bg-fill "..THEME_PATH.."backgrounds/*" -- Random Background
 	,"sudo bash ~/documents/Commands/appleKeyboard" -- TODO: This should be moved...
 	
