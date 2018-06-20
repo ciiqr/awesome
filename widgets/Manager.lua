@@ -347,9 +347,16 @@ function WidgetManager:getNetUsage(vertical)
 	if vertical then
 		self.netwidget:set_align("center")
 	end
-	vicious.register(self.netwidget, vicious.widgets.net, '<span foreground="#97D599" weight="bold">↑${'..WidgetManager.wifiDevice..' up_mb}</span> <span foreground="#CE5666" weight="bold">↓${'..WidgetManager.wifiDevice..' down_mb}</span>', 1) --#585656
+	
+	local device = self.ethDevice
+	local ip = retrieveIPAddress(device)
+	if ip == "" then
+		device = self.wifiDevice
+	end
+	
+	vicious.register(self.netwidget, vicious.widgets.net, '<span foreground="#97D599" weight="bold">↑${'..device..' up_mb}</span> <span foreground="#CE5666" weight="bold">↓${'..device..' down_mb}</span>', 1) --#585656
 	self.netwidget:buttons(awful.util.table.join(
-		awful.button({}, 1, function() awful.util.spawn(TERMINAL_EXEC.." sudo nethogs "..WidgetManager.wifiDevice.."") end)
+		awful.button({}, 1, function() awful.util.spawn(TERMINAL_EXEC.." sudo nethogs "..device.."") end)
 	))
 
 	-- TODO
@@ -394,7 +401,7 @@ function WidgetManager:getBatteryWidget()
 		return retval
 	end
 	-- TODO: Have a setting for the battery to use
-	vicious.register(self.battery, customWrapper, '<span foreground="#ffcc00" weight="bold">$1$2%$3</span>', 120, "BAT0") --585656
+	-- vicious.register(self.battery, customWrapper, '<span foreground="#ffcc00" weight="bold">$1$2%$3</span>', 120, "BAT0") --585656
 	
 	return self.battery
 end
