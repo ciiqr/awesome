@@ -330,7 +330,7 @@ globalKeys = awful.util.table.join(
 	--Popups
 	-- Launcher Style
 	awful.key({SUPER}, "w", function() awful.util.spawn_with_shell(insertScreenWorkingAreaYIntoFormat(COMMAND_LAUNCHER_MENU)) end),
-	awful.key({SUPER}, "p", function() awful.util.spawn_with_shell(insertScreenWorkingAreaYIntoFormat(COMMAND_LAUNCHER)) end),
+	-- awful.key({SUPER}, "p", function() awful.util.spawn_with_shell(insertScreenWorkingAreaYIntoFormat(COMMAND_LAUNCHER)) end),
 	awful.key({SUPER}, "u", function() awful.util.spawn_with_shell(insertScreenWorkingAreaYIntoFormat(COMMAND_LAUNCHER_ALTERNATE)) end), -- TODO: Never Use...
 	awful.key({SUPER}, "s", function() awful.util.spawn_with_shell(insertScreenWorkingAreaYIntoFormat(COMMAND_WINDOW_SWITCHER)) end),
 	-- Quake Style
@@ -547,6 +547,14 @@ awful.rules.rules = {
 		}
 	}
 	,{
+		rule_any = {
+			class = {"URxvt"}
+		},
+		properties = {
+			opacity = 0.8
+		}
+	}
+	,{
 		rule = {
 			class = "XTerm"
 		},
@@ -582,6 +590,15 @@ awful.rules.rules = {
 		},
 		properties = {
 			border_width = 0
+		}
+	}
+	,{
+		rule = {
+			class = "albert"
+		},
+		properties = {
+			border_width = 0,
+			skip_taskbar = true
 		}
 	}
 	,{
