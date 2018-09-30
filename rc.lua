@@ -932,7 +932,6 @@ moveMouse(100, 100)
 
 -- Cleanup Variables --
 -----------------------
-THEME_NAME = nil
 STARTUP_PROGRAMS = nil
 
 globalKeys = nil
