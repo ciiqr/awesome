@@ -17,10 +17,14 @@ DEBUG = true
 -- Adjustment Values
 -- TODO: Could list all devices in /sys/class/backlight/, maybe device/type can be used to exclude the improper one
 -- TODO: When adjusting, if it would add up to over max or less than 0, adjust to those values
--- TODO: Only do this is there is a backlight (and only setup keybindings if these exist...)
 BRIGHTNESS_MAX = tonumber(readFile("/sys/class/backlight/intel_backlight/max_brightness"))
-BRIGHTNESS_CHANGE_NORMAL = roundi(BRIGHTNESS_MAX/10)
-BRIGHTNESS_CHANGE_SMALL = roundi(BRIGHTNESS_MAX/100)
+if BRIGHTNESS_MAX then
+	BRIGHTNESS_CHANGE_NORMAL = roundi(BRIGHTNESS_MAX/10)
+	BRIGHTNESS_CHANGE_SMALL = roundi(BRIGHTNESS_MAX/100)
+else
+	BRIGHTNESS_CHANGE_NORMAL = 0
+	BRIGHTNESS_CHANGE_SMALL = 0
+end
 VOLUME_CHANGE_NORMAL = 10
 VOLUME_CHANGE_SMALL = 1
 
@@ -32,7 +36,7 @@ BATTERY_PERCENT_LOW = 10
 BATTERY_PERCENT_CRITICAL = 5
 
 -- Programs
-TERMINAL = "rxvt-unicode"
+TERMINAL = "urxvt"
 TERMINAL_EXEC = TERMINAL.." -e "
 FILE_MANAGER = "spacefm"
 EDITOR = "sublime"
@@ -82,13 +86,16 @@ STARTUP_PROGRAMS = {
 	,"compton" -- Composition Manager (Transparency, Inactive Window Dimming, Visual Glitch Fix)
 	,"feh --randomize --bg-fill "..THEME_PATH.."backgrounds/*" -- Random Background
 	,"sudo bash ~/documents/Commands/appleKeyboard" -- TODO: This should be moved...
-	
+
 	-- System
 	-- ,"sudo seaf-cli start"		-- Seafile Files Syncer (Root)
 
 	-- Daemons
 	-- ,"synergyc 192.168.1.102"-- Share Mouse & Keyboard with Desktop
 	,FILE_MANAGER.." -d"
+
+	-- Launchers
+	,"albert"
 
 	-- Tray's
 	,"redshift-gtk"

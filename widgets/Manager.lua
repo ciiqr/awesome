@@ -4,8 +4,8 @@ local quake = quake or require("quake")
 
 local WidgetManager = {}
 
-WidgetManager.wifiDevice = trim(execForOutput("basename /sys/class/net/wl*"))
-WidgetManager.ethDevice = trim(execForOutput("basename /sys/class/net/e*"))
+WidgetManager.wifiDevice = trim(execForOutput("ls /sys/class/net/wl* >/dev/null 2>&1 && basename /sys/class/net/wl*"))
+WidgetManager.ethDevice = trim(execForOutput("ls /sys/class/net/e* >/dev/null 2>&1 && basename /sys/class/net/e*"))
 
 -- Popup Terminal
 function WidgetManager:initPopupTerminal(s)
@@ -347,9 +347,12 @@ function WidgetManager:getNetUsage(vertical)
 	if vertical then
 		self.netwidget:set_align("center")
 	end
-	vicious.register(self.netwidget, vicious.widgets.net, '<span foreground="#97D599" weight="bold">↑${'..WidgetManager.wifiDevice..' up_mb}</span> <span foreground="#CE5666" weight="bold">↓${'..WidgetManager.wifiDevice..' down_mb}</span>', 1) --#585656
+
+	local networkDevice = self.ethDevice or self.wifiDevice
+
+	vicious.register(self.netwidget, vicious.widgets.net, '<span foreground="#97D599" weight="bold">↑${'..networkDevice..' up_mb}</span> <span foreground="#CE5666" weight="bold">↓${'..networkDevice..' down_mb}</span>', 1) --#585656
 	self.netwidget:buttons(awful.util.table.join(
-		awful.button({}, 1, function() awful.util.spawn(TERMINAL_EXEC.." sudo nethogs "..WidgetManager.wifiDevice.."") end)
+		awful.button({}, 1, function() awful.util.spawn(TERMINAL_EXEC.." sudo nethogs "..networkDevice.."") end)
 	))
 
 	-- TODO
