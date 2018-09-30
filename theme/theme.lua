@@ -29,7 +29,7 @@ end
 -- Variables --
 --===========--
 local theme = {}
--- theme.wallpaper = THEME_PATH .. "Background.jpg"
+-- theme.wallpaper = THEME_PATH .. "/Background.jpg"
 -- BAR_TRANSPARENCY = true
 
 -- Styles --
@@ -104,12 +104,12 @@ theme.bg_systray = ternary(BAR_TRANSPARENCY, "#2b2726", black) -- bg_normal
 -- Icons --
 --=======--
 -- Taglist
-theme.taglist_squares_sel   = THEME_PATH .. "taglist/squarefz-double-height"..scale_factor_path..".png"
-theme.taglist_squares_unsel = THEME_PATH .. "taglist/squarez"..scale_factor_path..".png"
+theme.taglist_squares_sel   = THEME_PATH .. "/taglist/squarefz-double-height"..scale_factor_path..".png"
+theme.taglist_squares_unsel = THEME_PATH .. "/taglist/squarez"..scale_factor_path..".png"
 theme.taglist_squares_resize = "true"
 
 -- Layout
-local themePathLayouts	= THEME_PATH .. "layouts/"
+local themePathLayouts	= THEME_PATH .. "/layouts/"
 theme.layout_tile       = themePathLayouts .. "tile.png"
 theme.layout_fairv      = themePathLayouts .. "fairv.png"
 theme.layout_fairh      = themePathLayouts .. "fairh.png"

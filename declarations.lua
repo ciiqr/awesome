@@ -1,13 +1,11 @@
 -- Directories
 HOME_DIR = os.getenv("HOME")
--- USER = os.getenv("USER")
-CONFIG_DIR = HOME_DIR.."/.config/awesome/"
--- PERSONAL_BIN = HOME_DIR.."/.local/bin/"
+ROOT_DIR = HOME_DIR .. "/.config/awesome/"
 
 -- Theme
-THEME_NAME = "theme"
-THEME_PATH = CONFIG_DIR..THEME_NAME.."/"
-THEME_FILE_PATH = THEME_PATH.."theme.lua"
+THEME_PATH = ROOT_DIR .. "theme"
+THEME_FILE_PATH = THEME_PATH .. "/theme.lua"
+THEME_BACKGROUNDS_PATH = THEME_PATH .. "/backgrounds"
 PANEL_HEIGHT = 15
 SPACER_SIZE = 14
 
@@ -37,7 +35,7 @@ BATTERY_PERCENT_CRITICAL = 5
 
 -- Programs
 TERMINAL = "urxvt"
-TERMINAL_EXEC = TERMINAL.." -e "
+TERMINAL_EXEC = TERMINAL .. " -e "
 FILE_MANAGER = "spacefm"
 EDITOR = "sublime"
 GRAPHICAL_SUDO = "gksudo"
@@ -84,7 +82,7 @@ STARTUP_PROGRAMS = {
 	-- ,"xcompmgr"				-- Composition Manager (Transparency)
 	"pa-server.py" -- Updates volume widget when volume changes
 	,"compton" -- Composition Manager (Transparency, Inactive Window Dimming, Visual Glitch Fix)
-	,"feh --randomize --bg-fill "..THEME_PATH.."backgrounds/*" -- Random Background
+	,"feh --randomize --bg-fill " .. THEME_BACKGROUNDS_PATH .. "/*" -- Random Background
 	,"sudo bash ~/documents/Commands/appleKeyboard" -- TODO: This should be moved...
 
 	-- System
@@ -92,7 +90,7 @@ STARTUP_PROGRAMS = {
 
 	-- Daemons
 	-- ,"synergyc 192.168.1.102"-- Share Mouse & Keyboard with Desktop
-	,FILE_MANAGER.." -d"
+	,FILE_MANAGER .. " -d"
 
 	-- Launchers
 	,"albert"
