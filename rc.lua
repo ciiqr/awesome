@@ -329,9 +329,6 @@ globalKeys = awful.util.table.join(
 
 	--Popups
 	-- Launcher Style
-	awful.key({SUPER}, "w", function() awful.util.spawn_with_shell(insertScreenWorkingAreaYIntoFormat(COMMAND_LAUNCHER_MENU)) end),
-	-- awful.key({SUPER}, "p", function() awful.util.spawn_with_shell(insertScreenWorkingAreaYIntoFormat(COMMAND_LAUNCHER)) end),
-	awful.key({SUPER}, "u", function() awful.util.spawn_with_shell(insertScreenWorkingAreaYIntoFormat(COMMAND_LAUNCHER_ALTERNATE)) end), -- TODO: Never Use...
 	awful.key({SUPER}, "s", function() awful.util.spawn_with_shell(insertScreenWorkingAreaYIntoFormat(COMMAND_WINDOW_SWITCHER)) end),
 	-- Quake Style
 	awful.key({SUPER, SHIFT}, "t", function() widget_manager:togglePopupTerminal() end),
