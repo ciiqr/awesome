@@ -62,34 +62,21 @@ SCREEN_TAGS = {"➊","➋","➌","➍","➎","➏","➐","➑","➒"}
 -- Commands
 COMMAND_SLEEP = "systemctl suspend"
 COMMAND_SCREEN_SHOT = "scrot ~/documents/Screens/%Y-%m-%d-%T-screen.png"
-COMMAND_SCREEN_SHOT_SELECT = "gm import ~/documents/Screens/%Y-%m-%d-%T-screen.png"
+COMMAND_SCREEN_SHOT_SELECT = "gm import ~/Dropbox/Screenshots/$(date '+%Y-%m-%d-%T')-screen.png"
 COMMAND_SCREEN_INVERT = "xcalib -i -a"
 COMMAND_FILE_OPENER = "xdg-open \"$(locate \"\" | dmenu -y %s -i -p Open -l 20 -fn \"Nimbus Sans L-10\" -dim 0.75)\"" -- MUST Replace %s using string.format, with y Height -- -x 480 -w 960 -f
 COMMAND_WINDOW_SWITCHER = "DMENU_OPTIONS='-y %s -i -p Open -l 20 -dim 0.75' FONT=\"Nimbus Sans L-10\" wmgo"
-COMMAND_TASK_MANAGER_MEM = "sudo htop --delay 5 -s PERCENT_MEM"
-COMMAND_TASK_MANAGER_CPU = "sudo htop --delay 5 -s PERCENT_CPU"
--- COMMAND_LAUNCHER = "quick-launch-py -y %s" -- TODO: Remove when I'm happy
-COMMAND_LAUNCHER = "quick-launch --plugins=Applications -y %s 2>/dev/null"
--- TODO: These things should be based on the screen size...
-COMMAND_LAUNCHER_ALTERNATE = "quick-launch --plugins=Applications -y %s -x 760 -w 400 -h 540 --orientation=v 2>/dev/null"
-COMMAND_LAUNCHER_MENU = "quick-launch --plugins=Commands -y %s -x 1520 -w 800 -h 1080 --orientation=v 2>/dev/null"
+COMMAND_TASK_MANAGER_MEM = "sudo htop --delay 5 --sort-key PERCENT_MEM"
+COMMAND_TASK_MANAGER_CPU = "sudo htop --delay 5 --sort-key PERCENT_CPU"
 COMMAND_IS_RUNNING = "is-running"
 
 -- Startup
 STARTUP_PROGRAMS = {
 	-- Awesome
-	-- ,"wmname Sawfish"			-- wmname LG3D|Sawfish: Fix Java Issues, HOWEVER it causes issues with chrome/chromium, and chrome will always be more important so until I have a good alternative it is being disabled, (NOTE: I Can probably just change what WM it imitates)
-	-- ,"xcompmgr"				-- Composition Manager (Transparency)
-	"pa-server.py" -- Updates volume widget when volume changes
-	,"compton" -- Composition Manager (Transparency, Inactive Window Dimming, Visual Glitch Fix)
+	"compton" -- Composition Manager (Transparency, Inactive Window Dimming, Visual Glitch Fix)
 	,"feh --randomize --bg-fill " .. THEME_BACKGROUNDS_PATH .. "/*" -- Random Background
-	,"sudo bash ~/documents/Commands/appleKeyboard" -- TODO: This should be moved...
-
-	-- System
-	-- ,"sudo seaf-cli start"		-- Seafile Files Syncer (Root)
 
 	-- Daemons
-	-- ,"synergyc 192.168.1.102"-- Share Mouse & Keyboard with Desktop
 	,FILE_MANAGER .. " -d"
 
 	-- Launchers
@@ -99,10 +86,6 @@ STARTUP_PROGRAMS = {
 	,"redshift-gtk"
 	,"nm-applet"
 	,"dropbox start -i"
-	-- ,"keepass"
-	-- ,"seafile-applet"
-	-- ,"system-config-printer-applet"
-
 }
 
 sublime_window_rules = {
