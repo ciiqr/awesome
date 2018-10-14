@@ -609,6 +609,16 @@ awful.rules.rules = {
 	}
 	,{
 		rule = {
+			class = "Chromium",
+			name = "Authy"
+		},
+		properties = {
+			floating = true
+		}
+	}
+	-- TODO: it seems like the bug that made all this dumb callback stuff necessary has been fixed, clean this up
+	,{
+		rule = {
 			class = "Google-chrome-stable",
 			name = "Untitled" -- All Extension Windows
 		},
