@@ -82,7 +82,7 @@ function WidgetManager:initKeepass(s)
 	end
 	
 	-- Create Popup Notes
-	self.quake_keepass[s] = quake({app = "keepassx", name="keepassx", height = 0.75, screen = s, width = 0.5, border=0})
+	self.quake_keepass[s] = quake({app = "keepassx2", name="keepassx2", height = 0.75, screen = s, width = 0.5, border=0})
 	
 	return self.quake_keepass[s]
 end
