@@ -237,7 +237,7 @@ function clientDidLoseFocus(c)
 end
 
 function clientDidChangeFloating(c)
-	c.ontop = awful.client.floating.get(c)
+	c.ontop = c.floating and not c.fullscreen
 end
 
 function clientDidMouseEnter(c)
