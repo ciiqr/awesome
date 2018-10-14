@@ -859,7 +859,6 @@ awful.rules.rules = {
 			end
 		}
 	}
-	
 	-- ,{
 	-- 	rule = {
 	-- 		class = "Vlc"

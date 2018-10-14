@@ -215,7 +215,7 @@ end
 
 -- Text Clock
 function WidgetManager:getTextClock() -- .textClock:set_font()
-	self.textClock = awful.widget.textclock('<span foreground="#94738c">%A, %B %d</span>  <span foreground="#ecac13">%I:%M %p</span>', 10) -- TODO: Add constant...
+	self.textClock = wibox.widget.textclock('<span foreground="#94738c">%A, %B %d</span>  <span foreground="#ecac13">%I:%M %p</span>', 10) -- TODO: Add constant...
 	-- Add Calendar
 	require("cal").register(self.textClock, '<span weight="bold" foreground="'..(beautiful.taglist_fg_focus or beautiful.fg_focus or "")..'" underline="single">%s</span>')
 	return self.textClock
