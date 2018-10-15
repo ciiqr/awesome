@@ -15,14 +15,10 @@ DEBUG = true
 -- Adjustment Values
 -- TODO: Could list all devices in /sys/class/backlight/, maybe device/type can be used to exclude the improper one
 -- TODO: When adjusting, if it would add up to over max or less than 0, adjust to those values
-BRIGHTNESS_MAX = tonumber(readFile("/sys/class/backlight/intel_backlight/max_brightness"))
-if BRIGHTNESS_MAX then
-	BRIGHTNESS_CHANGE_NORMAL = roundi(BRIGHTNESS_MAX/10)
-	BRIGHTNESS_CHANGE_SMALL = roundi(BRIGHTNESS_MAX/100)
-else
-	BRIGHTNESS_CHANGE_NORMAL = 0
-	BRIGHTNESS_CHANGE_SMALL = 0
-end
+-- TODO: Only do this is there is a backlight (and only setup keybindings if these exist...)
+BRIGHTNESS_MAX = tonumber(readFile("/sys/class/backlight/intel_backlight/max_brightness")) or 1
+BRIGHTNESS_CHANGE_NORMAL = roundi(BRIGHTNESS_MAX/10)
+BRIGHTNESS_CHANGE_SMALL = roundi(BRIGHTNESS_MAX/100)
 VOLUME_CHANGE_NORMAL = 10
 VOLUME_CHANGE_SMALL = 1
 
