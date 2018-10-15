@@ -27,7 +27,7 @@ function thrizen.arrange(p)
     for i, c in pairs(p_clients) do
         local row = math.floor((i - 1) / columns)
         local column = ((i - 1) % columns)
-        -- 
+        --
         local hasRoomToFill = ((i - 1 + columns) >= numClients)
         local isSecondLastRow = row == (numRows - 2)
         local isDoubleHeight = hasRoomToFill and isSecondLastRow

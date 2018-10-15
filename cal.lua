@@ -10,11 +10,11 @@
 --   + lua52 compliant module
 --
 -- 1. require it in your rc.lua
---	require("cal")
+--  require("cal")
 -- 2. attach the calendar to a widget of your choice (ex mytextclock)
---	cal.register(mytextclock)
+--  cal.register(mytextclock)
 --    If you don't like the default current day formating you can change it as following
---	cal.register(mytextclock, "<b>%s</b>") -- now the current day is bold instead of underlined
+--  cal.register(mytextclock, "<b>%s</b>") -- now the current day is bold instead of underlined
 --
 -- # How to Use #
 -- Just hover with your mouse over the widget, you register and the calendar popup.
@@ -32,94 +32,94 @@ local state = {}
 local current_day_format = "<u>%s</u>"
 
 function displayMonth(month, year, weekStart)
-	local t, wkSt=os.time{year=year, month=month+1, day=0}, weekStart or 1
-	local d=os.date("*t", t)
-	local mthDays, stDay=d.day, (d.wday-d.day-wkSt+1)%7
+    local t, wkSt=os.time{year=year, month=month+1, day=0}, weekStart or 1
+    local d=os.date("*t", t)
+    local mthDays, stDay=d.day, (d.wday-d.day-wkSt+1)%7
 
-	local lines = "    "
+    local lines = "    "
 
-	for x=0,6 do
-		lines = lines .. os.date("%a ", os.time{year=2006, month=1, day=x+wkSt})
-	end
+    for x=0,6 do
+        lines = lines .. os.date("%a ", os.time{year=2006, month=1, day=x+wkSt})
+    end
 
-	lines = lines .. "\n" .. os.date(" %V", os.time{year=year, month=month, day=1})
+    lines = lines .. "\n" .. os.date(" %V", os.time{year=year, month=month, day=1})
 
-	local writeLine = 1
-	while writeLine < (stDay + 1) do
-		lines = lines .. "    "
-		writeLine = writeLine + 1
-	end
+    local writeLine = 1
+    while writeLine < (stDay + 1) do
+        lines = lines .. "    "
+        writeLine = writeLine + 1
+    end
 
-	for d=1,mthDays do
-		local x = d
-		local t = os.time{year=year, month=month, day=d}
-		if writeLine == 8 then
-			writeLine = 1
-			lines = lines .. "\n" .. os.date(" %V", t)
-		end
-		if os.date("%Y-%m-%d") == os.date("%Y-%m-%d", t) then
-			x = string.format(current_day_format, d)
-		end
-		if d < 10 then
-			x = " " .. x
-		end
-		lines = lines .. "  " .. x
-		writeLine = writeLine + 1
-	end
-	if stDay + mthDays < 36 then
-		lines = lines .. "\n"
-	end
-	if stDay + mthDays < 29 then
-		lines = lines .. "\n"
-	end
-	local header = os.date("%B %Y\n", os.time{year=year, month=month, day=1})
+    for d=1,mthDays do
+        local x = d
+        local t = os.time{year=year, month=month, day=d}
+        if writeLine == 8 then
+            writeLine = 1
+            lines = lines .. "\n" .. os.date(" %V", t)
+        end
+        if os.date("%Y-%m-%d") == os.date("%Y-%m-%d", t) then
+            x = string.format(current_day_format, d)
+        end
+        if d < 10 then
+            x = " " .. x
+        end
+        lines = lines .. "  " .. x
+        writeLine = writeLine + 1
+    end
+    if stDay + mthDays < 36 then
+        lines = lines .. "\n"
+    end
+    if stDay + mthDays < 29 then
+        lines = lines .. "\n"
+    end
+    local header = os.date("%B %Y\n", os.time{year=year, month=month, day=1})
 
-	return header .. "\n" .. lines
+    return header .. "\n" .. lines
 end
 
 
 function cal.register(mywidget, custom_current_day_format)
-	if custom_current_day_format then current_day_format = custom_current_day_format end
+    if custom_current_day_format then current_day_format = custom_current_day_format end
 
-	if not tooltip then
-		tooltip = awful.tooltip({})
-		function tooltip:update()
-			local month, year = os.date('%m'), os.date('%Y')
-			state = {month, year}
-			tooltip:set_markup(string.format('<span font_desc="monospace" foreground="' ..beautiful.fg_normal.. '">%s</span>', displayMonth(month, year, 2)))
-			
-			-- Keep to right edge
-			-- TODO: Modularize so we can disable/keep to any edge
-			local screenDimens = screen[mouse.screen.index].workarea
-			tooltip.wibox.x = screenDimens.width - tooltip.wibox.width + beautiful.border_width
-			tooltip.wibox.y = screenDimens.y - beautiful.border_width
-		end
-		tooltip:update()
-	end
-	tooltip:add_to_object(mywidget)
+    if not tooltip then
+        tooltip = awful.tooltip({})
+        function tooltip:update()
+            local month, year = os.date('%m'), os.date('%Y')
+            state = {month, year}
+            tooltip:set_markup(string.format('<span font_desc="monospace" foreground="' ..beautiful.fg_normal.. '">%s</span>', displayMonth(month, year, 2)))
 
-	mywidget:connect_signal("mouse::enter", tooltip.update)
-	
-	local function backMonth() switchMonth(-1) end
-	local function forwardMonth() switchMonth(1) end
-	local function backYear() switchMonth(-12) end
-	local function forwardYear() switchMonth(12) end
+            -- Keep to right edge
+            -- TODO: Modularize so we can disable/keep to any edge
+            local screenDimens = screen[mouse.screen.index].workarea
+            tooltip.wibox.x = screenDimens.width - tooltip.wibox.width + beautiful.border_width
+            tooltip.wibox.y = screenDimens.y - beautiful.border_width
+        end
+        tooltip:update()
+    end
+    tooltip:add_to_object(mywidget)
 
-	mywidget:buttons(awful.util.table.join(
-	awful.button({}, 1, forwardMonth),
-	awful.button({}, 3, backMonth),
-	awful.button({}, 4, backMonth),
-	awful.button({}, 5, forwardMonth),
-	awful.button({"Shift"}, 1, backYear),
-	awful.button({"Shift"}, 3, forwardYear),
-	awful.button({"Shift"}, 4, backYear),
-	awful.button({"Shift"}, 5, forwardYear)))
+    mywidget:connect_signal("mouse::enter", tooltip.update)
+
+    local function backMonth() switchMonth(-1) end
+    local function forwardMonth() switchMonth(1) end
+    local function backYear() switchMonth(-12) end
+    local function forwardYear() switchMonth(12) end
+
+    mywidget:buttons(awful.util.table.join(
+    awful.button({}, 1, forwardMonth),
+    awful.button({}, 3, backMonth),
+    awful.button({}, 4, backMonth),
+    awful.button({}, 5, forwardMonth),
+    awful.button({"Shift"}, 1, backYear),
+    awful.button({"Shift"}, 3, forwardYear),
+    awful.button({"Shift"}, 4, backYear),
+    awful.button({"Shift"}, 5, forwardYear)))
 end
 
 function switchMonth(delta)
-	state[1] = state[1] + (delta or 1)
-	local text = string.format('<span font_desc="monospace">%s</span>', displayMonth(state[1], state[2], 2))
-	tooltip:set_markup(text)
+    state[1] = state[1] + (delta or 1)
+    local text = string.format('<span font_desc="monospace">%s</span>', displayMonth(state[1], state[2], 2))
+    tooltip:set_markup(text)
 end
 
 return cal
