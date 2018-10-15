@@ -373,7 +373,7 @@ globalKeys = awful.util.table.join(
     awful.key({SUPER}, "i", function() awful.util.spawn_with_shell(COMMAND_SCREEN_INVERT) end),
 
     -- Print Screen
-    awful.key({}, "Print", captureScreenShot),
+    awful.key({}, "Print", captureScreenshot),
 
     -- Print Screen (Select Area)
     awful.key({SUPER}, "Print", captureScreenSnip),
