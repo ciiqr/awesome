@@ -258,18 +258,15 @@ function clientShouldAttemptFocus(c)
 end
 
 --Utility
-function captureScreenShot()
-    -- Capture
-    awful.util.spawn_with_shell(COMMAND_SCREEN_SHOT)
-    -- Display Naughty
-    delayFunc(0.5, function()
-        notify_send("ScreenShot Taken", 1)
+function captureScreenshot()
+    awful.spawn.easy_async_with_shell(COMMAND_SCREENSHOT, function()
+        notify_send("Screenshot Taken", 1)
     end)
 end
 function captureScreenSnip()
-    -- TODO: Use Popen (presumably) in order to know when it actually finishes, this way I can display the notification right after it was taken
-    -- Capture
-    awful.util.spawn_with_shell(os.date(COMMAND_SCREEN_SHOT_SELECT))
+    awful.spawn.easy_async_with_shell(COMMAND_SCREENSHOT_SELECT, function()
+        notify_send("Screenshot Taken", 1)
+    end)
 end
 
 function insertScreenWorkingAreaYIntoFormat(format)
