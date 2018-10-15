@@ -100,7 +100,10 @@ client.connect_signal("property::floating", clientDidChangeFloating)
 client.connect_signal("mouse::enter", clientDidMouseEnter)
 
 -- Per-Screen Setup (Wallpapers, Tags, Pop-down Terminal/Htop/Note, Maximized Layouts, Top/BottomBars)
-for s = 1, screen.count() do
+awful.screen.connect_for_each_screen(function(s)
+
+    -- TODO: need to handle wallpapers...
+
     local top_layout    = wibox.layout.align.horizontal()
     local left_layout   = wibox.layout.fixed.horizontal()
     local middle_layout = wibox.layout.flex.horizontal()
@@ -126,15 +129,19 @@ for s = 1, screen.count() do
     end
 
     --Tags
-    local tileLay = layouts[1]
-    -- awful.tag(SCREEN_TAGS, s, {layouts[2], tileLay, tileLay, tileLay, tileLay, tileLay, tileLay, tileLay, tileLay})
-    awful.tag(SCREEN_TAGS, s, tileLay)
+    awful.tag(SCREEN_TAGS, s, layouts[1])
     -- - Columns
-    local tags = awful.tag.gettags(s)
-    for _,tag in pairs(tags) do
+    for _,tag in pairs(s.tags) do
         awful.tag.setncol(3, tag)
         awful.tag.setmwfact(1/3, tag)
     end
+
+    -- Popup Terminal/Process Info/Notes
+    widget_manager:initPopupTerminal(s)
+    widget_manager:initPopupCPU(s)
+    widget_manager:initPopupMemory(s)
+    widget_manager:initPopupNotes(s)
+    widget_manager:initKeepass(s)
 
     --Wiboxes w/ Widgets
     --Left Widgets
@@ -145,7 +152,8 @@ for s = 1, screen.count() do
     middle_layout:add(widget_manager:getIP())
 
     --Right Widgets
-    if s == screen.count() then -- Main Widgets on Far Right
+    -- TODO: hmm
+    if s.index == screen.count() then -- Main Widgets on Far Right
         local right_widgets = {
             -- require("widgets.tester"):init(),
             widget_manager:getNetUsage(),
@@ -234,15 +242,6 @@ for s = 1, screen.count() do
     alignSysInfoLayout:set_right(fixedSysInfoLayout)
 
     sysInfoWibox[s] = widget_manager:getSysInfoWibox(s, alignSysInfoLayout)
-end
-
-awful.screen.connect_for_each_screen(function(s)
-    -- Popup Terminal/Process Info/Notes
-    widget_manager:initPopupTerminal(s)
-    widget_manager:initPopupCPU(s)
-    widget_manager:initPopupMemory(s)
-    widget_manager:initPopupNotes(s)
-    widget_manager:initKeepass(s)
 end)
 
 --Global Key Bindings
@@ -283,12 +282,12 @@ globalKeys = awful.util.table.join(
     awful.key({SUPER}, "Down", revertFromMaximizedLayout),
 
     --Sleep
-    awful.key({}, "XF86Sleep", putToSleep),
+    awful.key({}, "XF86Sleep", function() awful.util.spawn(COMMAND_SLEEP) end),
 
     -- Add Tag
     awful.key({SUPER}, "y", function()
         -- Add Tag
-        newTag = awful.tag.add("Tag "..(#awful.tag.gettags(mouse.screen.index)) + 1, {
+        newTag = awful.tag.add("Tag "..(#mouse.screen.tags) + 1, {
             layout = thrizen,
         })
         -- Switch to it
@@ -411,7 +410,7 @@ globalKeys = awful.util.table.join(
 )
 --Tag Keys
 -- Uses keycodes to make it works on any keyboard layout
-local numberOfTags = #(awful.tag.gettags(mouse.screen.index))
+local numberOfTags = #mouse.screen.tags
 for i = 1, numberOfTags do
     local iKey = "#"..(i + 9)
     globalKeys = awful.util.table.join(globalKeys,
@@ -467,7 +466,7 @@ clientkeys = awful.util.table.join(
             c.floating = true
 
             -- Get screen dimensions
-            local screenRect = screen[mouse.screen.index].geometry
+            local screenRect = mouse.screen.geometry
             -- Set window dimensions and position based on screen size...
             local PIP_SIZE_RATIO = 3
             local newWidth = screenRect.width / PIP_SIZE_RATIO
@@ -513,7 +512,10 @@ awful.rules.rules = {
             maximized_vertical   = false,
             maximized_horizontal = false,
             -- Perfect, I never have to worry about this crap again!
-            size_hints_honor = false
+            size_hints_honor = false,
+            -- awesome docs suggests these...
+            screen = awful.screen.preferred,
+            placement = awful.placement.no_overlap+awful.placement.no_offscreen
         }
     }
     ,{ -- Floating
@@ -570,7 +572,7 @@ awful.rules.rules = {
             floating = true,
             callback = function(c)
                 -- Get screen dimensions
-                local workingArea = screen[mouse.screen.index].workarea
+                local workingArea = mouse.screen.workarea
                 -- Set window dimensions and position based on screen size...
                 local newWidth = workingArea.width / 2
                 c:geometry({
@@ -635,7 +637,7 @@ awful.rules.rules = {
                             awful.client.floating.set(c, true)
                             -- Set Ontop
                             -- Change Size
-                            local screenDimens = screen[mouse.screen.index].workarea
+                            local screenDimens = mouse.screen.workarea
                             local screenHeight = screenDimens.height
                             c:geometry({width = screenDimens.width - (2 * beautiful.border_width), height = screenHeight / 2, y = screenHeight/  4, x=0})
 
@@ -647,7 +649,7 @@ awful.rules.rules = {
                             -- NOT Floating
                             awful.client.floating.set(c, false)
                             -- On Social Tag
-                            local tags = awful.tag.gettags(c.screen)
+                            local tags = c.screen.tags
                             awful.client.movetotag(tags[6], c); -- TODO: Add constant for Social Tag Index...
                         else
                             -- Print Name So I Can Possibly Change Other Names
@@ -709,7 +711,7 @@ awful.rules.rules = {
                     end
 
                     -- Get Tags
-                    local tags = awful.tag.gettags(c.screen)
+                    local tags = c.screen.tags
                     -- Move to Tag
                     for name,tag in pairs(sublime_window_rules) do
                         if find_window(name) then
@@ -730,7 +732,7 @@ awful.rules.rules = {
         properties = {
             border_width = 0,
             callback = function(c)
-                local screenDimens = screen[mouse.screen.index].workarea
+                local screenDimens = mouse.screen.workarea
                 local width = 322 -- TODO: Should probably get the actual size OR the actual minimum
                 local height = 883
                 c:geometry({
@@ -749,7 +751,7 @@ awful.rules.rules = {
         },
         properties = {
             callback = function(c)
-                local screenDimens = screen[mouse.screen.index].workarea
+                local screenDimens = mouse.screen.workarea
                 local clientDimens = c:geometry()
                 c:geometry({
                     x = (screenDimens.width - clientDimens.width) / 2,
@@ -765,7 +767,7 @@ awful.rules.rules = {
         properties = {
             callback = function(c)
                 local existingDimens = c:geometry()
-                screenDimens = screen[mouse.screen.index].workarea
+                screenDimens = mouse.screen.workarea
                 local width = existingDimens.width
                 local height = existingDimens.height
                 c:geometry({
@@ -783,7 +785,7 @@ awful.rules.rules = {
         },
         properties = {
             callback = function(c)
-                local screenDimens = screen[mouse.screen.index].workarea
+                local screenDimens = mouse.screen.workarea
                 local clientDimens = c:geometry()
                 c:geometry({
                     x = (screenDimens.width - clientDimens.width) / 2,
@@ -806,7 +808,7 @@ awful.rules.rules = {
             class = {"Skype", "yakyak"},
         },
         properties = {
-            tag = awful.tag.gettags(mouse.screen.index)[6]
+            tag = mouse.screen.tags[6]
             -- callback = function(c)
             --  -- Floating Windows have a north west gravity, others have static
             --  -- False Assumption
@@ -839,7 +841,7 @@ awful.rules.rules = {
             instance = {"TeamViewer.exe"}
         },
         properties = {
-            tag = awful.tag.gettags(mouse.screen.index)[5]
+            tag = mouse.screen.tags[5]
         }
     }
     ,{
@@ -860,7 +862,7 @@ awful.rules.rules = {
                 -- Change Size of Normal Window Only
                 -- if c.type == "floating" then
                     -- existingDimens = c:geometry()
-                    screenDimens = screen[mouse.screen.index].workarea
+                    screenDimens = mouse.screen.workarea
                     local height = screenDimens.height * 0.75
                     c:geometry({
                         y = (screenDimens.height - height) / 2,
@@ -929,19 +931,3 @@ setup_network_connectivity_change_listener()
 for _,program in pairs(STARTUP_PROGRAMS) do
     run_once(program)
 end
-
--- Default first item in tag history
-awful.tag.history.update(screen[1])
-
--- End Configuring --
----------------------
--- Move Mouse
-moveMouse(100, 100)
-
--- Cleanup Variables --
------------------------
-STARTUP_PROGRAMS = nil
-
-globalKeys = nil
-clientKeys = nil
-clientButtons = nil

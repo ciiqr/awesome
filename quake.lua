@@ -99,9 +99,9 @@ function quake:compute_size()
     if not self.geometry[self.screen] then
         local geom
         if not self.overlap then
-            geom = screen[self.screen].workarea
+            geom = self.screen.workarea
         else
-            geom = screen[self.screen].geometry
+            geom = self.screen.geometry
         end
         local width, height = self.width, self.height
         if width  <= 1 then width = math.floor(geom.width * width) - 2 * self.border end

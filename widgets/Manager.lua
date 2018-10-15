@@ -262,24 +262,22 @@ function WidgetManager:getAllWindowsWibox(s, widget)
         aWibox.height = screen.workarea.height
     end
 
-    local ourScreen = screen[s]
     -- Set the initial size
-    sizeWibox(ourScreen)
+    sizeWibox(s)
     -- Resize on working area change
-    ourScreen:connect_signal("property::workarea", sizeWibox)
+    s:connect_signal("property::workarea", sizeWibox)
 
     -- TODO: on task list change it should update height, never more than workarea
     return aWibox
 end
 
 function WidgetManager:getSysInfoWibox(s, widget)
-    local ourScreen = screen[s]
     local width = xresources.apply_dpi(120)
     -- 'awful.wibox' to have it affect the workarea
     local aWibox = wibox({
         position = "right",
         screen = s,
-        x = ourScreen.workarea.width - width,
+        x = s.workarea.width - width,
         width = width,
         -- bg = "#222222FF",
         -- bg = "22222288",
@@ -299,9 +297,9 @@ function WidgetManager:getSysInfoWibox(s, widget)
     end
 
     -- Set the initial size
-    sizeWibox(ourScreen)
+    sizeWibox(s)
     -- Resize on working area change
-    ourScreen:connect_signal("property::workarea", sizeWibox)
+    s:connect_signal("property::workarea", sizeWibox)
 
     return aWibox
 end

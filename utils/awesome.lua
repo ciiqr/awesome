@@ -47,11 +47,6 @@ function run_once(prg)
     awful.util.spawn_with_shell(COMMAND_IS_RUNNING.." "..programName.." "..ternary(isRoot, "root", "$USER").." || ("..prg..")")
 end
 
--- Mouse
-function moveMouse(x_co, y_co)
-    mouse.coords({ x=x_co, y=y_co })
-end
-
 -- Clients
 function minimizeClient(c)
     -- Prevents Windows Being Minimized if they aren't on the task bar
@@ -83,7 +78,7 @@ function moveClientToTagAndFollow(tagNum, c)
     local c = c or client.focus
     if c then
         -- All tags on the screen
-        local tags = awful.tag.gettags(c.screen)
+        local tags = c.screen.tags
         -- Index of tag
         local index
         if tagNum == -1 then
@@ -109,7 +104,7 @@ function moveClientToLastTagAndFollow(c)
 end
 -- TODO: Maybe think of a clean way to modularize below 2, would be nice to use moveClientToTagAndFollow
 function moveClientLeftAndFollow(c)
-    local tags = awful.tag.gettags(client.focus.screen)
+    local tags = client.focus.screen.tags
     local curidx = awful.tag.getidx()
     local tag
     if curidx == 1 then
@@ -122,7 +117,7 @@ function moveClientLeftAndFollow(c)
     awful.tag.viewonly(tag)
 end
 function moveClientRightAndFollow(c)
-    local tags = awful.tag.gettags(client.focus.screen)
+    local tags = client.focus.screen.tags
     local curidx = awful.tag.getidx()
     local tag
     if curidx == #tags then
@@ -139,7 +134,7 @@ function toggleClientFullscreen(c)
     c.fullscreen = not c.fullscreen
 end
 function toggleClientTag(tagNum)
-    local tag = awful.tag.gettags(client.focus.screen)[tagNum]
+    local tag = client.focus.screen.tags[tagNum]
     if client.focus and tag then
         awful.client.toggletag(tag)
     end
@@ -148,19 +143,19 @@ switchClient = awful.client.focus.byidx
 
 -- Tags
 function toggleTag(tagNum)
-    local tag = awful.tag.gettags(mouse.screen.index)[tagNum]
+    local tag = mouse.screen.tags[tagNum]
     if tag then
         awful.tag.viewtoggle(tag)
     end
 end
 function switchToTag(tagNum)
-    local tag = awful.tag.gettags(mouse.screen.index)[tagNum]
+    local tag = mouse.screen.tags[tagNum]
     if tag then
         awful.tag.viewonly(tag)
     end
 end
 function switchToLastTag()
-    local tags = awful.tag.gettags(mouse.screen.index)
+    local tags = mouse.screen.tags
     local tag = tags[#tags]
     if tag then
         awful.tag.viewonly(tag)
@@ -168,7 +163,7 @@ function switchToLastTag()
     return tag
 end
 function switchToFirstTag()
-    local tags = awful.tag.gettags(mouse.screen.index)
+    local tags = mouse.screen.tags
     local tag = tags[1]
     if tag then
         awful.tag.viewonly(tag)
@@ -221,7 +216,7 @@ end
 --  if not c then return end
 
 --  local lay = awful.layout.get(c.screen)
---  local wa = screen[c.screen].workarea
+--  local wa = c.screen.workarea
 --  local mwfact = awful.tag.getmwfact()
 --  local g = c:geometry()
 --  -- local x,y
@@ -248,7 +243,7 @@ end
 
 -- Wibox
 function toggleWibox(wibox, s)
-    local s = s or mouse.screen.index
+    local s = s or mouse.screen
     local lwibox = wibox[s]
     lwibox.visible = not lwibox.visible
 
@@ -259,7 +254,7 @@ function toggleWibox(wibox, s)
     local position = awful.wibox.get_position(lwibox)
     if position == "top" or position == "bottom" then
 
-        sysInfoWibox[s].y = screen[s].workarea.y
-        sysInfoWibox[s].height = screen[s].workarea.height
+        sysInfoWibox[s].y = s.workarea.y
+        sysInfoWibox[s].height = s.workarea.height
     end
 end

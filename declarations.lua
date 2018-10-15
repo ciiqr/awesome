@@ -57,7 +57,7 @@ BACKWARDS = -1
 SCREEN_TAGS = {"➊","➋","➌","➍","➎","➏","➐","➑","➒"}
 
 -- Commands
-COMMAND_SLEEP = "systemctl suspend"
+COMMAND_SLEEP = "systemctl suspend" -- TODO: fix for non-systemd platforms
 COMMAND_SCREEN_SHOT = "scrot ~/Dropbox/Screenshots/$(date '+%Y-%m-%d-%T')-$(lsb_release -sc).png"
 COMMAND_SCREEN_SHOT_SELECT = "gm import ~/Dropbox/Screenshots/$(date '+%Y-%m-%d-%T')-$(lsb_release -sc).png"
 COMMAND_SCREEN_INVERT = "xcalib -i -a"
