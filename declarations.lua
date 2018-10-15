@@ -68,23 +68,23 @@ COMMAND_IS_RUNNING = "is-running"
 
 -- Startup
 STARTUP_PROGRAMS = {
-	-- Awesome
-	"compton" -- Composition Manager (Transparency, Inactive Window Dimming, Visual Glitch Fix)
-	,"feh --randomize --bg-fill " .. THEME_BACKGROUNDS_PATH .. "/*" -- Random Background
+    -- Awesome
+    "compton" -- Composition Manager (Transparency, Inactive Window Dimming, Visual Glitch Fix)
+    ,"feh --randomize --bg-fill " .. THEME_BACKGROUNDS_PATH .. "/*" -- Random Background
 
-	-- Daemons
-	,FILE_MANAGER .. " -d"
+    -- Daemons
+    ,FILE_MANAGER .. " -d"
 
-	-- Launchers
-	,"albert"
+    -- Launchers
+    ,"albert"
 
-	-- Tray's
-	,"redshift-gtk"
-	,"nm-applet"
-	,"dropbox start -i"
+    -- Tray's
+    ,"redshift-gtk"
+    ,"nm-applet"
+    ,"dropbox start -i"
 }
 
 sublime_window_rules = {
-	["awesome, lib"] = 7,
-	["machines"] = 7,
+    ["awesome, lib"] = 7,
+    ["machines"] = 7,
 }

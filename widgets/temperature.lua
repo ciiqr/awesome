@@ -2,38 +2,38 @@ temperature = wibox.widget.textbox()
 temperature:set_align("center")
 
 temperature.reload = function(self)
-	-- Run 'sensors'
-	local output = execForOutput("sensors")
+    -- Run 'sensors'
+    local output = execForOutput("sensors")
 
-	-- Parse Temperature
-	local temperature = string.match(split(output, ":%s*%+")[3] or "", "%d*")
-	-- Display Formatte Temperature
-	self:set_markup('<span weight="bold">' .. temperature .. "°" .. '</span>')
+    -- Parse Temperature
+    local temperature = string.match(split(output, ":%s*%+")[3] or "", "%d*")
+    -- Display Formatte Temperature
+    self:set_markup('<span weight="bold">' .. temperature .. "°" .. '</span>')
 end
 
 temperature.init = function(self)
-	self:reload()
+    self:reload()
 
-	-- Timer for every 10 seconds
-	self.updateTimer = timer({timeout = TEMPERATURE_UPDATE_INTERVAL})
+    -- Timer for every 10 seconds
+    self.updateTimer = timer({timeout = TEMPERATURE_UPDATE_INTERVAL})
 
-	-- Event Handler
-	self.updateTimer:connect_signal("timeout", function()
-		self:reload()
-	end)
+    -- Event Handler
+    self.updateTimer:connect_signal("timeout", function()
+        self:reload()
+    end)
 
-	-- Start Timer
-	self.updateTimer:start()
+    -- Start Timer
+    self.updateTimer:start()
 
-	return self
+    return self
 end
 
 -- Signals
 temperature:connect_signal("button::press", function(self, x, y, button, t)
-	self:reload()
+    self:reload()
 
-	-- Update
-	self:emit_signal("widget::updated")
+    -- Update
+    self:emit_signal("widget::updated")
 end)
 
 -- Return Created Instance

@@ -18,12 +18,12 @@
 
 -- TODO: Is there a way we can set theme settings like this per-screen and update them as appropriate (when windows change screen for example, blah...)
 -- TODO: Also have a function for this, and also use it in rc.lua
-xresources 	= require("beautiful.xresources");
+xresources  = require("beautiful.xresources");
 local dpi = xresources.apply_dpi
 local scale_factor = dpi(1)
 local scale_factor_path = ""
 if scale_factor ~= 1 then
-	scale_factor_path = "@"..scale_factor.."x"
+    scale_factor_path = "@"..scale_factor.."x"
 end
 
 -- Variables --
@@ -42,29 +42,29 @@ theme.font      = "DejaVu Sans Book 9" -- Roboto 9
 --========--
 -- TODO: Clean this up so we can define entire colour schemes at a time instead of having to manually select the light and dark colour separately... We should just have it be something that overrides the current settings in the theme variable, so we can override whatever...
 local lightColour = "#23CDC0"
-	--97281C - Red
-	--DE7712 - Orange
-	--F4E210 - Yellow
-	--3F923A - Green
-	--218fbd - Blue
-	--8512DE - Purple
+    --97281C - Red
+    --DE7712 - Orange
+    --F4E210 - Yellow
+    --3F923A - Green
+    --218fbd - Blue
+    --8512DE - Purple
 
-	--92803A - Natural
-	--23CDC0 - Sea
-	--f08080 - Calm
-	--FFC629 - Red, Yellow Highlights
+    --92803A - Natural
+    --23CDC0 - Sea
+    --f08080 - Calm
+    --FFC629 - Red, Yellow Highlights
 local darkColour = "#EDC9AF"
-	--581109 - Red
-	--C96508 - Orange
-	--bf7900 - Yellow
-	--22511F - Green
-	--005577 - Blue
-	--3F175E - Purple
+    --581109 - Red
+    --C96508 - Orange
+    --bf7900 - Yellow
+    --22511F - Green
+    --005577 - Blue
+    --3F175E - Purple
 
-	--453D1C - Natural
-	--EDC9AF - Sea
-	--68838b - Calm *
-	--5A0000 - Red, Yellow Highlights
+    --453D1C - Natural
+    --EDC9AF - Sea
+    --68838b - Calm *
+    --5A0000 - Red, Yellow Highlights
 local white = "#FFFFFF"
 local black = "#000000"
 local paleYellow = "#DCDCCC" -- Almost White
@@ -109,13 +109,13 @@ theme.taglist_squares_unsel = THEME_PATH .. "/taglist/squarez"..scale_factor_pat
 theme.taglist_squares_resize = "true"
 
 -- Layout
-local themePathLayouts	= THEME_PATH .. "/layouts/"
+local themePathLayouts  = THEME_PATH .. "/layouts/"
 theme.layout_tile       = themePathLayouts .. "tile.png"
 theme.layout_fairv      = themePathLayouts .. "fairv.png"
 theme.layout_fairh      = themePathLayouts .. "fairh.png"
 theme.layout_max        = themePathLayouts .. "max.png"
 theme.layout_floating   = themePathLayouts .. "floating.png"
-theme.layout_thrizen 	= themePathLayouts .. "thrizen.png"
+theme.layout_thrizen    = themePathLayouts .. "thrizen.png"
 
 -- Exit & Return Module
 return theme
