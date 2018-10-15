@@ -57,10 +57,10 @@ SCREEN_TAGS = {"➊","➋","➌","➍","➎","➏","➐","➑","➒"}
 
 -- Commands
 COMMAND_SLEEP = "systemctl suspend"
-COMMAND_SCREEN_SHOT = "scrot ~/documents/Screens/%Y-%m-%d-%T-screen.png"
+COMMAND_SCREEN_SHOT = "scrot ~/Dropbox/Screenshots/$(date '+%Y-%m-%d-%T')-$(lsb_release -sc).png"
 COMMAND_SCREEN_SHOT_SELECT = "gm import ~/Dropbox/Screenshots/$(date '+%Y-%m-%d-%T')-$(lsb_release -sc).png"
 COMMAND_SCREEN_INVERT = "xcalib -i -a"
-COMMAND_FILE_OPENER = "xdg-open \"$(locate \"\" | dmenu -y %s -i -p Open -l 20 -fn \"Nimbus Sans L-10\" -dim 0.75)\"" -- MUST Replace %s using string.format, with y Height -- -x 480 -w 960 -f
+COMMAND_FILE_OPENER = "xdg-open \"$(locate \"\" | dmenu -i -p Open -l 20 -fn \"Nimbus Sans L-10\")\""
 COMMAND_WINDOW_SWITCHER = "DMENU_OPTIONS='-y %s -i -p Open -l 20 -dim 0.75' FONT=\"Nimbus Sans L-10\" wmgo"
 COMMAND_TASK_MANAGER_MEM = "sudo htop --delay 5 --sort-key PERCENT_MEM"
 COMMAND_TASK_MANAGER_CPU = "sudo htop --delay 5 --sort-key PERCENT_CPU"
