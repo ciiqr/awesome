@@ -40,22 +40,6 @@ function toggleStateFunc(functionToToggle, state)
     end
 end
 
--- Delay
-function delayFunc(delayTime, func, ...)
-    -- Store additional arguments
-    local bound_args = table.pack(...);
-    -- Create Timer
-    delayTimer = timer({timeout = delayTime})
-    delayTimer:connect_signal("timeout", function()
-        -- Unpack arguments & call function with them
-        func(unpack(bound_args))
-        -- Stop the timer
-        delayTimer:stop()
-    end)
-    -- Start Timer
-    delayTimer:start()
-end
-
 -- If the condition is true, returns the tVal, else it returns the fVal
 function ternary(condition, tVal, fVal)
   if condition then return tVal else return fVal end
