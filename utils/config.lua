@@ -57,9 +57,9 @@ function toggleClientMultiFullscreen(c)
          local clientWidth = 0
          -- look at http://www.rpm.org/api/4.4.2.2/llimits_8h-source.html
          local clientHeight = 2147483640
-         for s = 1, screen.count() do
-             clientHeight = math.min(clientHeight, screen[s].workarea.height)
-             clientWidth = clientWidth + screen[s].workarea.width
+         for s in screen do
+             clientHeight = math.min(clientHeight, s.workarea.height)
+             clientWidth = clientWidth + s.workarea.width
          end
          c.border_width = 0
          local t = c:geometry({x = clientX, y = clientY, width = clientWidth, height = clientHeight})
@@ -258,11 +258,6 @@ function clientShouldAttemptFocus(c)
 end
 
 --Utility
-function putToSleep()
-    local screenDimens = screen[mouse.screen.index].workarea
-    moveMouse(screenDimens.width / 2, screenDimens.height / 2)
-    awful.util.spawn(COMMAND_SLEEP)
-end
 function captureScreenShot()
     -- Capture
     awful.util.spawn_with_shell(COMMAND_SCREEN_SHOT)
@@ -278,7 +273,7 @@ function captureScreenSnip()
 end
 
 function insertScreenWorkingAreaYIntoFormat(format)
-    return string.format(format, math.floor(screen[mouse.screen.index].workarea.y))
+    return string.format(format, math.floor(mouse.screen.workarea.y))
 end
 
 --Debugging

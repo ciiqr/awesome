@@ -90,7 +90,7 @@ function cal.register(mywidget, custom_current_day_format)
 
             -- Keep to right edge
             -- TODO: Modularize so we can disable/keep to any edge
-            local screenDimens = screen[mouse.screen.index].workarea
+            local screenDimens = awful.screen.focused().workarea
             tooltip.wibox.x = screenDimens.width - tooltip.wibox.width + beautiful.border_width
             tooltip.wibox.y = screenDimens.y - beautiful.border_width
         end
