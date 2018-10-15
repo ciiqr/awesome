@@ -6,6 +6,7 @@ local WidgetManager = {}
 
 WidgetManager.wifiDevice = trim(execForOutput("ls /sys/class/net/wl* >/dev/null 2>&1 && basename /sys/class/net/wl*"))
 WidgetManager.ethDevice = trim(execForOutput("ls /sys/class/net/e* >/dev/null 2>&1 && basename /sys/class/net/e*"))
+WidgetManager.batteryDevice = trim(execForOutput("ls /sys/class/power_supply/BAT* >/dev/null 2>&1 && basename /sys/class/power_supply/BAT*"))
 
 -- Popup Terminal
 function WidgetManager:initPopupTerminal(s)
@@ -396,9 +397,10 @@ function WidgetManager:getBatteryWidget()
 		end
 		return retval
 	end
-	-- TODO: Have a setting for the battery to use
-	vicious.register(self.battery, customWrapper, '<span foreground="#ffcc00" weight="bold">$1$2%$3</span>', 120, "BAT0") --585656
-	
+	if self.batteryDevice then
+		vicious.register(self.battery, customWrapper, '<span foreground="#ffcc00" weight="bold">$1$2%$3</span>', 120, self.batteryDevice) --585656
+	end
+
 	return self.battery
 end
 

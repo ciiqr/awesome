@@ -128,7 +128,7 @@ end
 
 function readAll(stream, dontClose)
 	if not stream then
-		return ""
+		return nil
 	end
 
 	local output = stream:read("*all")

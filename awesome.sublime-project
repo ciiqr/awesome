@@ -6,6 +6,9 @@
 		},
 		{
 			"path": "/usr/share/awesome/lib"
+		},
+		{
+			"path": "/usr/share/lua/5.3/vicious"
 		}
 	]
 }
