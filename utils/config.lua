@@ -79,7 +79,7 @@ function debugClient(c)
 	debug_print("name: " .. (c.name or "null"))
 	debug_print("class: " .. (c.class or "null"))
 	debug_print("role: " .. (c.role or "null"))
-	debug_print("type: " .. inspect(c.type))
+	debug_print("type: " .. (c.type or "null"))
 	if c.transient_for then
 		name = c.transient_for.name or "null"
 		debug_print("transient for: " .. inspect(name))
