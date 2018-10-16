@@ -107,41 +107,34 @@ end
 function WidgetManager:changeVolume(incORDec, change)
     local change = change or VOLUME_CHANGE_NORMAL
 
-    -- Change with amixer
-    awful.util.spawn("amixer set Master "..change.."%"..incORDec)
+    -- Change
+    awful.spawn.easy_async_with_shell('~/.scripts/volume.sh change '..incORDec..' '..change..'%', function()
+        self:displayVolume()
+    end)
 end
 function WidgetManager:toggleMute()
-    awful.util.spawn('amixer -D pulse set Master 1+ toggle')
+    awful.spawn.easy_async_with_shell('~/.scripts/volume.sh toggle-mute', function()
+        self:displayVolume()
+    end)
 end
-function WidgetManager:displayVolume(vol)
-    local displayValue
+function WidgetManager:displayVolume()
+    local displayValue = self:getVolumeForDisplay()
 
-    if vol then
-        displayValue = math.floor(vol)
-    else
-        displayValue = self:retrieveSystemVolumeLevel()
+    self.volume:set_markup('<span foreground="#ffaf5f" weight="bold">🔈 '..displayValue..'</span>')
+end
+function WidgetManager:isMuted()
+    local muted = trim(execForOutput("~/.scripts/volume.sh is-muted"))
+    return muted == 'yes'
+end
+function WidgetManager:getVolumePercent()
+    return execForOutput("~/.scripts/volume.sh get")
+end
+function WidgetManager:getVolumeForDisplay()
+    if self:isMuted() then
+        return 'Off'
     end
 
-    self.volume:set_markup('<span foreground="#ffaf5f" weight="bold">🔈 '..displayValue.."%"..'</span>')
-end
-function WidgetManager:retrieveSystemVolumeLevel()
-    local mixer = execForOutput("amixer get Master")
-
-    -- Capture mixer control state:          [5%] ... ... [on]
-    local volu, mute = string.match(mixer, "([%d]+)%%.*%[([%l]*)")
-    -- Handle mixers without data
-    if volu == nil then
-        volu = "Off" -- TODO: Fix this for startup
-    end
-
-    -- -- Handle mixers without mute  -- Handle mixers that are muted
-    -- if (mute == "" and volu == "0")  or mute == "off" then
-    --  self:displayVolume("Muted")--mute = mixer_state["off"]
-    -- else
-    --  self:displayVolume(volu or "")
-    -- end
-
-    return volu
+    return self:getVolumePercent()
 end
 
 -- Memory
