@@ -388,7 +388,7 @@ function WidgetManager:getBatteryWidget()
         end
         return retval
     end
-    if self.batteryDevice then
+    if self.batteryDevice ~= "" then
         vicious.register(self.battery, customWrapper, '<span foreground="#ffcc00" weight="bold">$1$2%$3</span>', 120, self.batteryDevice) --585656
     end
 
