@@ -115,9 +115,9 @@ local theme = {
     border_marked = lightRed,
 
     -- Tasklist
-    -- tasklist_bg_focus = darkColour,
-    -- tasklist_fg_normal = white,
-    -- tasklist_fg_focus = black,
+    tasklist_bg_focus = darkColour,
+    tasklist_fg_normal = white,
+    tasklist_fg_focus = black,
 
     -- TagList
     taglist_fg_focus = lightColour,
