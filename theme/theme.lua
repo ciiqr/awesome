@@ -41,30 +41,56 @@ theme.font      = "DejaVu Sans Book 9" -- Roboto 9
 -- Colors --
 --========--
 -- TODO: Clean this up so we can define entire colour schemes at a time instead of having to manually select the light and dark colour separately... We should just have it be something that overrides the current settings in the theme variable, so we can override whatever...
-local lightColour = "#23CDC0"
-    --97281C - Red
-    --DE7712 - Orange
-    --F4E210 - Yellow
-    --3F923A - Green
-    --218fbd - Blue
-    --8512DE - Purple
-
-    --92803A - Natural
-    --23CDC0 - Sea
-    --f08080 - Calm
-    --FFC629 - Red, Yellow Highlights
-local darkColour = "#EDC9AF"
-    --581109 - Red
-    --C96508 - Orange
-    --bf7900 - Yellow
-    --22511F - Green
-    --005577 - Blue
-    --3F175E - Purple
-
-    --453D1C - Natural
-    --EDC9AF - Sea
-    --68838b - Calm *
-    --5A0000 - Red, Yellow Highlights
+local currentScheme = "blue, yellow highlights"
+local colourSchemes = {
+    ["red"] = {
+        lightColour = "#97281C",
+        darkColour = "#581109",
+    },
+    ["orange"] = {
+        lightColour = "#DE7712",
+        darkColour = "#C96508",
+    },
+    ["yellow"] = {
+        lightColour = "#F4E210",
+        darkColour = "#bf7900",
+    },
+    ["green"] = {
+        lightColour = "#3F923A",
+        darkColour = "#22511F",
+    },
+    ["blue"] = {
+        lightColour = "#218fbd",
+        darkColour = "#005577",
+    },
+    ["purple"] = {
+        lightColour = "#8512DE",
+        darkColour = "#3F175E",
+    },
+    ["natural"] = {
+        lightColour = "#92803A",
+        darkColour = "#453D1C",
+    },
+    ["sea"] = {
+        lightColour = "#23CDC0",
+        darkColour = "#EDC9AF",
+    },
+    ["calm"] = {
+        lightColour = "#f08080",
+        darkColour = "#68838b",
+    },
+    ["red, yellow highlights"] = {
+        lightColour = "#FFC629",
+        darkColour = "#5A0000",
+    },
+    ["blue, yellow highlights"] = {
+        lightColour = "#FFC629",
+        darkColour = "#68838b",
+    },
+}
+local scheme = colourSchemes[currentScheme] or {}
+local lightColour = scheme.lightColour or "#97281C"
+local darkColour = scheme.darkColour or "#581109"
 local white = "#FFFFFF"
 local black = "#000000"
 local paleYellow = "#DCDCCC" -- Almost White
