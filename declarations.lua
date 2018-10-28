@@ -1,9 +1,9 @@
 -- Directories
 HOME_DIR = os.getenv("HOME")
-ROOT_DIR = HOME_DIR .. "/.config/awesome/"
+ROOT_DIR = HOME_DIR .. "/.config/awesome"
 
 -- Theme
-THEME_PATH = ROOT_DIR .. "theme"
+THEME_PATH = ROOT_DIR .. "/theme"
 THEME_FILE_PATH = THEME_PATH .. "/theme.lua"
 THEME_BACKGROUNDS_PATH = THEME_PATH .. "/backgrounds"
 PANEL_HEIGHT = 15
