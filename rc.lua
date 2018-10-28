@@ -81,10 +81,10 @@ widget_manager = require("widgets.Manager")
 -----------
 --Layouts
 layouts = {
-    thrizen
-    ,awful.layout.suit.tile
-    ,awful.layout.suit.fair
-    -- ,awful.layout.suit.fair.horizontal
+    thrizen,
+    awful.layout.suit.tile,
+    awful.layout.suit.fair,
+    -- awful.layout.suit.fair.horizontal,
 }
 
 --Signals
