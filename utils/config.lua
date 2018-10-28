@@ -205,6 +205,7 @@ function manageClient(c, startup)
     -- When first created
     -- TODO: There is no longer a startup parameter
     if not startup then
+        -- determines order of new clients
         awful.client.setslave(c)
         -- Position
         if not c.size_hints.user_position and not c.size_hints.program_position then
