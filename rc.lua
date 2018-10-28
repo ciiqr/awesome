@@ -49,7 +49,7 @@ naughty     = require("naughty")
 -- Config
 divider     = require("widgets.divider")
 -- thrizen      = require("layouts.thrizen")
-thrizen     = require("layouts.thrizen3000")
+thrizen     = require("layouts.thrizen6000")
 xrandr      = require("utils.xrandr")
               require("utils.lua")
               require("utils.awesome")
