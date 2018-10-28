@@ -21,9 +21,9 @@ function XRandR:displayOutputs()
     local xrandr = io.popen("xrandr -q")
     if xrandr then
         for line in xrandr:lines() do
-        output = line:match("^([%w-]+) connected ")
-        if output then
-            displayOutputs[#displayOutputs + 1] = output
+            output = line:match("^([%w-]+) connected ")
+            if output then
+                displayOutputs[#displayOutputs + 1] = output
             end
         end
         xrandr:close()
