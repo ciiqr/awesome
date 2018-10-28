@@ -89,7 +89,7 @@ local slightlyLighterGrey = "#424242" -- Matches GTK Theme
 -- Variables --
 --===========--
 -- BAR_TRANSPARENCY = true
-local themePathLayouts  = THEME_PATH .. "/layouts/"
+local themePathLayouts = THEME_PATH .. "/layouts/"
 
 local theme = {
     -- wallpaper = THEME_PATH .. "/Background.jpg"
@@ -140,7 +140,7 @@ local theme = {
     layout_fairh      = themePathLayouts .. "fairh.png",
     layout_max        = themePathLayouts .. "max.png",
     layout_floating   = themePathLayouts .. "floating.png",
-    layout_thrizen    = themePathLayouts .. "thrizen.png",
+    layout_thrizen    = ROOT_DIR .. "/layouts/thrizen/themes/default/thrizen.png",
 }
 
 return theme
