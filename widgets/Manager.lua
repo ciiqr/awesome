@@ -340,7 +340,7 @@ function WidgetManager:getNetUsage(vertical)
         self.netwidget:set_align("center")
     end
 
-    local networkDevice = self.ethDevice or self.wifiDevice
+    local networkDevice = ternary(self.ethDevice == "", self.wifiDevice, self.ethDevice)
 
     vicious.register(self.netwidget, vicious.widgets.net, '<span foreground="#97D599" weight="bold">↑${'..networkDevice..' up_mb}</span> <span foreground="#CE5666" weight="bold">↓${'..networkDevice..' down_mb}</span>', 1) --#585656
     self.netwidget:buttons(awful.util.table.join(
