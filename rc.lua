@@ -148,7 +148,8 @@ awful.screen.connect_for_each_screen(function(s)
     left_layout:add(widget_manager:getTagsList(s))
 
     --Middle Widget
-    middle_layout:add(widget_manager:getIP())
+    -- middle_layout:add(widget_manager:getIP())
+    middle_layout:add(widget_manager:getTextClock())
 
     --Right Widgets
     -- TODO: hmm
@@ -162,7 +163,7 @@ awful.screen.connect_for_each_screen(function(s)
             widget_manager:getMemory(),
             widget_manager:getCPU(),
             widget_manager:getSystemTray(),
-            widget_manager:getTextClock()
+            -- widget_manager:getTextClock()
         }
 
         for _,widget in pairs(right_widgets) do
@@ -214,7 +215,7 @@ awful.screen.connect_for_each_screen(function(s)
         -- sysInfoLabel("Network"), -- SYS-INFO-TITLES
         -- DIVIDER_HORIZONTAL, -- SYS-INFO-TITLES
 
-        -- widget_manager:getIP(),
+        widget_manager:getIP(),
         -- widget_manager:getNetUsage(true),
 
         -- SPACING, -- SYS-INFO-TITLES
