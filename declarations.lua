@@ -5,7 +5,14 @@ ROOT_DIR = HOME_DIR .. "/.config/awesome"
 -- Theme
 THEME_PATH = ROOT_DIR .. "/theme"
 THEME_FILE_PATH = THEME_PATH .. "/theme.lua"
-THEME_BACKGROUNDS_PATH = THEME_PATH .. "/backgrounds"
+THEME_WALLPAPERS_PATH = THEME_PATH .. "/backgrounds"
+
+-- TODO: still gotta move
+local screenGeo = screen[1].geometry
+local DROPBOX_WALLPAPERS_PATH = HOME_DIR .. "/Dropbox/Wallpapers/" .. screenGeo.width .. "x" .. screenGeo.height
+local WALLPAPERS_PATH = ternary(gears.filesystem.dir_readable(DROPBOX_WALLPAPERS_PATH), DROPBOX_WALLPAPERS_PATH, THEME_WALLPAPERS_PATH)
+
+
 PANEL_HEIGHT = 15
 SPACER_SIZE = 14
 
@@ -71,7 +78,7 @@ COMMAND_IS_RUNNING = "is-running"
 STARTUP_PROGRAMS = {
     -- Awesome
     "compton" -- Composition Manager (Transparency, Inactive Window Dimming, Visual Glitch Fix)
-    ,"feh --randomize --bg-fill " .. THEME_BACKGROUNDS_PATH .. "/*" -- Random Background
+    ,"feh --randomize --bg-fill " .. WALLPAPERS_PATH .. "/*" -- Random Background
 
     -- Daemons
     ,FILE_MANAGER .. " -d"
