@@ -92,8 +92,6 @@ local slightlyLighterGrey = "#424242" -- Matches GTK Theme
 local themePathLayouts = THEME_PATH .. "/layouts/"
 
 local theme = {
-    -- wallpaper = THEME_PATH .. "/Background.jpg"
-
     -- Fonts
     font = "DejaVu Sans Book 9", -- Roboto 9
     -- font_bold = "sans bold 10",
