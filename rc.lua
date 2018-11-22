@@ -283,6 +283,7 @@ globalKeys = awful.util.table.join(
 
     --Sleep
     awful.key({}, "XF86Sleep", function() awful.util.spawn(COMMAND_SLEEP) end),
+    awful.key({SUPER, CONTROL}, "q", function() awful.util.spawn(COMMAND_SLEEP) end),
 
     -- Add Tag
     awful.key({SUPER}, "y", function()
