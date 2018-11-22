@@ -87,6 +87,7 @@ layouts = {
 }
 
 --Signals
+
 --Client
 client.connect_signal("manage", manageClient)
 -- Change Border Colours
@@ -98,10 +99,12 @@ client.connect_signal("property::floating", clientDidChangeFloating)
 -- Mouse Over Focus
 client.connect_signal("mouse::enter", clientDidMouseEnter)
 
+--Screen
+screen.connect_signal("property::geometry", screenSetWallpaper)
+
+
 -- Per-Screen Setup (Wallpapers, Tags, Pop-down Terminal/Htop/Note, Maximized Layouts, Top/BottomBars)
 awful.screen.connect_for_each_screen(function(s)
-
-    -- TODO: need to handle wallpapers...
 
     local top_layout    = wibox.layout.align.horizontal()
     local left_layout   = wibox.layout.fixed.horizontal()
@@ -122,10 +125,8 @@ awful.screen.connect_for_each_screen(function(s)
     -- TODO: It would probably bet better to have function to get/calculate these values
     local panel_height = xresources.apply_dpi(PANEL_HEIGHT, s)
 
-    --Wallpapers
-    if beautiful.wallpaper then
-        gears.wallpaper.maximized(beautiful.wallpaper, s, true)
-    end
+    -- Wallpaper
+    screenSetWallpaper(s)
 
     --Tags
     awful.tag(SCREEN_TAGS, s, layouts[1])
