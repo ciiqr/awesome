@@ -248,6 +248,10 @@ function clientDidMouseEnter(c)
     end
 end
 
+function screenPropertyGeometry(s)
+    screenSetWallpaper(s)
+end
+
 function clientShouldAttemptFocus(c)
     -- NOTE: Experimental support for not changing focus from transient back to it's parent
     -- NOTE: If there is another client on screen then we can still switch to that client then back to the parent...
@@ -274,6 +278,18 @@ end
 function insertScreenWorkingAreaYIntoFormat(format)
     return string.format(format, math.floor(mouse.screen.workarea.y))
 end
+
+function screenSetWallpaper(s)
+    local geometry = s.geometry
+    local resolutionDirectory = geometry.width .. "x" .. geometry.height
+    local resSpecificPath = RESOLUTION_WALLPAPERS_PATH .. "/" .. resolutionDirectory
+    local wallpapersPath = ternary(gears.filesystem.dir_readable(resSpecificPath), resSpecificPath, THEME_WALLPAPERS_PATH)
+
+    -- TODO: cleanup
+    -- Random Background
+    awful.util.spawn_with_shell("feh --xinerama-index " .. (s.index - 1) .. " --randomize --bg-fill " .. wallpapersPath .. "/*")
+end
+
 
 --Debugging
 function debug_string(object, recursion)
