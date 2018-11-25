@@ -1,125 +1,63 @@
--- original code made by Bzed and published on http://awesome.naquadah.org/wiki/Calendar_widget
--- modified by Marc Dequènes (Duck) <Duck@DuckCorp.org> (2009-12-29), under the same licence,
--- and with the following changes:
---   + transformed to module
---   + the current day formating is customizable
--- modified by Jörg Thalheim (Mic92) <jthalheim@gmail.com> (2011), under the same licence,
--- and with the following changes:
---   + use tooltip instead of naughty.notify
---   + rename it to cal
---   + lua52 compliant module
---
--- 1. require it in your rc.lua
---  require("cal")
--- 2. attach the calendar to a widget of your choice (ex mytextclock)
---  cal.register(mytextclock)
---    If you don't like the default current day formating you can change it as following
---  cal.register(mytextclock, "<b>%s</b>") -- now the current day is bold instead of underlined
---
--- # How to Use #
--- Just hover with your mouse over the widget, you register and the calendar popup.
--- On clicking or by using the mouse wheel the displayed month changes.
--- Pressing Shift + Mouse click change the year.
+local beautiful = beautiful or require("beautiful")
+local xresources = require("beautiful.xresources");
+local gears = gears or require("gears")
+local calendar_popup = require('awful.widget.calendar_popup')
 
-local string = {format = string.format}
-local os = {date = os.date, time = os.time}
-local awful = require("awful")
+local defaultStyle = {
+    bg_color = beautiful.bg_focus,
+    border_width = 0,
+    padding = 2,
+    shape = gears.shape.rectangle,
+}
 
-local cal = {}
+-- create calendar
+local cal = calendar_popup.month({
+    position = 'tc',
+    -- @tparam string args.bg Wibox background color
+    -- @tparam string args.font Calendar font
+    -- @tparam number args.spacing Calendar spacing
+    week_numbers = false,
+    start_sunday = true,
+    long_weekdays = true,
+    style_month = gears.table.join(defaultStyle, {
+        border_width = beautiful.border_width,
+    }),
+    style_header = defaultStyle,
+    style_weekday = defaultStyle,
+    style_weeknumber = defaultStyle,
+    style_normal = gears.table.join(defaultStyle, {
+        border_width = xresources.apply_dpi(1),
+    }),
+    style_focus = gears.table.join(defaultStyle, {
+        border_width = xresources.apply_dpi(1),
+        markup = string.format(
+            '<span foreground="%s" background="%s" underline="%s"><b>%s</b></span>',
+            beautiful.fg_focus,
+            beautiful.bg_focus,
+            'single',
+            "%s"
+        )
+    }),
+})
 
-local tooltip
-local state = {}
-local current_day_format = "<u>%s</u>"
-
-function displayMonth(month, year, weekStart)
-    local t, wkSt=os.time{year=year, month=month+1, day=0}, weekStart or 1
-    local d=os.date("*t", t)
-    local mthDays, stDay=d.day, (d.wday-d.day-wkSt+1)%7
-
-    local lines = "    "
-
-    for x=0,6 do
-        lines = lines .. os.date("%a ", os.time{year=2006, month=1, day=x+wkSt})
-    end
-
-    lines = lines .. "\n" .. os.date(" %V", os.time{year=year, month=month, day=1})
-
-    local writeLine = 1
-    while writeLine < (stDay + 1) do
-        lines = lines .. "    "
-        writeLine = writeLine + 1
-    end
-
-    for d=1,mthDays do
-        local x = d
-        local t = os.time{year=year, month=month, day=d}
-        if writeLine == 8 then
-            writeLine = 1
-            lines = lines .. "\n" .. os.date(" %V", t)
+function cal.register(mywidget)
+    -- hover shows
+    local toggle = function(visible)
+        return function()
+            cal:call_calendar(0)
+            cal.visible = visible
         end
-        if os.date("%Y-%m-%d") == os.date("%Y-%m-%d", t) then
-            x = string.format(current_day_format, d)
-        end
-        if d < 10 then
-            x = " " .. x
-        end
-        lines = lines .. "  " .. x
-        writeLine = writeLine + 1
     end
-    if stDay + mthDays < 36 then
-        lines = lines .. "\n"
-    end
-    if stDay + mthDays < 29 then
-        lines = lines .. "\n"
-    end
-    local header = os.date("%B %Y\n", os.time{year=year, month=month, day=1})
+    mywidget:connect_signal('mouse::enter', toggle(true))
+    mywidget:connect_signal('mouse::leave', toggle(false))
 
-    return header .. "\n" .. lines
-end
-
-
-function cal.register(mywidget, custom_current_day_format)
-    if custom_current_day_format then current_day_format = custom_current_day_format end
-
-    if not tooltip then
-        tooltip = awful.tooltip({})
-        function tooltip:update()
-            local month, year = os.date('%m'), os.date('%Y')
-            state = {month, year}
-            tooltip:set_markup(string.format('<span font_desc="monospace" foreground="' ..beautiful.fg_normal.. '">%s</span>', displayMonth(month, year, 2)))
-
-            -- Keep to right edge
-            -- TODO: Modularize so we can disable/keep to any edge
-            local screenDimens = awful.screen.focused().workarea
-            tooltip.wibox.x = screenDimens.width - tooltip.wibox.width + beautiful.border_width
-            tooltip.wibox.y = screenDimens.y - beautiful.border_width
-        end
-        tooltip:update()
-    end
-    tooltip:add_to_object(mywidget)
-
-    mywidget:connect_signal("mouse::enter", tooltip.update)
-
-    local function backMonth() switchMonth(-1) end
-    local function forwardMonth() switchMonth(1) end
-    local function backYear() switchMonth(-12) end
-    local function forwardYear() switchMonth(12) end
-
-    mywidget:buttons(awful.util.table.join(
-    awful.button({}, 1, forwardMonth),
-    awful.button({}, 3, backMonth),
-    awful.button({}, 4, backMonth),
-    awful.button({}, 5, forwardMonth),
-    awful.button({"Shift"}, 1, backYear),
-    awful.button({"Shift"}, 3, forwardYear),
-    awful.button({"Shift"}, 4, backYear),
-    awful.button({"Shift"}, 5, forwardYear)))
-end
-
-function switchMonth(delta)
-    state[1] = state[1] + (delta or 1)
-    local text = string.format('<span font_desc="monospace">%s</span>', displayMonth(state[1], state[2], 2))
-    tooltip:set_markup(text)
+    -- clicks go back/forth through time
+    mywidget:buttons(gears.table.join(
+        awful.button({ }, 1, function () cal:call_calendar(-1) end),
+        awful.button({ }, 3, function () cal:call_calendar( 1) end),
+        awful.button({"Shift"}, 1, function () cal:call_calendar(-1) end),
+        awful.button({"Shift"}, 3, function () cal:call_calendar( 1) end)
+    ))
 end
 
 return cal
