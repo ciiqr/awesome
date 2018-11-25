@@ -208,10 +208,14 @@ function WidgetManager:updateIP()
 end
 
 -- Text Clock
-function WidgetManager:getTextClock() -- .textClock:set_font()
-    self.textClock = wibox.widget.textclock('<span foreground="#94738c">%A, %B %d</span>  <span foreground="#ecac13">%I:%M %p</span>', 10) -- TODO: Add constant...
-    -- Add Calendar
-    require("cal").register(self.textClock, '<span weight="bold" foreground="'..(beautiful.taglist_fg_focus or beautiful.fg_focus or "")..'" underline="single">%s</span>')
+function WidgetManager:getTextClock()
+    -- TODO: Add constant...
+    local text = '<span foreground="#94738c">%A, %B %d</span>  <span foreground="#ecac13">%I:%M %p</span>'
+    self.textClock = wibox.widget.textclock(text, 10)
+
+    -- add popup calendar
+    require("cal").register(self.textClock)
+
     return self.textClock
 end
 
