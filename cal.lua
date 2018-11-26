@@ -7,8 +7,11 @@ local defaultStyle = {
     bg_color = beautiful.bg_focus,
     border_width = 0,
     padding = 2,
-    shape = gears.shape.rectangle,
 }
+
+local roundedRect = function(cr, width, height)
+    gears.shape.rounded_rect(cr, width, height, xresources.apply_dpi(4))
+end
 
 -- create calendar
 local cal = calendar_popup.month({
@@ -27,9 +30,11 @@ local cal = calendar_popup.month({
     style_weeknumber = defaultStyle,
     style_normal = gears.table.join(defaultStyle, {
         border_width = xresources.apply_dpi(1),
+        shape = roundedRect,
     }),
     style_focus = gears.table.join(defaultStyle, {
         border_width = xresources.apply_dpi(1),
+        shape = roundedRect,
         markup = string.format(
             '<span foreground="%s" background="%s" underline="%s"><b>%s</b></span>',
             beautiful.fg_focus,
