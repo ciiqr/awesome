@@ -91,23 +91,8 @@ function basename(str)
     return string.gsub(str, "(.*/)(.*)", "%2")
 end
 
--- Round to given decimal places
--- SOURCE: http://stackoverflow.com/a/16036841/1469823
-function round(val, decimal)
-    local exp = decimal and 10^decimal or 1
-    return math.ceil(val * exp - 0.5) / exp
-end
-
-function roundi(val)
-    return math.ceil(val - 0.4)
-end
-
 function execForOutput(command)
     return readAll(io.popen(command))
-end
-
-function readFile(file)
-    return readAll(io.open(file, "r"))
 end
 
 function readAll(stream, dontClose)
@@ -122,4 +107,8 @@ function readAll(stream, dontClose)
     end
 
     return output
+end
+
+function expandUser(path)
+    return path:gsub('~', os.getenv('HOME'))
 end

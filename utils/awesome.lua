@@ -44,7 +44,7 @@ function run_once(prg)
     -- checks if program is running
         -- if program is root then checks root, otherwise checks current user
     -- if it's not running then run it
-    awful.util.spawn_with_shell(COMMAND_IS_RUNNING.." "..programName.." "..ternary(isRoot, "root", "$USER").." || ("..prg..")")
+    awful.util.spawn_with_shell(CONFIG.commands.isRunning.." "..programName.." "..ternary(isRoot, "root", "$USER").." || ("..prg..")")
 end
 
 -- Clients

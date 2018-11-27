@@ -108,6 +108,7 @@ local theme = {
 
     -- Borders
     border_width  = dpi(2),
+    border_thin_width = dpi(1),
     border_normal = darkGrey,
     border_focus  = darkColour,
     border_marked = lightRed,
@@ -138,7 +139,21 @@ local theme = {
     layout_fairh      = themePathLayouts .. "fairh.png",
     layout_max        = themePathLayouts .. "max.png",
     layout_floating   = themePathLayouts .. "floating.png",
-    layout_thrizen    = ROOT_DIR .. "/layouts/thrizen/themes/default/thrizen.png",
+    layout_thrizen    = gears.filesystem.get_configuration_dir() .. "/layouts/thrizen/themes/default/thrizen.png",
+
+    --
+    panel = {
+        height = function(screen)
+            return dpi(15, screen)
+        end
+    },
+
+    spacer_size = 14,
+
+    rounded_rect_corner_radius = dpi(4),
+
+    global_windows_list_width = dpi(300),
+    system_info_width = dpi(120),
 }
 
 return theme
