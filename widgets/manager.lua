@@ -2,7 +2,10 @@ local beautiful = beautiful or require("beautiful")
 local vicious = vicious or require("vicious")
 local quake = quake or require("quake")
 
-local WidgetManager = {}
+local WidgetManager = {
+    -- TODO: should pass this in when I create a new widget manager...
+    config = CONFIG.widgets or {},
+}
 
 WidgetManager.wifiDevice = trim(execForOutput("ls /sys/class/net/wl* >/dev/null 2>&1 && basename /sys/class/net/wl*"))
 WidgetManager.ethDevice = trim(execForOutput("ls /sys/class/net/e* >/dev/null 2>&1 && basename /sys/class/net/e*"))
@@ -16,7 +19,7 @@ function WidgetManager:initPopupTerminal(s)
     end
 
     -- Create Popup Terminal
-    self.quake_terminal[s] = quake({ app = TERMINAL, height = 0.35, screen = s, width = 0.5, border=0})
+    self.quake_terminal[s] = quake({ app = CONFIG.commands.terminal, height = 0.35, screen = s, width = 0.5, border=0})
 
     return self.quake_terminal[s]
 end
@@ -33,7 +36,7 @@ function WidgetManager:initPopupCPU(s)
     end
 
     -- Create Popup CPU
-    self.quake_htop_cpu_terminal[s] = quake({app=TERMINAL, argname="-name %s -e "..COMMAND_TASK_MANAGER_CPU, name="QUAKE_COMMAND_TASK_MANAGER_CPU", height=0.75, screen=s, width=0.5, horiz="right", border=0})
+    self.quake_htop_cpu_terminal[s] = quake({app=CONFIG.commands.terminal, argname="-name %s -e "..CONFIG.commands.taskManagerCpu, name="QUAKE_COMMAND_TASK_MANAGER_CPU", height=0.75, screen=s, width=0.5, horiz="right", border=0})
 
     return self.quake_htop_cpu_terminal[s]
 end
@@ -50,7 +53,7 @@ function WidgetManager:initPopupMemory(s)
     end
 
     -- Create Popup Memory
-    self.quake_htop_mem_terminal[s] = quake({app=TERMINAL, argname="-name %s -e "..COMMAND_TASK_MANAGER_MEM, name="QUAKE_COMMAND_TASK_MANAGER_MEM", height=0.75, screen=s, width=0.5, horiz="left", border=0})
+    self.quake_htop_mem_terminal[s] = quake({app=CONFIG.commands.terminal, argname="-name %s -e "..CONFIG.commands.taskManagerMem, name="QUAKE_COMMAND_TASK_MANAGER_MEM", height=0.75, screen=s, width=0.5, horiz="left", border=0})
 
     return self.quake_htop_mem_terminal[s]
 end
@@ -96,8 +99,8 @@ end
 function WidgetManager:getVolume()
     self.volume = wibox.widget.textbox() -- 🔇 -- Mute icon --
     self.volume:buttons(awful.util.table.join(
-        awful.button({}, MOUSE_SCROLL_UP, function() WidgetManager:changeVolume("+", 1) end),
-        awful.button({}, MOUSE_SCROLL_DOWN, function() WidgetManager:changeVolume("-", 1) end),
+        awful.button({}, MOUSE_SCROLL_UP, function() WidgetManager:changeVolume("+", CONFIG.volume.change.small) end),
+        awful.button({}, MOUSE_SCROLL_DOWN, function() WidgetManager:changeVolume("-", CONFIG.volume.change.small) end),
         awful.button({}, 1, function() run_once("pavucontrol") end)
     ))
 
@@ -105,8 +108,6 @@ function WidgetManager:getVolume()
     return self.volume
 end
 function WidgetManager:changeVolume(incORDec, change)
-    local change = change or VOLUME_CHANGE_NORMAL
-
     -- Change
     awful.spawn.easy_async_with_shell('~/.scripts/volume.sh change '..incORDec..' '..change..'%', function()
         self:displayVolume()
@@ -193,7 +194,7 @@ function WidgetManager:getIP()
     self:updateIP()
 
     -- self.ip:buttons(awful.util.table.join(
-    --  awful.button({}, 1, function() awful.util.spawn_with_shell(TERMINAL_EXEC.."'ip addr show; read -n'") end)
+    --  awful.button({}, 1, function() awful.util.spawn_with_shell(CONFIG.commands.terminalExec.."'ip addr show; read -n'") end)
     --  -- ,awful.button({}, 3, function() self.ip:updateIP() end)
     -- ))
     return self.ip
@@ -208,15 +209,13 @@ function WidgetManager:updateIP()
 end
 
 -- Text Clock
-function WidgetManager:getTextClock()
-    -- TODO: Add constant...
-    local text = '<span foreground="#94738c">%A, %B %d</span>  <span foreground="#ecac13">%I:%M %p</span>'
-    self.textClock = wibox.widget.textclock(text, 10)
+function WidgetManager:getClock()
+    self.clock = wibox.widget.textclock(self.config.clock.text, 10)
 
     -- add popup calendar
-    require("cal").register(self.textClock)
+    require("widgets.cal").register(self.clock)
 
-    return self.textClock
+    return self.clock
 end
 
 function WidgetManager:getTaskBox(screen, is_vertical)
@@ -247,7 +246,7 @@ function WidgetManager:getAllWindowsWibox(s, widget)
     local aWibox = wibox({
         position = "left",
         screen = s,
-        width = xresources.apply_dpi(300),
+        width = beautiful.global_windows_list_width,
         ontop = true,
         visible = false})
     aWibox:set_widget(widget)
@@ -269,7 +268,7 @@ function WidgetManager:getAllWindowsWibox(s, widget)
 end
 
 function WidgetManager:getSysInfoWibox(s, widget)
-    local width = xresources.apply_dpi(120)
+    local width = beautiful.system_info_width
     -- 'awful.wibox' to have it affect the workarea
     local aWibox = wibox({
         position = "right",
@@ -348,7 +347,7 @@ function WidgetManager:getNetUsage(vertical)
 
     vicious.register(self.netwidget, vicious.widgets.net, '<span foreground="#97D599" weight="bold">↑${'..networkDevice..' up_mb}</span> <span foreground="#CE5666" weight="bold">↓${'..networkDevice..' down_mb}</span>', 1) --#585656
     self.netwidget:buttons(awful.util.table.join(
-        awful.button({}, 1, function() awful.util.spawn(TERMINAL_EXEC.." sudo nethogs "..networkDevice.."") end)
+        awful.button({}, 1, function() awful.util.spawn(CONFIG.commands.terminalExec.." sudo nethogs "..networkDevice.."") end)
     ))
 
     -- TODO
@@ -384,10 +383,10 @@ function WidgetManager:getBatteryWidget()
                 notify_send(level.." Battery: "..batteryPercent.."% !", 0, naughty.config.presets.critical)
             end
             -- Low Battery
-            if batteryPercent < BATTERY_PERCENT_LOW then
-                notify_battery_warning("Low")
-            elseif batteryPercent < BATTERY_PERCENT_CRITICAL then
+            if batteryPercent < CONFIG.battery.warning.critical then
                 notify_battery_warning("Critical")
+            elseif batteryPercent < CONFIG.battery.warning.low then
+                notify_battery_warning("Low")
             end
         end
         return retval

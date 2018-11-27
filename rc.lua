@@ -11,18 +11,19 @@ beautiful   = require("beautiful");
 xresources  = require("beautiful.xresources");
 naughty     = require("naughty")
 -- Config
+inspect     = require("third-party.inspect")
 divider     = require("widgets.divider")
 thrizen     = require("layouts.thrizen")
 xrandr      = require("utils.xrandr")
               require("utils.lua")
               require("utils.awesome")
               require("utils.config")
-              require("declarations")
-if DEBUG then
-    inspect = require("third-party.inspect")
-end
+              require("enums")
+CONFIG = require("config")
+THEME_PATH = gears.filesystem.get_configuration_dir() .. "/theme"
+
 -- Beautiful Theme
-beautiful.init(THEME_FILE_PATH)
+beautiful.init(THEME_PATH .. "/theme.lua")
 
 -- Variables --
 ---------------
@@ -38,7 +39,7 @@ allWindowsWibox={} -- Persistent
 sysInfoWibox={} -- Persistent
 local name_callback = {}  -- Persistent
 --Widgets
-widget_manager = require("widgets.Manager")
+widget_manager = require("widgets.manager")
 
 -- Setup --
 -----------
@@ -81,19 +82,18 @@ awful.screen.connect_for_each_screen(function(s)
     -- This makes the middle widget centre on on the screen (instead of in the free space)
     top_layout:set_expand("none")
 
-    local SPACING = require("widgets.spacer"):init(SPACER_SIZE)
+    local SPACING = require("widgets.spacer"):init(beautiful.spacer_size)
     -- local DIVIDER_VERTICAL = divider({size=2, total_size=10, orientation="vertical", end_padding=40}) -- 40 is somewhat arbitrary since the widget will just fill the available height
     local DIVIDER_HORIZONTAL = divider({total_size=0.5, orientation="horizontal", end_padding=40}) -- 40 is somewhat arbitrary since the widget will just fill the available width
 
 
-    -- TODO: It would probably bet better to have function to get/calculate these values
-    local panel_height = xresources.apply_dpi(PANEL_HEIGHT, s)
+    local panel_height = beautiful.panel.height(s)
 
     -- Wallpaper
     screenSetWallpaper(s)
 
     --Tags
-    awful.tag(SCREEN_TAGS, s, layouts[1])
+    awful.tag(CONFIG.screens.tags, s, layouts[1])
     -- - Columns
     for _,tag in pairs(s.tags) do
         awful.tag.setncol(3, tag)
@@ -114,7 +114,7 @@ awful.screen.connect_for_each_screen(function(s)
 
     --Middle Widget
     -- middle_layout:add(widget_manager:getIP())
-    middle_layout:add(widget_manager:getTextClock())
+    middle_layout:add(widget_manager:getClock())
 
     --Right Widgets
     -- TODO: hmm
@@ -128,7 +128,7 @@ awful.screen.connect_for_each_screen(function(s)
             widget_manager:getMemory(),
             widget_manager:getCPU(),
             widget_manager:getSystemTray(),
-            -- widget_manager:getTextClock()
+            -- widget_manager:getClock()
         }
 
         for _,widget in pairs(right_widgets) do
@@ -247,8 +247,8 @@ globalKeys = awful.util.table.join(
     awful.key({SUPER}, "Down", revertFromMaximizedLayout),
 
     --Sleep
-    awful.key({}, "XF86Sleep", function() awful.util.spawn_with_shell(COMMAND_SLEEP) end),
-    awful.key({SUPER, CONTROL}, "q", function() awful.util.spawn_with_shell(COMMAND_SLEEP) end),
+    awful.key({}, "XF86Sleep", function() awful.util.spawn_with_shell(CONFIG.commands.sleep) end),
+    awful.key({SUPER, CONTROL}, "q", function() awful.util.spawn_with_shell(CONFIG.commands.sleep) end),
 
     -- Add Tag
     awful.key({SUPER}, "y", function()
@@ -294,8 +294,8 @@ globalKeys = awful.util.table.join(
 
     --Popups
     -- Launcher Style
-    awful.key({SUPER}, "w", function() awful.util.spawn_with_shell(insertScreenWorkingAreaYIntoFormat(COMMAND_FILE_OPENER)) end),
-    awful.key({SUPER}, "s", function() awful.util.spawn_with_shell(insertScreenWorkingAreaYIntoFormat(COMMAND_WINDOW_SWITCHER)) end),
+    awful.key({SUPER}, "w", function() awful.util.spawn_with_shell(insertScreenWorkingAreaYIntoFormat(CONFIG.commands.fileOpener)) end),
+    awful.key({SUPER}, "s", function() awful.util.spawn_with_shell(insertScreenWorkingAreaYIntoFormat(CONFIG.commands.windowSwitcher)) end),
     -- Quake Style
     awful.key({SUPER, SHIFT}, "t", function() widget_manager:togglePopupTerminal() end),
     awful.key({SUPER, SHIFT}, "n", function() widget_manager:togglePopupNotes() end),
@@ -304,13 +304,13 @@ globalKeys = awful.util.table.join(
     awful.key({SUPER, SHIFT}, "k", function() widget_manager:toggleKeepass() end),
 
     --Programs
-    awful.key({SUPER}, "t", function() awful.util.spawn(TERMINAL) end),
+    awful.key({SUPER}, "t", function() awful.util.spawn(CONFIG.commands.terminal) end),
 
-    awful.key({SUPER}, "Return", function() awful.util.spawn(FILE_MANAGER) end),
-    awful.key({SUPER, SHIFT}, "Return", function() awful.util.spawn(GRAPHICAL_SUDO.." "..FILE_MANAGER) end),
+    awful.key({SUPER}, "Return", function() awful.util.spawn(CONFIG.commands.fileManager) end),
+    awful.key({SUPER, SHIFT}, "Return", function() awful.util.spawn(CONFIG.commands.graphicalSudo.." "..CONFIG.commands.fileManager) end),
 
-    awful.key({SUPER}, "o", function() awful.util.spawn_with_shell(EDITOR) end),
-    awful.key({SUPER, SHIFT}, "o", function() awful.util.spawn_with_shell(GRAPHICAL_SUDO.." "..EDITOR) end),
+    awful.key({SUPER}, "o", function() awful.util.spawn_with_shell(CONFIG.commands.editor) end),
+    awful.key({SUPER, SHIFT}, "o", function() awful.util.spawn_with_shell(CONFIG.commands.graphicalSudo.." "..CONFIG.commands.editor) end),
 
     --Awesome
     awful.key({SUPER, CONTROL}, "r", awesome.restart),
@@ -318,16 +318,17 @@ globalKeys = awful.util.table.join(
     --System
     -- Volume
     awful.key({}, "XF86AudioMute", function() widget_manager:toggleMute() end),
-    awful.key({}, "XF86AudioLowerVolume", function() widget_manager:changeVolume("-") end),
-    awful.key({}, "XF86AudioRaiseVolume", function() widget_manager:changeVolume("+") end),
-    awful.key({SHIFT}, "XF86AudioLowerVolume", function() widget_manager:changeVolume("-", VOLUME_CHANGE_SMALL) end),
-    awful.key({SHIFT}, "XF86AudioRaiseVolume", function() widget_manager:changeVolume("+", VOLUME_CHANGE_SMALL) end),
+    awful.key({}, "XF86AudioLowerVolume", function() widget_manager:changeVolume("-", CONFIG.volume.change.normal) end),
+    awful.key({}, "XF86AudioRaiseVolume", function() widget_manager:changeVolume("+", CONFIG.volume.change.normal) end),
+    awful.key({SHIFT}, "XF86AudioLowerVolume", function() widget_manager:changeVolume("-", CONFIG.volume.change.small) end),
+    awful.key({SHIFT}, "XF86AudioRaiseVolume", function() widget_manager:changeVolume("+", CONFIG.volume.change.small) end),
 
     -- Brightness
-    awful.key({}, "XF86MonBrightnessUp", function() changeBrightness("+", BRIGHTNESS_CHANGE_NORMAL) end),
-    awful.key({}, "XF86MonBrightnessDown", function() changeBrightness("-", BRIGHTNESS_CHANGE_NORMAL) end),
-    awful.key({SHIFT}, "XF86MonBrightnessUp", function() changeBrightness("+", BRIGHTNESS_CHANGE_SMALL) end),
-    awful.key({SHIFT}, "XF86MonBrightnessDown", function() changeBrightness("-", BRIGHTNESS_CHANGE_SMALL) end),
+    -- TODO: only setup keybindings if brightness can be adjusted...
+    awful.key({}, "XF86MonBrightnessUp", function() changeBrightness("+", CONFIG.brightness.change.normal) end),
+    awful.key({}, "XF86MonBrightnessDown", function() changeBrightness("-", CONFIG.brightness.change.normal) end),
+    awful.key({SHIFT}, "XF86MonBrightnessUp", function() changeBrightness("+", CONFIG.brightness.change.small) end),
+    awful.key({SHIFT}, "XF86MonBrightnessDown", function() changeBrightness("-", CONFIG.brightness.change.small) end),
     -- TODO: Clean up
     -- TODO: Consider, Or in then mythical future when I write lfwm, use the code that xbacklight uses
     -- awful.key({}, "XF86MonBrightnessUp", function() awful.util.spawn("xbacklight -inc 10 -time 0") end),
@@ -336,7 +337,7 @@ globalKeys = awful.util.table.join(
     -- awful.key({SHIFT}, "XF86MonBrightnessDown", function() awful.util.spawn("xbacklight -dec 1 -time 0") end),
 
     -- Invert Screen
-    awful.key({SUPER}, "i", function() awful.util.spawn_with_shell(COMMAND_SCREEN_INVERT) end),
+    awful.key({SUPER}, "i", function() awful.util.spawn_with_shell(CONFIG.commands.screenInvert) end),
 
     -- Print Screen
     awful.key({}, "Print", captureScreenshot),
@@ -677,9 +678,9 @@ awful.rules.rules = {
                     end
 
                     -- Get Tags
+                    for name,tag in pairs(CONFIG.clients.sublime.rules) do
                     local tags = c.screen.tags
                     -- Move to Tag
-                    for name,tag in pairs(sublime_window_rules) do
                         if find_window(name) then
                             awful.client.movetotag(tags[tag], c); -- TODO: If I wanted to support having clients on multiple tags, would need to change this and other stuff here...
                             break
@@ -894,6 +895,6 @@ setup_network_connectivity_change_listener()
 
 -- Programs -- (run_once takes a while, probably due to system calls, try making a script that takes a list of files and runs them with the same commands as before)
 --------------
-for _,program in pairs(STARTUP_PROGRAMS) do
+for _,program in pairs(CONFIG.startup.programs) do
     run_once(program)
 end

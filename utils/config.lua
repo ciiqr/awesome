@@ -265,12 +265,12 @@ end
 
 --Utility
 function captureScreenshot()
-    awful.spawn.easy_async_with_shell(COMMAND_SCREENSHOT, function()
+    awful.spawn.easy_async_with_shell(CONFIG.commands.screenshot, function()
         notify_send("Screenshot Taken", 1)
     end)
 end
 function captureScreenSnip()
-    awful.spawn.easy_async_with_shell(COMMAND_SCREENSHOT_SELECT, function()
+    awful.spawn.easy_async_with_shell(CONFIG.commands.screenshotSelect, function()
         notify_send("Screenshot Taken", 1)
     end)
 end
@@ -280,10 +280,15 @@ function insertScreenWorkingAreaYIntoFormat(format)
 end
 
 function screenSetWallpaper(s)
-    local geometry = s.geometry
-    local resolutionDirectory = geometry.width .. "x" .. geometry.height
-    local resSpecificPath = RESOLUTION_WALLPAPERS_PATH .. "/" .. resolutionDirectory
-    local wallpapersPath = ternary(gears.filesystem.dir_readable(resSpecificPath), resSpecificPath, THEME_WALLPAPERS_PATH)
+    local resolutionPathTpl = CONFIG.theme.wallpapers.resolutionPath
+    local normalPathTpl = CONFIG.theme.wallpapers.normalPath
+
+    local resolutionPath = expandUser(resolutionPathTpl:gsub("{(%w+)}", s.geometry))
+    local normalPath = expandUser(resolutionPathTpl:gsub("{(%w+)}", {
+        theme_path = THEME_PATH,
+    }))
+
+    local wallpapersPath = ternary(gears.filesystem.dir_readable(resolutionPath), resolutionPath, normalPath)
 
     -- TODO: cleanup
     -- Random Background
@@ -333,7 +338,7 @@ end, true)
 -- Screen --
 -- Brightness
 function changeBrightness(incORDec, amount)
-    awful.util.spawn_with_shell("sudo sh -c 'echo $(($(cat /sys/class/backlight/intel_backlight/brightness)"..incORDec..amount..")) > /sys/class/backlight/intel_backlight/brightness'")
+    awful.util.spawn_with_shell("~/.scripts/brightness.sh change " .. incORDec .. ' ' .. amount)
 end
 -- IP
 function retrieveIPAddress(device)
