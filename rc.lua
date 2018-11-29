@@ -1,3 +1,6 @@
+-- TODO: make all these local
+CONFIG = require('cfg')
+
 -- Include --
 -------------
 -- Standard
@@ -19,7 +22,7 @@ xrandr      = require("utils.xrandr")
               require("utils.awesome")
               require("utils.config")
               require("enums")
-CONFIG = require("config")
+
 THEME_PATH = gears.filesystem.get_configuration_dir() .. "/theme"
 
 -- Beautiful Theme
