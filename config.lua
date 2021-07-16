@@ -127,7 +127,7 @@ return {
         rootEditor = "gksudo sublime",
         sleep = "~/.scripts/power.sh suspend",
         screenshot = "scrot ~/Screenshots/$(date '+%Y-%m-%d-%H-%M-%S')-$(lsb_release -sc).png && notify-send -t 1000 'Screenshot Taken'",
-        screenshotSelect = "gm import ~/Screenshots/$(date '+%Y-%m-%d-%H-%M-%S')-$(lsb_release -sc).png && notify-send -t 1000 'Screenshot Taken'",
+        screenshotSelect = "import ~/Screenshots/$(date '+%Y-%m-%d-%H-%M-%S')-$(lsb_release -sc).png && notify-send -t 1000 'Screenshot Taken'",
         fileOpener = "xdg-open \"$(locate \"\" | dmenu -i -p Open -l 20 -fn \"Nimbus Sans L-10\")\"",
         windowSwitcher = "rofi -modi window -show",
         setWallpaper = "feh --xinerama-index {screen} --randomize --bg-fill {directory}/*",
