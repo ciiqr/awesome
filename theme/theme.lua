@@ -68,6 +68,11 @@ local colourSchemes = {
         primaryColour = "#68838b",
         primaryColourContrast = "#000000",
     },
+    ["purpo"] = {
+        alternateColour = "#FFC629",
+        primaryColour = "#9948ea",
+        primaryColourContrast = "#000000",
+    },
 }
 local scheme = colourSchemes[CONFIG.theme.colourScheme] or {}
 local alternateColour = scheme.alternateColour or "#97281C"

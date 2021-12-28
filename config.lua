@@ -9,7 +9,7 @@ return {
         "programs",
     },
     theme = {
-        colourScheme = "sea",
+        colourScheme = "purpo",
         wallpapers = {
             normalPath = "{theme_path}/backgrounds",
             resolutionPath = "~/.wallpapers/{width}x{height}",
