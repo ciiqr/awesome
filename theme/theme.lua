@@ -93,7 +93,8 @@ local theme = {
     theme_path = themePath,
 
     -- Fonts
-    font = "DejaVu Sans Book 9", --
+    font = "Inconsolata 11", --
+    icon_font = "Font Awesome 5 Free Regular 11", --
 
 
     -- colours --

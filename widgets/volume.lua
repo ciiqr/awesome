@@ -29,7 +29,9 @@ function M:init(config)
 end
 
 function M:update()
-    local displayValue = volume.isMuted() and '🔇' or '🔈 ' .. volume.getVolume()
+    -- used to use: '🔇' or '🔈 ' really font dependent though
+    -- TODO: when we move markup here, we need to use multiple spans so text still uses default
+    local displayValue = volume.isMuted() and '' or ' ' .. volume.getVolume()
     local markup = string.format(self.markup, displayValue)
 
     self:set_markup(markup)

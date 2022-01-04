@@ -35,7 +35,7 @@ return {
             interval = 10,
         },
         volume = {
-            text = '<span foreground="#ffaf5f" weight="bold">%s</span>',
+            text = '<span foreground="#ffaf5f" font="Font Awesome 5 Free Regular 11" weight="bold">%s</span>', -- TODO: move, and use beautiful.icon_font
             mousebindings = {
                 ["ScrollUp"] = {action = "volume.change", args = {"-", 1}},
                 ["ScrollDown"] = {action = "volume.change", args = {"+", 1}},
