@@ -1,3 +1,4 @@
+local beautiful = require("beautiful")
 local textbox = require("wibox.widget.textbox")
 local mousebindings = require("mousebindings")
 local volume = require("system.volume")
@@ -14,9 +15,6 @@ local function construct(_, config)
 end
 
 function M:init(config)
-    -- markup
-    self.markup = config.text or ''
-
     -- buttons
     local buttons = mousebindings.widget(config.mousebindings)
     self:buttons(buttons)
@@ -29,10 +27,13 @@ function M:init(config)
 end
 
 function M:update()
-    -- used to use: '🔇' or '🔈 ' really font dependent though
-    -- TODO: when we move markup here, we need to use multiple spans so text still uses default
-    local displayValue = volume.isMuted() and '' or ' ' .. volume.getVolume()
-    local markup = string.format(self.markup, displayValue)
+    -- used to use: '🔇' or '🔈' really font dependent though
+    local colour = '#ffaf5f'
+    local icon = volume.isMuted() and '' or ''
+    local percent = volume.getVolume()
+    local markup =
+        '<span foreground="' .. colour .. '" weight="bold" font="' .. beautiful.icon_font .. '">' .. icon .. '</span>' ..
+        '<span foreground="' .. colour .. '" weight="bold"> ' .. percent .. '</span>'
 
     self:set_markup(markup)
 end
