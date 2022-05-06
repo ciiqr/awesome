@@ -159,7 +159,7 @@ return {
         },
         {
             name = "1password",
-            geometry = {height = 0.5, width = 0.5},
+            geometry = {height = 0.6, width = 0.5},
             options = {app = "1password", name = "1password"},
         },
         {
