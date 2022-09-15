@@ -10,6 +10,7 @@ local beautiful = require("beautiful")
 local dpi = require("beautiful.xresources").apply_dpi
 local scale_factor = dpi(1)
 local scale_factor_path = scale_factor ~= 1 and "@"..scale_factor.."x" or ""
+local ui_scale = 1
 
 -- Colors --
 local colourSchemes = {
@@ -93,8 +94,8 @@ local theme = {
     theme_path = themePath,
 
     -- Fonts
-    font = "Inconsolata 11", --
-    icon_font = "Font Awesome 5 Free Regular 11", --
+    font = "Inconsolata " .. (11 * ui_scale), --
+    icon_font = "Font Awesome 5 Free Regular " .. (11 * ui_scale), --
 
 
     -- colours --
@@ -160,7 +161,7 @@ local theme = {
     -- wibars
     panel = {
         height = function(screen)
-            return dpi(15, screen)
+            return dpi(15 * ui_scale, screen)
         end
     },
 
@@ -174,8 +175,8 @@ local theme = {
     rounded_rect_corner_radius = dpi(4),
 
     -- wiboxes
-    global_windows_list_width = dpi(300),
-    system_info_width = dpi(120),
+    global_windows_list_width = dpi(300 * ui_scale),
+    system_info_width = dpi(120 * ui_scale),
 }
 
 return theme
